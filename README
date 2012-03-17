@@ -1,17 +1,12 @@
 
-Compile:
+Run qmake once, If no new files are added, there is no reason to run it agan
+   $ qmake
 
-1. Change to the subdir "build"
-   $ cd ./build
+ or if you want Debug-Code
+   $ qmake DEBUG=1
 
-2. Run qmake
-   $ qmake -o Makefile ../PiTres.pro
-
-   or if you want Debug-Code
-   $ qmake DEBUG=1 -o Makefile ../PiTres.pro
-
-3. Compile with make
+Compile with make
    $ make
 
-4. Run PiTres
-   $ ./PiTres
+Run PiTres
+   $ build/PiTres
