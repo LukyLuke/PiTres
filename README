@@ -1,0 +1,17 @@
+
+Compile:
+
+1. Change to the subdir "build"
+   $ cd ./build
+
+2. Run qmake
+   $ qmake -o Makefile ../PiTres.pro
+
+   or if you want Debug-Code
+   $ qmake DEBUG=1 -o Makefile ../PiTres.pro
+
+3. Compile with make
+   $ make
+
+4. Run PiTres
+   $ ./PiTres
