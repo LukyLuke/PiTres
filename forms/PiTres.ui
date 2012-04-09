@@ -62,6 +62,8 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionConfiguration"/>
+    <addaction name="separator"/>
     <addaction name="actionHelp"/>
     <addaction name="action_About_PiTres"/>
    </widget>
@@ -340,6 +342,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionConfiguration">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/preferences-system.png</normaloff>:/icons/resources/icons/preferences-system.png</iconset>
+   </property>
+   <property name="text">
+    <string>Configuration</string>
+   </property>
+   <property name="toolTip">
+    <string>Configure PiTres</string>
    </property>
   </action>
  </widget>

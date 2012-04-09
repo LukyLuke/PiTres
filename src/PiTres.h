@@ -1,9 +1,7 @@
 #ifndef PiTres_H
 #define PiTres_H
 
-#include "ui_PiTres.h"
-#include "src/Userlist.h"
-#include "src/SentBills.h"
+#include "../ui_PiTres.h"
 
 #include <QtGui/QMainWindow>
 #include <QWidget>

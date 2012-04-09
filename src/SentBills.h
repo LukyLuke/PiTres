@@ -2,6 +2,7 @@
 #define SentBills_H
 
 #include "../ui_sentbills.h"
+
 #include <QWidget>
 
 class SentBills : public QWidget, private Ui::SentBillsForm {

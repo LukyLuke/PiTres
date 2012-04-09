@@ -8,15 +8,14 @@ DEPENDPATH += .
 INCLUDEPATH += . src
 
 # Sources
-HEADERS += PiTres.h src/Userlist.h src/SentBills.h
-SOURCES += main.cpp PiTres.cpp src/Userlist.cpp src/SentBills.cpp
+HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/CreateBills.h src/LDAPImport.h
+SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/CreateBills.cpp src/LDAPImport.cpp
 
 # Config
-CONFIG += qt thread
+CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml
-FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui
-SUBDIRS = src
+FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/createbills.ui forms/LDAPImport.ui
 OUT_PWD = build
 
 # Add special Platform-Dependant libraries and sources
@@ -24,7 +23,7 @@ win32 {
 	CONFIG += windows
 }
 unix {
-
+	LIBS += -lldap
 }
 macx {
 
@@ -46,6 +45,8 @@ include(build.pri)
 # Checking for SqLite
 !isEmpty(USE_SQLITE) {
 	CONFIG += sqlite3
+	HEADERS += 
+	SOURCES += 
 }
 isEmpty(USE_SQLITE) {
 	warning("SqLite3 is needed if you want store data locally")

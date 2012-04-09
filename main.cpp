@@ -1,6 +1,6 @@
 
 #include <QtGui/QApplication>
-#include "PiTres.h"
+#include "src/PiTres.h"
 
 int main(int argc, char** argv) {
 	QApplication app(argc, argv);

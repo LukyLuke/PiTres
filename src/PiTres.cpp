@@ -2,10 +2,20 @@
 
 #include <QtGui>
 #include <QtGui/QGridLayout>
+#include <QSettings>
+#include <QCoreApplication>
 
 #include "PiTres.h"
+#include "Userlist.h"
+#include "SentBills.h"
+#include "CreateBills.h"
+#include "LDAPImport.h"
 
 PiTres::PiTres(QMainWindow *parent) {
+	QCoreApplication::setOrganizationName("Piratenpartei");
+	QCoreApplication::setOrganizationDomain("piratenpartei.ch");
+	QCoreApplication::setApplicationName("PiTres");
+	
 	setupUi(this);
 	content = new QWidget();
 	connectActions();
@@ -54,7 +64,8 @@ void PiTres::openRecently() {
 }
 
 void PiTres::importFromLDAP() {
-	debugAction(QString("Import from LDAP"));
+	LDAPImport *widget = new LDAPImport;
+	setContent(widget);
 }
 
 void PiTres::importFromFile() {
@@ -74,15 +85,20 @@ void PiTres::showHelp(int page) {
 }
 
 void PiTres::showUsers() {
-	Userlist *users = new Userlist;
-	setContent(users);
+	Userlist *widget = new Userlist;
+	setContent(widget);
+#ifdef USE_SQLITE
+//	SqliteStorage storage;
+//	storage.load("data/userlist.db");
+#endif
 }
 
 void PiTres::showSentBills() {
-	SentBills *bills = new SentBills;
-	setContent(bills);
+	SentBills *widget = new SentBills;
+	setContent(widget);
 }
 
 void PiTres::showCreateBills() {
-	debugAction(QString("show create bills"));
+	CreateBills *widget = new CreateBills;
+	setContent(widget);
 }
