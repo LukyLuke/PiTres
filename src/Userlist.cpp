@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSettings>
 #include <QDebug>
 
 Userlist::Userlist(QWidget *parent) {
@@ -21,8 +22,8 @@ Userlist::~Userlist() {
 }
 
 void Userlist::loadData() {
-	//storage = new SqliteStorage("data/userlist.sqlite", "users");
-	QFileInfo dbfile("data/userlist.sqlite");
+	QSettings settings;
+	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	qDebug() << "Loading DB: " + dbfile.absoluteFilePath();
 	
 	if (!dbfile.absoluteDir().exists()) {

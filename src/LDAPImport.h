@@ -4,6 +4,8 @@
 #include "../ui_LDAPImport.h"
 
 #include <QWidget>
+#include <QString>
+#include <QtSql>
 
 extern "C" {
 #include <ldap.h>
@@ -14,9 +16,17 @@ Q_OBJECT
 private:
 	LDAP *ldap;
 	QString ldapError;
+	int version;
+	struct berval cred;
 	bool connected;
+	QSqlDatabase db;
 	void connectLdap();
 	void disconnectLdap();
+	void openDatabase();
+	void createTmpTables();
+	QSqlQuery *prepareQuery();
+	void bindQueryValue(QSqlQuery *query, QString field, QString value);
+	void bindUnboundQueryValues(QSqlQuery *query);
 
 public:
 	LDAPImport(QWidget *parent = 0);
