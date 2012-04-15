@@ -3,6 +3,8 @@
 
 #include "../ui_LDAPImport.h"
 
+#include "data/Person.h"
+
 #include <QWidget>
 #include <QString>
 #include <QtSql>
@@ -20,13 +22,11 @@ private:
 	struct berval cred;
 	bool connected;
 	QSqlDatabase db;
+	
 	void connectLdap();
 	void disconnectLdap();
 	void openDatabase();
-	void createTmpTables();
-	QSqlQuery *prepareQuery();
-	void bindQueryValue(QSqlQuery *query, QString field, QString value);
-	void bindUnboundQueryValues(QSqlQuery *query);
+	void setPersonValue(PPSPerson *person, QString field, QString value);
 
 public:
 	LDAPImport(QWidget *parent = 0);
@@ -39,6 +39,7 @@ public slots:
 	void searchLdap();
 	void importFromLdap();
 	void saveConfiguration();
+	void emptyDatabase();
 
 };
 

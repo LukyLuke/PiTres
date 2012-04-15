@@ -1,5 +1,6 @@
 
 #include "LDAPImport.h"
+#include "data/Person.h"
 
 #include <vector>
 #include <QSizePolicy>
@@ -14,12 +15,14 @@
 #include <QMap>
 #include <QList>
 #include <QVariant>
+#include <QString>
+#include <QStringList>
+#include <QRegExp>
 #include <QDebug>
 
 extern "C" {
 #include <ldap.h>
 }
-
 
 LDAPImport::LDAPImport(QWidget *parent) {
 	setupUi(this);
@@ -49,6 +52,7 @@ LDAPImport::LDAPImport(QWidget *parent) {
 	connect(btnSearch, SIGNAL(clicked()), this, SLOT(searchLdap()));
 	connect(btnGoToImport, SIGNAL(clicked()), this, SLOT(importFromLdap()));
 	connect(btnSaveData, SIGNAL(clicked()), this, SLOT(saveConfiguration()));
+	connect(btnEmptyDatabase, SIGNAL(clicked()), this, SLOT(emptyDatabase()));
 }
 
 LDAPImport::~LDAPImport() {
@@ -127,6 +131,13 @@ void LDAPImport::testConnection() {
 }
 
 void LDAPImport::searchLdap() {
+	QMessageBox::information(this,
+		tr("PiTres LDAP-Import"),
+		tr("The Search-Function does not work in this version. Go forward and import the Entries...")
+	);
+}
+
+void LDAPImport::importFromLdap() {
 	connectLdap();
 	if (!connected) {
 		QMessageBox::critical(this,
@@ -165,41 +176,61 @@ void LDAPImport::searchLdap() {
 		}
 		return;
 	}
-	qDebug() << QString("Search for %1 succed on %2").arg(editSearch->text()).arg(editAttributes->text());
+	qDebug() << QString("Search for %1 succeed").arg(editSearch->text());
 	
-	// Get al results
+	// Create Persons Database Tables if needed
+	PPSPerson::createTables(db);
+	
+	// Prepare the Progress-Bar
+	int max = ldap_count_entries(ldap, res);
+	int count = 0;
+	progressBar->setMinimum(1);
+	progressBar->setMaximum(max);
+	progressBar->setValue(0);
+	
+	// Get all results
 	char *attribute;
 	berval **values, dnval;
-	QSqlQuery *query;
+	PPSPerson *person;
+	QStringList dnlist;
 	QString dn;
-	int mail = 0;
+
 	for (msg = ldap_first_entry(ldap, res); msg != NULL; msg = ldap_next_entry(ldap, msg)) {
 		ldap_get_dn_ber(ldap, msg, &ber, &dnval);
 		
-		query = prepareQuery();
-		dn = QString(dnval.bv_val);
-		dn.replace(sectionExtract->text(), "\\1");
-		bindQueryValue(query, QString("section"), dn);
-		mail = 0;
+		progressBar->setValue(++count);
+		labelImportState->setText(QString("Import %1 of %2").arg(count).arg(max));
+		
+		person = new PPSPerson;
+		
+		setPersonValue(person, QString("section"), "");
+		dnlist = sectionExtract->text().split('|');
+		for (int i = 0; i < dnlist.size(); i++) {
+			dn = QString(dnval.bv_val);
+			dn.replace(QRegExp(dnlist.at(i)), "\\1");
+			if ((dn != dnval.bv_val)) {
+				setPersonValue(person, QString("section"), dn);
+				break;
+			}
+		}
+		
+		// dont't insert empty sections
+		if (person->section() == "") {
+			continue;
+		}
 		
 		for (attribute = ldap_first_attribute(ldap, msg, &ber); attribute != NULL; attribute = ldap_next_attribute(ldap, msg, ber)) {
 			if ((values = ldap_get_values_len(ldap, msg, attribute)) != NULL) {
 				for (int i = 0; values[i] != NULL; i++) {
-					if (QString(attribute) == "mail") {
-						bindQueryValue(query, QString("mail"+mail), QString(values[i]->bv_val));
-						mail++;
-					} else {
-						bindQueryValue(query, QString(attribute), QString(values[i]->bv_val));
-					}
+					setPersonValue(person, QString::fromUtf8(attribute), QString::fromUtf8(values[i]->bv_val));
 				}
 			}
 			ldap_value_free_len(values);
 		}
 		ldap_memfree(attribute);
 		
-		bindUnboundQueryValues(query);
-		query->exec();
-		qDebug() << query->lastError();
+		person->save(db);
+		person->clear();
 	}
 	
 	// Clean up
@@ -212,12 +243,10 @@ void LDAPImport::searchLdap() {
 	if (res != NULL) {
 		ldap_msgfree(res);
 	}
-	if (query != NULL) {
-		delete query;
+	if (person != NULL) {
+		delete person;
 	}
 }
-
-void LDAPImport::importFromLdap() {}
 
 void LDAPImport::openDatabase() {
 	QSettings settings;
@@ -234,106 +263,76 @@ void LDAPImport::openDatabase() {
 	db.open();
 }
 
-void LDAPImport::createTmpTables() {
-	QSqlQuery query("CREATE TEMPORARY TABLE ldap_persons (uid INTEGER, type INTEGER, nickname TEXT, gender TEXT, surname TEXT, "
-	                "lastname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, telephone TEXT, mobile TEXT, "
-	                "mail1 TEXT,  mail2 TEXT,  mail3 TEXT, birthday DATE, language TEXT, joining DATE);", db);
+void LDAPImport::emptyDatabase() {
+	PPSPerson::emptyTables(db);
 }
 
-QSqlQuery *LDAPImport::prepareQuery() {
-	QSqlQuery *query = new QSqlQuery(db);
-	query->prepare("INSERT INTO ldap_persons (uid, type, nickname, gender, surname, lastname, address, plz, city, country, state, "
-	               "telephone, mobile, mail1, mail2, mail3, birthday, language, joining) "
-	               "VALUES (:uid, :type, :nickname, :gender, :surname, :lastname, :address, :plz, :city, :country, :state, "
-	               ":telephone, :mobile, :mail1, :mail2, :mail3, :birthday, :language, :joining);");
-	return query;
-}
-
-void LDAPImport::bindQueryValue(QSqlQuery *query, QString field, QString value) {
+void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value) {
 	field = field.toLower();
 	
 	if (field == "uniqueidentifier") {
-		query->bindValue(":uid", value);
+		person->setUid(value);
+		
 	} else if (field == "ppscontributionclass") {
-		query->bindValue(":type", value);
+		person->setContributionClass(value.toInt() == PPSPerson::Full ? PPSPerson::Full : PPSPerson::Student);
+		
 	} else if (field == "uid") {
-		query->bindValue(":nickname", value);
+		person->setNickname(value);
+		
+	} else if (field == "section") {
+		person->setSection(value);
+		
 	} else if (field == "ppsgender") {
-		query->bindValue(":gender", value);
+		switch(value.toInt()) {
+			case 0: person->setGender(PPSPerson::Unknown); break;
+			case 1: person->setGender(PPSPerson::Male); break;
+			case 2: person->setGender(PPSPerson::Female); break;
+			case 3: person->setGender(PPSPerson::Both); break;
+		}
+		
 	} else if (field == "sn") {
-		query->bindValue(":surname", value);
+		person->setFamilyName(value);
+		
 	} else if (field == "givenname") {
-		query->bindValue(":lastname", value);
+		person->setGivenName(value);
+		
 	} else if (field == "street") {
-		query->bindValue(":address", value);
+		person->setStreet(value);
+		
 	} else if (field == "postalcode") {
-		query->bindValue(":plz", value);
+		person->setPostalCode(value);
+		
 	} else if (field == "l") {
-		query->bindValue(":city", value);
+		person->setCity(value);
+		
 	} else if (field == "c") {
-		query->bindValue(":country", value);
-	} else if (field == "state") {
-		query->bindValue(":state", value);
+		person->setCountry(value);
+		
+	} else if (field == "st") {
+		person->setState(value);
+		
 	} else if (field == "telephonenumber") {
-		query->bindValue(":telephone", value);
+		person->addTelephone(value);
+		
 	} else if (field == "mobile") {
-		query->bindValue(":mobile", value);
-	} else if (field == "mail1") {
-		query->bindValue(":mail1", value);
-	} else if (field == "mail2") {
-		query->bindValue(":mail2", value);
-	} else if (field == "mail3") {
-		query->bindValue(":mail3", value);
+		person->addMobile(value);
+		
+	} else if (field == "mail") {
+		person->addEmail(value);
+		
 	} else if (field == "ppsbirthdate") {
-		query->bindValue(":birthday", value);
+		value.resize(8);
+		person->setBirthdate(QDate::fromString(value, "yyyyMMdd"));
+		
 	} else if (field == "ppsjoining") {
-		query->bindValue(":joining", value);
+		value.resize(8);
+		person->setJoining(QDate::fromString(value, "yyyyMMdd"));
+		
 	} else if (field == "preferredlanguage") {
-		query->bindValue(":language", value);
-	}
-}
-
-void LDAPImport::bindUnboundQueryValues(QSqlQuery *query) {
-	QMap<QString, QVariant> map = query->boundValues();
-	QList<QString> keys = map.keys();
-	
-	if (keys.indexOf("uid") == -1) {
-		bindQueryValue(query, "uniqueidentifier", "");
-	} else if (keys.indexOf("type") == -1) {
-		bindQueryValue(query, "ppscontributionclass", "");
-	} else if (keys.indexOf("nickname") == -1) {
-		bindQueryValue(query, "uid", "");
-	} else if (keys.indexOf("gender") == -1) {
-		bindQueryValue(query, "ppsgender", "");
-	} else if (keys.indexOf("surname") == -1) {
-		bindQueryValue(query, "sn", "");
-	} else if (keys.indexOf("lastname") == -1) {
-		bindQueryValue(query, "givenname", "");
-	} else if (keys.indexOf("address") == -1) {
-		bindQueryValue(query, "street", "");
-	} else if (keys.indexOf("plz") == -1) {
-		bindQueryValue(query, "postalcode", "");
-	} else if (keys.indexOf("city") == -1) {
-		bindQueryValue(query, "l", "");
-	} else if (keys.indexOf("country") == -1) {
-		bindQueryValue(query, "c", "");
-	} else if (keys.indexOf("state") == -1) {
-		bindQueryValue(query, "state", "");
-	} else if (keys.indexOf("telephone") == -1) {
-		bindQueryValue(query, "telephonenumber", "");
-	} else if (keys.indexOf("mobile") == -1) {
-		bindQueryValue(query, "mobile", "");
-	} else if (keys.indexOf("mail1") == -1) {
-		bindQueryValue(query, "mail1", "");
-	} else if (keys.indexOf("mail2") == -1) {
-		bindQueryValue(query, "mail2", "");
-	} else if (keys.indexOf("mail3") == -1) {
-		bindQueryValue(query, "mail3", "");
-	} else if (keys.indexOf("birthday") == -1) {
-		bindQueryValue(query, "ppsbirthdate", "");
-	} else if (keys.indexOf("joining") == -1) {
-		bindQueryValue(query, "ppsjoining", "");
-	} else if (keys.indexOf("language") == -1) {
-		bindQueryValue(query, "preferredlanguage", "");
+		value = value.toLower();
+		if (value == "de") { person->setLanguage(PPSPerson::DE); }
+		else if (value == "it") { person->setLanguage(PPSPerson::IT); }
+		else if (value == "fr") { person->setLanguage(PPSPerson::FR); }
+		else { person->setLanguage(PPSPerson::EN); }
 	}
 }

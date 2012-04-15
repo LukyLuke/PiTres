@@ -169,6 +169,30 @@
              </layout>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnEmptyDatabase">
+                <property name="text">
+                 <string>Empty DB-Tables</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -266,7 +290,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you search in the Field &lt;span style=&quot; font-weight:600;&quot;&gt;dn&lt;/span&gt; for the Section like &lt;span style=&quot; font-weight:600;&quot;&gt;st=SECTION&lt;/span&gt; (where the section is always lowercase and two Chars long), you should enter here: &lt;span style=&quot; font-weight:600;&quot;&gt;dn:^.*dc=([a-z]{2}).*$&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string>dn:^.*,dc=([a-z]{2}).*$</string>
+               <string>^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$</string>
               </property>
              </widget>
             </item>
