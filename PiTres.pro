@@ -7,9 +7,21 @@ TARGET = PiTres
 DEPENDPATH += .
 INCLUDEPATH += . src
 
-# Sources
+# Main sources
 HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/CreateBills.h src/LDAPImport.h
 SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/CreateBills.cpp src/LDAPImport.cpp
+
+# Data Objects
+HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h
+SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp
+
+# Delegates
+#HEADERS += src/delegate/.h
+#SOURCES += src/delegate/.cpp
+
+# Helper Classes and Functions
+#HEADERS += src/helper/.h
+#SOURCES += src/helper/.cpp
 
 # Config
 CONFIG += qt thread sql
@@ -52,13 +64,6 @@ isEmpty(USE_SQLITE) {
 	warning("SqLite3 is needed if you want store data locally")
 }
 
-## Checking for LDAP
-#!isEmpty(USE_LDAP) {
-#	CONFIG += ldap
-#}
-#isEmpty(USE_LDAP) {
-#	warning("LDAP is needed if you want to lookup data from LDAP-Server")
-#}
 
 
 
