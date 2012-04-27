@@ -1,17 +1,20 @@
 
 #include "Person.h"
+#include "helper/Formatter.h"
 
 #include <QObject>
 #include <QString>
+#include <QRegExp>
 #include <QVariant>
 #include <QDate>
 #include <QList>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlError>
 #include <QDebug>
 
-PPSPerson::PPSPerson(QObject *parent) {
+PPSPerson::PPSPerson(QObject *parent) : QObject(parent) {
 	clear();
 }
 
@@ -88,7 +91,7 @@ void PPSPerson::save(QSqlDatabase db) {
 	QSqlQuery query(db);
 	query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section) "
 	              "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section);");
-	query.bindValue(":uid", s_uid);
+	query.bindValue(":uid", i_uid);
 	query.bindValue(":section", s_section);
 	query.bindValue(":contcls", (int)m_contributionClass);
 	query.bindValue(":nickname", s_nickname);
@@ -113,7 +116,7 @@ void PPSPerson::save(QSqlDatabase db) {
 	// Insert all telephones, mobiles and email addresses
 	if (!l_telephone.empty()) {
 		query.prepare("INSERT INTO ldap_persons_telephone (uid, type, number) VALUES (:uid, :type, :value);");
-		query.bindValue(":uid", s_uid);
+		query.bindValue(":uid", i_uid);
 		query.bindValue(":type", "default");
 		for (i = 0; i < l_telephone.size(); i++) {
 			query.bindValue(":value", l_telephone.at(i));
@@ -127,7 +130,7 @@ void PPSPerson::save(QSqlDatabase db) {
 	
 	if (!l_mobile.empty()) {
 		query.prepare("INSERT INTO ldap_persons_mobile (uid, type, number) VALUES (:uid, :type, :value);");
-		query.bindValue(":uid", s_uid);
+		query.bindValue(":uid", i_uid);
 		query.bindValue(":type", "default");
 		for (i = 0; i < l_mobile.size(); i++) {
 			query.bindValue(":value", l_mobile.at(i));
@@ -141,7 +144,7 @@ void PPSPerson::save(QSqlDatabase db) {
 	
 	if (!l_email.empty()) {
 		query.prepare("INSERT INTO ldap_persons_email (uid, type, mail) VALUES (:uid, :type, :value);");
-		query.bindValue(":uid", s_uid);
+		query.bindValue(":uid", i_uid);
 		query.bindValue(":type", "default");
 		for (i = 0; i < l_email.size(); i++) {
 			query.bindValue(":value", l_email.at(i));
@@ -155,11 +158,11 @@ void PPSPerson::save(QSqlDatabase db) {
 }
 
 void PPSPerson::clear() {
-	s_uid = "";
+	i_uid = 0;
 	s_section = "";
-	m_contributionClass = Full;
+	m_contributionClass = ContributeFull;
 	s_nickname = "";
-	m_gender = Unknown;
+	m_gender = GenderUnknown;
 	s_familyName = "";
 	s_givenName = "";
 	s_street = "";
@@ -173,10 +176,64 @@ void PPSPerson::clear() {
 	d_birthdate = QDate(1970, 01, 01);
 	d_joining = QDate::currentDate();
 	m_language = EN;
+	_invoice.clear();
 }
 
-void PPSPerson::setUid(QString uid) {
-	s_uid = uid;
+void PPSPerson::load(QSqlDatabase db, int uid) {
+	QSqlQuery query(db);
+	query.prepare("SELECT * FROM ldap_persons WHERE uid=?;");
+	query.bindValue(0, uid);
+	query.exec();
+	query.first();
+	
+	QSqlRecord record = query.record();
+	i_uid = query.value(record.indexOf("uid")).toInt();
+	s_section = query.value(record.indexOf("section")).toString();
+	m_contributionClass = (ContributionClass)query.value(record.indexOf("contribution")).toInt();
+	s_nickname = query.value(record.indexOf("nickname")).toString();
+	m_gender = (Gender)query.value(record.indexOf("gender")).toInt();
+	s_familyName = query.value(record.indexOf("familyname")).toString();
+	s_givenName = query.value(record.indexOf("givenname")).toString();
+	s_street = query.value(record.indexOf("address")).toString();
+	s_postalCode = query.value(record.indexOf("plz")).toString();
+	s_city = query.value(record.indexOf("city")).toString();
+	s_country = query.value(record.indexOf("country")).toString();
+	s_state = query.value(record.indexOf("state")).toString();
+	d_birthdate = query.value(record.indexOf("birthday")).toDate();
+	d_joining = query.value(record.indexOf("joining")).toDate();
+	m_language = (Language)query.value(record.indexOf("language")).toInt();
+	
+	// Load telephone, mobile and email
+	query.prepare("SELECT number FROM ldap_persons_telephone WHERE uid=?;");
+	query.bindValue(0, uid);
+	query.exec();
+	while (query.next()) {
+		l_telephone << Formatter::telephone(query.value(0).toString());
+	}
+	
+	query.prepare("SELECT number FROM ldap_persons_mobile WHERE uid=?;");
+	query.bindValue(0, uid);
+	query.exec();
+	while (query.next()) {
+		l_mobile << Formatter::telephone(query.value(0).toString());
+	}
+	
+	query.prepare("SELECT mail FROM ldap_persons_email WHERE uid=?;");
+	query.bindValue(0, uid);
+	query.exec();
+	while (query.next()) {
+		l_email << query.value(0).toString();
+	}
+	
+	_invoice.loadLast(db, uid);
+}
+
+Invoice *PPSPerson::getInvoice() {
+	return &_invoice;
+}
+
+void PPSPerson::setUid(int uid) {
+	i_uid = uid;
 	emit uidChanged(uid);
 }
 

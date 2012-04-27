@@ -20,8 +20,8 @@ SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp
 #SOURCES += src/delegate/.cpp
 
 # Helper Classes and Functions
-#HEADERS += src/helper/.h
-#SOURCES += src/helper/.cpp
+HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h
+SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.cpp
 
 # Config
 CONFIG += qt thread sql

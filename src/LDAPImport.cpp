@@ -271,10 +271,10 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 	field = field.toLower();
 	
 	if (field == "uniqueidentifier") {
-		person->setUid(value);
+		person->setUid(value.toInt());
 		
 	} else if (field == "ppscontributionclass") {
-		person->setContributionClass(value.toInt() == PPSPerson::Full ? PPSPerson::Full : PPSPerson::Student);
+		person->setContributionClass(value.toInt() == PPSPerson::ContributeFull ? PPSPerson::ContributeFull : PPSPerson::ContributeStudent);
 		
 	} else if (field == "uid") {
 		person->setNickname(value);
@@ -284,10 +284,10 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 		
 	} else if (field == "ppsgender") {
 		switch(value.toInt()) {
-			case 0: person->setGender(PPSPerson::Unknown); break;
-			case 1: person->setGender(PPSPerson::Male); break;
-			case 2: person->setGender(PPSPerson::Female); break;
-			case 3: person->setGender(PPSPerson::Both); break;
+			case 0: person->setGender(PPSPerson::GenderUnknown); break;
+			case 1: person->setGender(PPSPerson::GenderMale); break;
+			case 2: person->setGender(PPSPerson::GenderFemale); break;
+			case 3: person->setGender(PPSPerson::GenderBoth); break;
 		}
 		
 	} else if (field == "sn") {

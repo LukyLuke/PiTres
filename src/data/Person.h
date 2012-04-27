@@ -1,6 +1,8 @@
 #ifndef Data_Person_H
 #define Data_Person_H
 
+#include "Invoice.h"
+
 #include <QObject>
 #include <QString>
 #include <QDate>
@@ -10,7 +12,7 @@
 
 class PPSPerson : public QObject {
 Q_OBJECT
-Q_PROPERTY(QString uid READ uid WRITE setUid NOTIFY uidChanged)
+Q_PROPERTY(int uid READ uid WRITE setUid NOTIFY uidChanged)
 Q_PROPERTY(QString section READ section WRITE setSection NOTIFY sectionChanged)
 Q_PROPERTY(ContributionClass contributionClass READ contributionClass WRITE setContributionClass NOTIFY contributionClassChanged)
 Q_PROPERTY(QString nickname READ nickname WRITE setNickname NOTIFY nicknameChanged)
@@ -28,6 +30,7 @@ Q_PROPERTY(QList<QString> email READ email WRITE setEmail NOTIFY emailChanged)
 Q_PROPERTY(QDate birthdate READ birthdate WRITE setBirthdate NOTIFY birthdateChanged)
 Q_PROPERTY(QDate joining READ joining WRITE setJoining NOTIFY joiningChanged)
 Q_PROPERTY(Language language READ language WRITE setLanguage NOTIFY languageChanged)
+
 Q_ENUMS(ContributionClass)
 Q_ENUMS(Gender)
 Q_ENUMS(Language)
@@ -37,15 +40,17 @@ public:
 	virtual ~PPSPerson();
 	void save(QSqlDatabase db);
 	void clear();
+	void load(QSqlDatabase db, int uid);
+	Invoice *getInvoice();
 	static void createTables(QSqlDatabase db);
 	static void emptyTables(QSqlDatabase db);
 	
-	enum ContributionClass { Full=0, Student=1 };
-	enum Gender { Male=0, Female=1, Both=2, None=3, Unknown=-1 };
+	enum ContributionClass { ContributeFull=0, ContributeStudent=1 };
+	enum Gender { GenderMale=0, GenderFemale=1, GenderBoth=2, GenderNone=3, GenderUnknown=-1 };
 	enum Language { DE=0, FR=1, IT=2, EN=3 };
 	
 	// Setter
-	void setUid(QString uid);
+	void setUid(int uid);
 	void setSection(QString section);
 	void setContributionClass(ContributionClass contributionClass);
 	void setNickname(QString nickname);
@@ -74,7 +79,7 @@ public:
 	void setLanguage(Language language);
 	
 	// Getter
-	QString uid() const { return s_uid; };
+	int uid() const { return i_uid; };
 	QString section() const { return s_section; };
 	ContributionClass contributionClass() const { return m_contributionClass; };
 	QString nickname() const { return s_nickname; };
@@ -94,7 +99,7 @@ public:
 	Language language() const { return m_language; };
 
 signals:
-	void uidChanged(QString);
+	void uidChanged(int);
 	void sectionChanged(QString);
 	void contributionClassChanged(ContributionClass);
 	void nicknameChanged(QString);
@@ -123,7 +128,7 @@ signals:
 	void languageChanged(Language);
 
 private:
-	QString s_uid;
+	int i_uid;
 	QString s_section;
 	ContributionClass m_contributionClass;
 	QString s_nickname;
@@ -141,6 +146,7 @@ private:
 	QDate d_birthdate;
 	QDate d_joining;
 	Language m_language;
+	Invoice _invoice;
 };
 
 #endif // Data_Person_H

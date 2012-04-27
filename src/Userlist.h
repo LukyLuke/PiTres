@@ -4,17 +4,37 @@
 #include "../ui_userlist.h"
 
 #include <QWidget>
-#include <QtSql>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QString>
+#include <QSqlQueryModel>
+#include <QModelIndex>
+#include <QTimerEvent>
 
 class Userlist : public QWidget, private Ui::UserlistForm {
 Q_OBJECT
 private:
 	QSqlDatabase db;
+	QSqlQueryModel *tableModel;
+	int searchTimer;
+	
+	void openDatabase();
+	void loadSections();
 
 public:
 	Userlist(QWidget *parent = 0);
 	virtual ~Userlist();
 	void loadData();
+
+public slots:
+	void searchData();
+	void searchDataTimeout(QString data);
+	void filterSection(QString section);
+	void showDetails(QModelIndex index);
+
+protected:
+	void timerEvent(QTimerEvent *event);
 };
 
 #endif // Userlist_H
