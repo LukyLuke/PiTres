@@ -32,7 +32,7 @@ public slots:
 	void showHelp(int page = 0);
 	void showUsers();
 	void showSentBills();
-	void showCreateBills();
+	void showImportPayments();
 };
 
 #endif // PiTres_H

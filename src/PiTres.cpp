@@ -8,7 +8,7 @@
 #include "PiTres.h"
 #include "Userlist.h"
 #include "SentBills.h"
-#include "CreateBills.h"
+#include "PaymentImport.h"
 #include "LDAPImport.h"
 
 PiTres::PiTres(QMainWindow *parent) {
@@ -39,7 +39,7 @@ void PiTres::connectActions() {
 	connect(actionHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
 	connect(actionShow_Users, SIGNAL(triggered()), this, SLOT(showUsers()));
 	connect(actionShow_Bills, SIGNAL(triggered()), this, SLOT(showSentBills()));
-	connect(actionCreate_Bills, SIGNAL(triggered()), this, SLOT(showCreateBills()));
+	connect(actionImport_Payments, SIGNAL(triggered()), this, SLOT(showImportPayments()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -98,7 +98,7 @@ void PiTres::showSentBills() {
 	setContent(widget);
 }
 
-void PiTres::showCreateBills() {
-	CreateBills *widget = new CreateBills;
+void PiTres::showImportPayments() {
+	PaymentImport *widget = new PaymentImport;
 	setContent(widget);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>885</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -37,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>885</width>
      <height>20</height>
     </rect>
    </property>
@@ -175,7 +175,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="newBillsButton">
+      <widget class="QToolButton" name="importPaymentsButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -186,7 +186,7 @@
         <string>Create new Bills and send they as EMails or print out the PDFs and Letters</string>
        </property>
        <property name="text">
-        <string>Create new Bills</string>
+        <string>Import Payments</string>
        </property>
        <property name="icon">
         <iconset resource="../PiTres.qrc">
@@ -329,16 +329,16 @@
     <string>Ctrl+R</string>
    </property>
   </action>
-  <action name="actionCreate_Bills">
+  <action name="actionImport_Payments">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
      <normaloff>:/buttons/resources/buttons/mail-folder-inbox.png</normaloff>:/buttons/resources/buttons/mail-folder-inbox.png</iconset>
    </property>
    <property name="text">
-    <string>Create Bills</string>
+    <string>Import Payments</string>
    </property>
    <property name="toolTip">
-    <string>Create new Bills and send them over EMail or print them</string>
+    <string>Import Payments based on the Reference-Number, the Member UID, the Member name or based on ESR</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
@@ -378,9 +378,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>newBillsButton</sender>
+   <sender>importPaymentsButton</sender>
    <signal>clicked()</signal>
-   <receiver>actionCreate_Bills</receiver>
+   <receiver>actionImport_Payments</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -32,6 +32,7 @@ public slots:
 	void searchDataTimeout(QString data);
 	void filterSection(QString section);
 	void showDetails(QModelIndex index);
+	void showTableContextMenu(const QPoint &point);
 
 protected:
 	void timerEvent(QTimerEvent *event);

@@ -18,6 +18,8 @@
 #include <QModelIndex>
 #include <QVariant>
 #include <QSqlRecord>
+#include <QPoint>
+#include <QMenu>
 #include <QDebug>
 
 Userlist::Userlist(QWidget *parent) : QWidget(parent) {
@@ -32,9 +34,14 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	openDatabase();
 	loadSections();
 	loadData();
+	
+	// Enable the ContextMenu
+	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showTableContextMenu(const QPoint&)));
 }
+
 Userlist::~Userlist() {
-	db.close();
+	//db.close();
 }
 
 void Userlist::openDatabase() {
@@ -203,7 +210,12 @@ void Userlist::showDetails(QModelIndex index) {
 	
 	Invoice *invoice = person.getInvoice();
 	detailPaidDate->setText(invoice->paidDate().toString("yyyy-MM-dd"));
+	detailPayableDue->setText(invoice->payableDue().toString("yyyy-MM-dd"));
 	
 	//delete invoice;
+}
+
+void Userlist::showTableContextMenu(const QPoint &point) {
+	
 }
 

@@ -89,12 +89,16 @@ void Invoice::save(QSqlDatabase db) {
 void Invoice::loadLast(QSqlDatabase db, int member) {
 	clear();
 	QSqlQuery query;
-	query.prepare("SELECT * FROM pps_invoice WHERE id=? ORDER BY issue_date DESC;");
+	query.prepare("SELECT * FROM pps_invoice WHERE member_uid=? ORDER BY issue_date DESC;");
 	query.bindValue(0, member);
 	query.exec();
-	query.first();
-	_loaded = query.size() > 0;
 	
+	if (query.lastError().type() != QSqlError::NoError) {
+		qDebug() << query.lastQuery();
+		qDebug() << query.lastError();
+	}
+	
+	_loaded = query.first();
 	if (_loaded) {
 		QSqlRecord record = query.record();
 		i_memberUid = query.value(record.indexOf("member_uid")).toInt();

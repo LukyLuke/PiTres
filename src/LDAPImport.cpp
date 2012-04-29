@@ -57,7 +57,7 @@ LDAPImport::LDAPImport(QWidget *parent) {
 
 LDAPImport::~LDAPImport() {
 	disconnectLdap();
-	db.close();
+	//db.close();
 }
 
 void LDAPImport::nextPage() {
