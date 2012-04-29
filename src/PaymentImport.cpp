@@ -126,18 +126,30 @@ void PaymentImport::paySelectedInvoice() {
 }
 
 void PaymentImport::continueImport() {
-	exportQifBankTransfer();
-	exportLDIFChanges();
-}
-
-void PaymentImport::exportLDIFChanges() {
 	QSettings settings;
 	QString ldiff;
+	QString qif("!Type:" + settings.value("qif/account_asset", "Bank").toString());
+	QSqlQuery query(db);
+	query.prepare("UPDATE pps_invoice SET paid_date=:date,amount_paid=amount_paid+:amount WHERE reference=:ref AND member_uid=:member;");
 	
 	for (int i = 0; i < tablePay->rowCount(); i++) {
+		QString ref = tablePay->item(i, 0)->text();
+		QString amount = tablePay->item(i, 1)->text();
 		QString member = tablePay->item(i, 2)->text();
+		QString valuta = tablePay->item(i, 3)->text();
+		QString name = tablePay->item(i, 4)->text();
 		QString section = tablePay->item(i, 6)->text();
 		
+		// Payment QIF
+		qif.append("\nD" + valuta);
+		qif.append("\nT" + amount);
+		qif.append("\nP"+ settings.value("qif/payee_label", tr("Payment: ")).toString() + name + "("+member+")");
+		qif.append("\nN" + ref);
+		qif.append("\nM"+ settings.value("qif/memo", tr("Member UID: ")).toString() + member);
+		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
+		qif.append("\n^\n");
+		
+		// LDIF
 		if (section.isEmpty() || section.length() > 2) {
 			ldiff.append("dn: " + settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString().arg(member));
 		} else {
@@ -150,44 +162,38 @@ void PaymentImport::exportLDIFChanges() {
 		ldiff.append("\n");
 		ldiff.append(settings.value("ldif/memberstate_attribute", "ppsPaid").toString() + ": " + settings.value("ldif/memberstate_value", "1").toString());
 		ldiff.append("\n\n");
-	}
-	
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save LDIF File"), "", tr("LDIF (*.ldif);;Plaintext (*.txt)"));
-	if (!fileName.isEmpty()) {
-		QFile f(fileName);
-		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
-			QTextStream out(&f);
-			out << ldiff;
+		
+		// Update the Database
+		query.bindValue(":date", valuta);
+		query.bindValue(":amount", amount.toFloat());
+		query.bindValue(":ref", ref);
+		query.bindValue(":member", member);
+		query.exec();
+		if (query.lastError().type() != QSqlError::NoError) {
+			qDebug() << query.lastQuery();
+			qDebug() << query.lastError();
 		}
 	}
-}
-
-void PaymentImport::exportQifBankTransfer() {
-	QSettings settings;
-	QString qif("!Type:" + settings.value("qif/account_asset", "Bank").toString());
 	
-	for (int i = 0; i < tablePay->rowCount(); i++) {
-		QString ref = tablePay->item(i, 0)->text();
-		QString amount = tablePay->item(i, 1)->text();
-		QString member = tablePay->item(i, 2)->text();
-		QString valuta = tablePay->item(i, 3)->text();
-		QString name = tablePay->item(i, 4)->text();
-		
-		qif.append("\nD" + valuta);
-		qif.append("\nT" + amount);
-		qif.append("\nP"+ settings.value("qif/payee_label", tr("Payment: ")).toString() + name + "("+member+")");
-		qif.append("\nN" + ref);
-		qif.append("\nM"+ settings.value("qif/memo", tr("Member UID: ")).toString() + member);
-		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
-		qif.append("\n^\n");
-	}
+	QString fileName;
 	
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
+	// Safe the QIF
+	fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
 		QFile f(fileName);
 		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
 			QTextStream out(&f);
 			out << qif;
+		}
+	}
+	
+	// Save the LDIF
+	fileName = QFileDialog::getSaveFileName(this, tr("Save LDIF File"), "", tr("LDIF (*.ldif);;Plaintext (*.txt)"));
+	if (!fileName.isEmpty()) {
+		QFile f(fileName);
+		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+			QTextStream out(&f);
+			out << ldiff;
 		}
 	}
 }

@@ -19,8 +19,6 @@ private:
 	int searchTimer;
 	
 	void openDatabase();
-	void exportLDIFChanges();
-	void exportQifBankTransfer();
 
 public:
 	PaymentImport(QWidget *parent = 0);
