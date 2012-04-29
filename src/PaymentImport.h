@@ -15,6 +15,7 @@
 class PaymentImport : public QWidget, private Ui::PaymentImportForm {
 Q_OBJECT
 private:
+	QString INVOICE_PAID_STATE;
 	QSqlDatabase db;
 	int searchTimer;
 	

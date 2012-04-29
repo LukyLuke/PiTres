@@ -40,7 +40,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="searchButton">
+      <widget class="QToolButton" name="buttonSearch">
        <property name="text">
         <string>Search</string>
        </property>
@@ -52,45 +52,10 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableWidget" name="tableWidget">
+    <widget class="QTableView" name="tableView">
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
-     <column>
-      <property name="text">
-       <string/>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>UID</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Surname</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Lastname</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Sent</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Last Remind</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Functions</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>

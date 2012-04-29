@@ -18,6 +18,8 @@
 #include <QDebug>
 
 PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
+	INVOICE_PAID_STATE = "2";
+	
 	setupUi(this);
 	dateEdit->setDate(QDate::currentDate());
 	
@@ -127,6 +129,7 @@ void PaymentImport::paySelectedInvoice() {
 
 void PaymentImport::continueImport() {
 	QSettings settings;
+	QString fileName;
 	QString ldiff;
 	QString qif("!Type:" + settings.value("qif/account_asset", "Bank").toString());
 	QSqlQuery query(db);
@@ -175,7 +178,9 @@ void PaymentImport::continueImport() {
 		}
 	}
 	
-	QString fileName;
+	// Set Invoices as paid
+	query.prepare("UPDATE pps_invoice SET state="+INVOICE_PAID_STATE+" WHERE amount<=amount_paid;");
+	query.exec();
 	
 	// Safe the QIF
 	fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
