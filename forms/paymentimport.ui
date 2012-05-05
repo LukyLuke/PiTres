@@ -83,24 +83,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="editAmount">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>100</width>
-         <height>16777215</height>
-        </size>
-       </property>
+      <widget class="QDoubleSpinBox" name="editAmount">
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="placeholderText">
-        <string>Amount paid</string>
        </property>
       </widget>
      </item>
@@ -122,6 +107,9 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
        </property>
        <property name="wordWrap">
         <bool>false</bool>
@@ -179,13 +167,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnInvoiceQif">
-       <property name="text">
-        <string>Export Invoice QIF</string>
-       </property>
-      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnContinue">

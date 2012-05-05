@@ -18,6 +18,8 @@
 #include <QModelIndex>
 #include <QVariant>
 #include <QSqlRecord>
+#include <QFileDialog>
+#include <QRegExp>
 #include <QPoint>
 #include <QMenu>
 #include <QDebug>
@@ -25,11 +27,11 @@
 Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	
-	connect(buttonSearch, SIGNAL(clicked()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(selectSection, SIGNAL(currentIndexChanged(QString)), this, SLOT(filterSection(QString)));
-	connect(tableView, SIGNAL(clicked(QModelIndex)), this, SLOT(showDetails(QModelIndex)));
+	connect(tableView, SIGNAL(activated(QModelIndex)), this, SLOT(showDetails(QModelIndex)));
+	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	
 	openDatabase();
 	loadSections();
@@ -66,7 +68,7 @@ void Userlist::loadData() {
 	PPSPerson::createTables(db);
 	Invoice::createTables(db);
 	
-	QSqlQuery query("SELECT uid,nickname,givenname,familyname,joining,section FROM ldap_persons;", db);
+	QSqlQuery query("SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons;", db);
 	tableModel->setQuery(query);
 	
 	// InvoiceState: o_pen, c_anceled, p_aid, u_nknown
@@ -74,11 +76,13 @@ void Userlist::loadData() {
 	// MemberState: m_ember, l_eave, i_nactive
 	
 	tableModel->setHeaderData(0, Qt::Horizontal, tr("UID"));
-	tableModel->setHeaderData(1, Qt::Horizontal, tr("Nickname"));
-	tableModel->setHeaderData(2, Qt::Horizontal, tr("Given name"));
-	tableModel->setHeaderData(3, Qt::Horizontal, tr("Family name"));
-	tableModel->setHeaderData(4, Qt::Horizontal, tr("Joining Date"));
-	tableModel->setHeaderData(5, Qt::Horizontal, tr("Section"));
+	tableModel->setHeaderData(1, Qt::Horizontal, tr("Due"));
+	tableModel->setHeaderData(2, Qt::Horizontal, tr("Nickname"));
+	tableModel->setHeaderData(3, Qt::Horizontal, tr("Given name"));
+	tableModel->setHeaderData(4, Qt::Horizontal, tr("Family name"));
+	tableModel->setHeaderData(5, Qt::Horizontal, tr("City"));
+	tableModel->setHeaderData(6, Qt::Horizontal, tr("Joining Date"));
+	tableModel->setHeaderData(7, Qt::Horizontal, tr("Section"));
 	
 	tableView->setSortingEnabled(true);
 	tableView->setModel(tableModel);
@@ -110,7 +114,8 @@ void Userlist::searchDataTimeout(QString data) {
 	searchTimer = startTimer(1000);
 }
 
-void Userlist::filterSection(QString section) {
+QSqlQuery Userlist::createQuery() {
+	QString section = selectSection->currentText();
 	QString search;
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	for (int i = 0; i < sl.size(); i++) {
@@ -124,13 +129,13 @@ void Userlist::filterSection(QString section) {
 	QString qs;
 	bool bindSection = FALSE;
 	if (section == "All") {
-		qs = "SELECT uid,nickname,givenname,familyname,joining,section FROM ldap_persons";
+		qs = "SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons";
 		if (sl.size() > 0) {
 			qs.append(" WHERE ").append(search);
 		}
 	} else {
 		bindSection = TRUE;
-		qs = "SELECT uid,nickname,givenname,familyname,joining,section FROM ldap_persons WHERE section=:section";
+		qs = "SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons WHERE section=:section";
 		if (sl.size() > 0) {
 			qs.append(" AND (").append(search).append(")");
 		}
@@ -145,12 +150,18 @@ void Userlist::filterSection(QString section) {
 		query.bindValue(QString(":p2_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
 		query.bindValue(QString(":p3_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
 	}
+	return query;
+}
+
+void Userlist::filterSection(QString section) {
+	QSqlQuery query = createQuery();
 	query.exec();
 	
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
 		qDebug() << query.lastError();
 	}
+	
 	tableModel->setQuery(query);
 }
 
@@ -158,7 +169,11 @@ void Userlist::showDetails(QModelIndex index) {
 	if (!index.isValid()) {
 		return;
 	}
-	int uid = tableModel->record(index.row()).value(0).toInt();
+	showDetails(index.row());
+}
+
+void Userlist::showDetails(int index) {
+	int uid = tableModel->record(index).value(0).toInt();
 	PPSPerson person;
 	person.load(db, uid);
 	
@@ -186,7 +201,7 @@ void Userlist::showDetails(QModelIndex index) {
 	}
 	detailSection->setText(person.section());
 	switch (person.contributionClass()) {
-		case PPSPerson::ContributeStudent: detailContributionClass->setText(tr("Student")); break;
+		case PPSPerson::ContributeStudent: detailContributionClass->setText(tr("Limited")); break;
 		default: detailContributionClass->setText(tr("Full")); break;
 	}
 	
@@ -208,11 +223,43 @@ void Userlist::showDetails(QModelIndex index) {
 	}
 	detailEmail->setText(s.trimmed());
 	
-	Invoice *invoice = person.getInvoice();
-	detailPaidDate->setText(invoice->paidDate().toString("yyyy-MM-dd"));
-	detailPayableDue->setText(invoice->payableDue().toString("yyyy-MM-dd"));
+	//Invoice *invoice = person.getInvoice();
+	detailMemberDue->setText(person.paidDue().toString("yyyy-MM-dd"));
 	
 	//delete invoice;
+}
+
+void Userlist::exportData() {
+	QSqlQuery query = createQuery();
+	query.exec();
+	
+	if (query.lastError().type() != QSqlError::NoError) {
+		qDebug() << query.lastQuery();
+		qDebug() << query.lastError();
+	}
+	
+	QRegExp re("[\"',\r\n]+");
+	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Paid\n");
+	while (query.next()) {
+		// "SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
+		csv.append( query.value(0).toString().remove(re) ).append(",");
+		csv.append( query.value(2).toString().remove(re) ).append(",");
+		csv.append( query.value(3).toString().remove(re) ).append(",");
+		csv.append( query.value(4).toString().remove(re) ).append(",");
+		csv.append( query.value(5).toString().remove(re) ).append(",");
+		csv.append( query.value(7).toString().remove(re) ).append(",");
+		csv.append( query.value(1).toString().remove(re) ).append("\n");
+	}
+	
+	// Safe as File
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save the Userlist"), "", tr("CSV (*.csv);;Plaintext (*.txt)"));
+	if (!fileName.isEmpty()) {
+		QFile f(fileName);
+		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+			QTextStream out(&f);
+			out << csv;
+		}
+	}
 }
 
 void Userlist::showTableContextMenu(const QPoint &point) {

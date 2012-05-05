@@ -1,9 +1,3 @@
-#include <iostream>
-
-#include <QtGui>
-#include <QtGui/QGridLayout>
-#include <QSettings>
-#include <QCoreApplication>
 
 #include "PiTres.h"
 #include "Userlist.h"
@@ -11,18 +5,38 @@
 #include "PaymentImport.h"
 #include "LDAPImport.h"
 
-PiTres::PiTres(QMainWindow *parent) {
-	QCoreApplication::setOrganizationName("Piratenpartei");
-	QCoreApplication::setOrganizationDomain("piratenpartei.ch");
-	QCoreApplication::setApplicationName("PiTres");
-	
+#include <QtGui>
+#include <QtGui/QGridLayout>
+#include <QSettings>
+
+PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	setupUi(this);
+	
+	// Resize
+	QSettings settings;
+	resize(settings.value("core/size", QSize(800, 600)).toSize());
+	if (settings.value("core/maximized", false).toBool()) {
+		showMaximized();
+	} else if (settings.value("core/fullscreen", false).toBool()) {
+		showFullScreen();
+	}
+	
 	content = new QWidget();
 	connectActions();
+	
+	settingsDialog = new QDialog(this);
+	settingsForm.setupUi(settingsDialog);
+	connect(settingsForm.actionSave, SIGNAL(triggered()), this, SLOT(doSaveSettings()));
 }
 
 PiTres::~PiTres() {
 	delete content;
+	
+	// Store current Window-Settings
+	QSettings settings;
+	settings.setValue("core/size", size());
+	settings.setValue("core/maximized", isMaximized());
+	settings.setValue("core/fullscreen", isFullScreen());
 }
 
 void PiTres::showStatusMessage(QString msg) {
@@ -40,6 +54,7 @@ void PiTres::connectActions() {
 	connect(actionShow_Users, SIGNAL(triggered()), this, SLOT(showUsers()));
 	connect(actionShow_Bills, SIGNAL(triggered()), this, SLOT(showSentBills()));
 	connect(actionImport_Payments, SIGNAL(triggered()), this, SLOT(showImportPayments()));
+	connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(showSettings()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -101,4 +116,12 @@ void PiTres::showSentBills() {
 void PiTres::showImportPayments() {
 	PaymentImport *widget = new PaymentImport;
 	setContent(widget);
+}
+
+void PiTres::showSettings() {
+	settingsDialog->show();
+}
+
+void PiTres::doSaveSettings() {
+	settingsDialog->hide();
 }

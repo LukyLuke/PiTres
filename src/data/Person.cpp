@@ -23,7 +23,8 @@ PPSPerson::~PPSPerson() {}
 void PPSPerson::createTables(QSqlDatabase db) {
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons (uid INTEGER, contribution INTEGER, nickname TEXT, gender TEXT, familyname TEXT, "
-	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT);");
+	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
+	              "paid_due TEXT, ldap_paid_due TEXT);");
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
@@ -89,8 +90,8 @@ void PPSPerson::emptyTables(QSqlDatabase db) {
 void PPSPerson::save(QSqlDatabase db) {
 	int i;
 	QSqlQuery query(db);
-	query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section) "
-	              "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section);");
+	query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section, paid_due, ldap_paid_due) "
+	              "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section, :paiddue, :ldappaiddue);");
 	query.bindValue(":uid", i_uid);
 	query.bindValue(":section", s_section);
 	query.bindValue(":contcls", (int)m_contributionClass);
@@ -106,6 +107,8 @@ void PPSPerson::save(QSqlDatabase db) {
 	query.bindValue(":birthday", d_birthdate);
 	query.bindValue(":joining", d_joining);
 	query.bindValue(":language", (int)m_language);
+	query.bindValue(":paiddue", d_paidDue);
+	query.bindValue(":ldappaiddue", d_ldapPaidDue);
 	query.exec();
 	
 	if (query.lastError().type() != QSqlError::NoError) {
@@ -176,6 +179,7 @@ void PPSPerson::clear() {
 	d_birthdate = QDate(1970, 01, 01);
 	d_joining = QDate::currentDate();
 	m_language = EN;
+	d_paidDue = QDate(1970, 01, 01);
 	_invoice.clear();
 }
 
@@ -202,6 +206,7 @@ void PPSPerson::load(QSqlDatabase db, int uid) {
 	d_birthdate = query.value(record.indexOf("birthday")).toDate();
 	d_joining = query.value(record.indexOf("joining")).toDate();
 	m_language = (Language)query.value(record.indexOf("language")).toInt();
+	d_paidDue = query.value(record.indexOf("paid_due")).toDate();
 	
 	// Load telephone, mobile and email
 	query.prepare("SELECT number FROM ldap_persons_telephone WHERE uid=?;");
@@ -386,4 +391,14 @@ void PPSPerson::setJoining(QDate joining) {
 void PPSPerson::setLanguage(Language language) {
 	m_language = language;
 	emit languageChanged(language);
+}
+
+void PPSPerson::setPaidDue(QDate paidDue) {
+	d_paidDue = paidDue;
+	emit paidDueChanged(paidDue);
+}
+
+void PPSPerson::setLdapPaidDue(QDate paidDue) {
+	d_ldapPaidDue = paidDue;
+	emit ldapPaidDueChanged(paidDue);
 }

@@ -328,6 +328,10 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 		value.resize(8);
 		person->setJoining(QDate::fromString(value, "yyyyMMdd"));
 		
+	} else if (field == "ppsvotingrightuntil") {
+		value.resize(8);
+		person->setLdapPaidDue(QDate::fromString(value, "yyyyMMdd"));
+		
 	} else if (field == "preferredlanguage") {
 		value = value.toLower();
 		if (value == "de") { person->setLanguage(PPSPerson::DE); }

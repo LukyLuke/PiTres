@@ -1,5 +1,6 @@
 
 #include "PaymentImport.h"
+#include "data/Invoice.h"
 
 #include <QVariant>
 #include <QDate>
@@ -18,8 +19,6 @@
 #include <QDebug>
 
 PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
-	INVOICE_PAID_STATE = "2";
-	
 	setupUi(this);
 	dateEdit->setDate(QDate::currentDate());
 	
@@ -27,7 +26,6 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continueImport()));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(paySelectedInvoice()));
-	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifLiabilities()));
 	
 	openDatabase();
 }
@@ -61,22 +59,26 @@ void PaymentImport::searchData() {
 		return;
 	}
 	
-	QString search;
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+	QString search("reference LIKE :reference OR (");
 	for (int i = 0; i < sl.size(); i++) {
 		if (i > 0) {
 			search.append(" AND ");
 		}
-		search.append(QString("(reference LIKE :p1_").append(QString::number(i)).append(" OR member_uid = :p2_").append(QString::number(i)).append(" OR address_name LIKE :p3_").append(QString::number(i)).append(")"));
+		search.append("(");
+		search.append( QString("member_uid = :uid_").append(QString::number(i)) );
+		search.append( QString(" OR address_name LIKE :name_").append(QString::number(i)) );
+		search.append(")");
 	}
+	search.append(")");
 	
 	QSqlQuery query(db);
 	query.prepare(QString("SELECT member_uid,reference,payable_date,address_name,for_section FROM pps_invoice WHERE %1;").arg(search));
 	
+	query.bindValue(QString(":reference"), QString("%%1%").arg(sl.join(" ")));
 	for (int i = 0; i < sl.size(); i++) {
-		query.bindValue(QString(":p1_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-		query.bindValue(QString(":p2_").append(QString::number(i)), sl.at(i));
-		query.bindValue(QString(":p3_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
+		query.bindValue(QString(":uid_").append(QString::number(i)), sl.at(i));
+		query.bindValue(QString(":name_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
 	}
 	
 	query.exec();
@@ -130,8 +132,9 @@ void PaymentImport::paySelectedInvoice() {
 void PaymentImport::continueImport() {
 	QSettings settings;
 	QString fileName;
-	QString ldiff;
-	QString qif("!Type:" + settings.value("qif/account_asset", "Bank").toString());
+	//float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
+	//float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
+	QString qif("!Type:" + settings.value("qif/account_bank", "Bank").toString());
 	QSqlQuery query(db);
 	query.prepare("UPDATE pps_invoice SET paid_date=:date,amount_paid=amount_paid+:amount WHERE reference=:ref AND member_uid=:member;");
 	
@@ -152,20 +155,6 @@ void PaymentImport::continueImport() {
 		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
 		qif.append("\n^\n");
 		
-		// LDIF
-		if (section.isEmpty() || section.length() > 2) {
-			ldiff.append("dn: " + settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString().arg(member));
-		} else {
-			ldiff.append("dn: " + settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,st=%2,dc=piratenpartei,dc=ch").toString().arg(member, section));
-		}
-		ldiff.append("\nchangetype: modify\ndelete: ");
-		ldiff.append(settings.value("ldif/memberstate_attribute", "ppsPaid").toString());
-		ldiff.append("\n-\nadd: ");
-		ldiff.append(settings.value("ldif/memberstate_attribute", "ppsPaid").toString());
-		ldiff.append("\n");
-		ldiff.append(settings.value("ldif/memberstate_attribute", "ppsPaid").toString() + ": " + settings.value("ldif/memberstate_value", "1").toString());
-		ldiff.append("\n\n");
-		
 		// Update the Database
 		query.bindValue(":date", valuta);
 		query.bindValue(":amount", amount.toFloat());
@@ -179,7 +168,7 @@ void PaymentImport::continueImport() {
 	}
 	
 	// Set Invoices as paid
-	query.prepare("UPDATE pps_invoice SET state="+INVOICE_PAID_STATE+" WHERE amount<=amount_paid;");
+	query.prepare("UPDATE pps_invoice SET state=" + QString::number(Invoice::StatePaid) + " WHERE amount<=amount_paid;");
 	query.exec();
 	
 	// Safe the QIF
@@ -191,44 +180,5 @@ void PaymentImport::continueImport() {
 			out << qif;
 		}
 	}
-	
-	// Save the LDIF
-	fileName = QFileDialog::getSaveFileName(this, tr("Save LDIF File"), "", tr("LDIF (*.ldif);;Plaintext (*.txt)"));
-	if (!fileName.isEmpty()) {
-		QFile f(fileName);
-		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
-			QTextStream out(&f);
-			out << ldiff;
-		}
-	}
 }
 
-void PaymentImport::exportQifLiabilities() {
-	QSettings settings;
-	QString qif("!Type:" + settings.value("qif/account_liability", "Oth L").toString());
-	
-	for (int i = 0; i < tablePay->rowCount(); i++) {
-		QString ref = tablePay->item(i, 0)->text();
-		QString amount = tablePay->item(i, 1)->text();
-		QString member = tablePay->item(i, 2)->text();
-		QString valuta = tablePay->item(i, 3)->text();
-		QString name = tablePay->item(i, 4)->text();
-		
-		qif.append("\nD" + valuta);
-		qif.append("\nT" + amount);
-		qif.append("\nP" + settings.value("qif/payee_label", tr("Invoice: ")).toString() + name + "("+member+")");
-		qif.append("\nN" + ref);
-		qif.append("\nM"+ settings.value("qif/memo", tr("Member UID: ")).toString() + member);
-		qif.append("\nL" + settings.value("qif/account_income", "Membership Income").toString());
-		qif.append("\n^\n");
-	}
-	
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
-	if (!fileName.isEmpty()) {
-		QFile f(fileName);
-		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
-			QTextStream out(&f);
-			out << qif;
-		}
-	}
-}

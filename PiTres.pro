@@ -27,7 +27,7 @@ SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.
 CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml
-FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui
+FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui forms/adjustpaiddate.ui forms/fromtodates.ui forms/settings.ui
 OUT_PWD = build
 
 # Add special Platform-Dependant libraries and sources

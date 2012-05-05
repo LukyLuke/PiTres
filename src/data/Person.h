@@ -30,6 +30,8 @@ Q_PROPERTY(QList<QString> email READ email WRITE setEmail NOTIFY emailChanged)
 Q_PROPERTY(QDate birthdate READ birthdate WRITE setBirthdate NOTIFY birthdateChanged)
 Q_PROPERTY(QDate joining READ joining WRITE setJoining NOTIFY joiningChanged)
 Q_PROPERTY(Language language READ language WRITE setLanguage NOTIFY languageChanged)
+Q_PROPERTY(QDate paidDue READ paidDue WRITE setPaidDue NOTIFY paidDueChanged)
+Q_PROPERTY(QDate ldapPaidDue READ ldapPaidDue WRITE setLdapPaidDue NOTIFY ldapPaidDueChanged)
 
 Q_ENUMS(ContributionClass)
 Q_ENUMS(Gender)
@@ -77,6 +79,8 @@ public:
 	void setBirthdate(QDate birthdate);
 	void setJoining(QDate joining);
 	void setLanguage(Language language);
+	void setPaidDue(QDate paidDue);
+	void setLdapPaidDue(QDate paidDue);
 	
 	// Getter
 	int uid() const { return i_uid; };
@@ -97,6 +101,8 @@ public:
 	QDate birthdate() const { return d_birthdate; };
 	QDate joining() const { return d_joining; };
 	Language language() const { return m_language; };
+	QDate paidDue() const { return d_paidDue; };
+	QDate ldapPaidDue() const { return d_ldapPaidDue; };
 
 signals:
 	void uidChanged(int);
@@ -126,6 +132,8 @@ signals:
 	void birthdateChanged(QDate);
 	void joiningChanged(QDate);
 	void languageChanged(Language);
+	void paidDueChanged(QDate);
+	void ldapPaidDueChanged(QDate);
 
 private:
 	int i_uid;
@@ -147,6 +155,8 @@ private:
 	QDate d_joining;
 	Language m_language;
 	Invoice _invoice;
+	QDate d_paidDue;
+	QDate d_ldapPaidDue;
 };
 
 #endif // Data_Person_H

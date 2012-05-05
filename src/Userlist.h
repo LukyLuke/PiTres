@@ -21,6 +21,7 @@ private:
 	
 	void openDatabase();
 	void loadSections();
+	QSqlQuery createQuery();
 
 public:
 	Userlist(QWidget *parent = 0);
@@ -31,8 +32,10 @@ public slots:
 	void searchData();
 	void searchDataTimeout(QString data);
 	void filterSection(QString section);
+	void showDetails(int index);
 	void showDetails(QModelIndex index);
 	void showTableContextMenu(const QPoint &point);
+	void exportData();
 
 protected:
 	void timerEvent(QTimerEvent *event);
