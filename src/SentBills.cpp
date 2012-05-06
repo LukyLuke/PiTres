@@ -355,11 +355,12 @@ void SentBills::sendNewReminder() {
 	
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
 	if (!fileName.isEmpty()) {
+		fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
 		foreach(const int &i, rows) {
 			uid = tableModel->record(i).value(0).toInt();
 			reminder.loadLast(db, uid);
 			XmlPdf pdf = reminder.createPdf();
-			pdf.print(fileName.replace( QString(".pdf"), QString(".").append(QString::number(reminder.memberUid())).append(".pdf") ));
+			pdf.print( QString(fileName).arg(reminder.memberUid()) );
 		}
 	}
 }
@@ -371,11 +372,12 @@ void SentBills::printNewReminder() {
 	
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
 	if (!fileName.isEmpty()) {
+		fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
 		foreach(const int &i, rows) {
 			uid = tableModel->record(i).value(0).toInt();
 			reminder.loadLast(db, uid);
 			XmlPdf pdf = reminder.createPdf();
-			pdf.print(fileName.replace( QString(".pdf"), QString(".").append(QString::number(reminder.memberUid())).append(".pdf") ));
+			pdf.print( QString(fileName).arg(reminder.memberUid()) );
 		}
 	}
 }

@@ -6,6 +6,7 @@
 #include <QDomNode>
 #include <QDomNodeList>
 #include <QFile>
+#include <QFileInfo>
 #include <QIODevice>
 #include <QFontDatabase>
 #include <QHashIterator>
@@ -36,6 +37,9 @@ void XmlPdf::loadTemplate(QString file) {
 	}
 	tpl.close();
 	
+	QFileInfo info(file);
+	templatePath = info.canonicalPath();
+	
 	elements.clear();
 	QDomNodeList nl = doc.elementsByTagName("g");
 	for (int i = 0; i < nl.size(); i++) {
@@ -43,7 +47,7 @@ void XmlPdf::loadTemplate(QString file) {
 		if (n.isElement()) {
 			QDomElement elem = n.toElement();
 			if (elem.hasAttribute("part") && !elem.attribute("part").isEmpty()) {
-				elements.insert(elem.attribute("part").toLower(), PdfElement::fromElement(elem));
+				elements.insert(elem.attribute("part").toLower(), PdfElement::fromElement(elem, templatePath));
 			}
 		}
 	}

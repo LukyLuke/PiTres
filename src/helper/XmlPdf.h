@@ -17,6 +17,7 @@ public:
 
 private:
 	QHash<QString, PdfElement> elements;
+	QString templatePath;
 };
 
 #endif // HELPER_XMLPDF_H

@@ -12,6 +12,7 @@
 #include <QPolygonF>
 #include <QFont>
 #include <QImage>
+#include <QApplication>
 #include <QDebug>
 
 PdfElement::PdfElement() {}
@@ -20,6 +21,7 @@ PdfElement::PdfElement(const PdfElement &newPdfElement) {
 	_type = newPdfElement.type();
 	_attributes = newPdfElement.attributes();
 	_nodes = newPdfElement.nodes();
+	_templatePath = newPdfElement.templatePath();
 }
 
 PdfElement::~PdfElement() {}
@@ -73,8 +75,9 @@ void PdfElement::paint(QPainter *painter) {
 	}
 }
 
-PdfElement PdfElement::fromElement(QDomElement element) {
+PdfElement PdfElement::fromElement(QDomElement element, QString templatePath) {
 	PdfElement e;
+	e.setTemplatePath(templatePath);
 	e.setElement(element);
 	return e;
 }
@@ -84,6 +87,10 @@ void PdfElement::setElement(QDomElement element) {
 	for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling()) {
 		parse(n);
 	}
+}
+
+void PdfElement::setTemplatePath(QString templatePath) {
+	_templatePath = templatePath;
 }
 
 void PdfElement::setType(PdfElementType pdfType) {
@@ -97,6 +104,7 @@ void PdfElement::parse(QDomNode n) {
 		PdfElement elem = parseType(name);
 		if (_type != PdfUnknown) {
 			elem.setType(_type);
+			elem.setTemplatePath(_templatePath);
 			elem.setAttributes(e.attributes(), e.text());
 			_nodes.push_back(elem);
 		}
@@ -126,7 +134,7 @@ PdfElement PdfElement::parseType(QString name) {
 	} else if (name == "text") {
 		_type = PdfText;
 		return PdfElementText();
-	} else if (name == "img") {
+	} else if ((name == "img") || (name == "image")) {
 		_type = PdfImage;
 		return PdfElementImage();
 	}
@@ -272,18 +280,18 @@ void PdfElementText::paint(QPainter *painter) {
 	bool wordwrap = _attributes.value("wordwrap", "true").toLower() == "true";
 	qreal x = _attributes.value("x", "0").toFloat();
 	qreal y = _attributes.value("y", "0").toFloat();
-	qreal w = _attributes.value("w", "0").toFloat();
-	qreal h = _attributes.value("h", "0").toFloat();
+	qreal w = _attributes.value("width", "0").toFloat();
+	qreal h = _attributes.value("height", "0").toFloat();
 	
 	if (w > 0 && h > 0) {
-		QFont font(font);
+		QFont font = QApplication::font();
 		font.setWeight(weight);
 		font.setItalic(italic);
 		font.setUnderline(underline);
 		font.setPointSizeF(size);
 		
-		//QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter->setPen(Qt::NoPen);
+		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
+		painter->setPen(pen);
 		painter->setBrush(Qt::black);
 		painter->setFont(font);
 		
@@ -308,14 +316,14 @@ void PdfElementText::paint(QPainter *painter) {
 PdfElementImage::PdfElementImage() : PdfElement() {}
 PdfElementImage::~PdfElementImage() {}
 void PdfElementImage::paint(QPainter *painter) {
-	QString image = _attributes.value("file", "");
+	QString image = _templatePath.append("/").append(_attributes.value("file", ""));
 	qreal x = _attributes.value("x", "0").toFloat();
 	qreal y = _attributes.value("y", "0").toFloat();
 	qreal w = _attributes.value("width", "0").toFloat();
 	qreal h = _attributes.value("height", "0").toFloat();
 	if (w > 0 && h > 0) {
 		QImage picture;
-		if (picture.load(":"+image)) {
+		if (picture.load(image)) {
 			painter->setPen(Qt::NoPen);
 			painter->setBrush(Qt::NoBrush);
 			painter->drawImage( QRectF(QPointF(x, y), QSizeF(w, h)), picture, QRectF(picture.rect()) );

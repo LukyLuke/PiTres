@@ -21,17 +21,20 @@ public:
 	void setElement(QDomElement element);
 	void setAttributes(const QDomNamedNodeMap attr, const QString cdata);
 	void setType(PdfElementType type);
+	void setTemplatePath(QString templatePath);
 	
 	QHash<QString, QString> attributes() const { return _attributes; };
 	PdfElementType type() const { return _type; };
 	QList<PdfElement> nodes() const { return _nodes; };
+	QString templatePath() const { return _templatePath; };
 	
-	static PdfElement fromElement(QDomElement element);
+	static PdfElement fromElement(QDomElement element, QString fromElement);
 
 protected:
 	PdfElementType _type;
 	QList<PdfElement> _nodes;
 	QHash<QString, QString> _attributes;
+	QString _templatePath;
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
 };
