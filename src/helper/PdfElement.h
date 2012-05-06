@@ -17,7 +17,7 @@ public:
 	PdfElement();
 	PdfElement(const PdfElement &newPdfElement);
 	virtual ~PdfElement();
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 	void setElement(QDomElement element);
 	void setAttributes(const QDomNamedNodeMap attr, const QString cdata);
 	void setType(PdfElementType type);
@@ -41,7 +41,7 @@ public:
 	PdfElementLine();
 	virtual ~PdfElementLine();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementCircle : public PdfElement {
@@ -49,7 +49,7 @@ public:
 	PdfElementCircle();
 	virtual ~PdfElementCircle();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementArc : public PdfElement {
@@ -57,7 +57,7 @@ public:
 	PdfElementArc();
 	virtual ~PdfElementArc();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementEllipse : public PdfElement {
@@ -65,7 +65,7 @@ public:
 	PdfElementEllipse();
 	virtual ~PdfElementEllipse();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementRectangle : public PdfElement {
@@ -73,7 +73,7 @@ public:
 	PdfElementRectangle();
 	virtual ~PdfElementRectangle();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementPolygon : public PdfElement {
@@ -81,7 +81,7 @@ public:
 	PdfElementPolygon();
 	virtual ~PdfElementPolygon();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementText : public PdfElement {
@@ -89,7 +89,7 @@ public:
 	PdfElementText();
 	virtual ~PdfElementText();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 class PdfElementImage : public PdfElement {
@@ -97,7 +97,7 @@ public:
 	PdfElementImage();
 	virtual ~PdfElementImage();
 	void setType(PdfElementType type);
-	void paint(QPainter painter);
+	void paint(QPainter *painter);
 };
 
 #endif // HELPER_PDFELEMENT_H

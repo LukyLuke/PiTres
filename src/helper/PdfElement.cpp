@@ -12,6 +12,7 @@
 #include <QPolygonF>
 #include <QFont>
 #include <QImage>
+#include <QDebug>
 
 PdfElement::PdfElement() {}
 
@@ -22,6 +23,55 @@ PdfElement::PdfElement(const PdfElement &newPdfElement) {
 }
 
 PdfElement::~PdfElement() {}
+
+void PdfElement::paint(QPainter *painter) {
+	PdfElementLine *_line;
+	PdfElementCircle *_circle;
+	PdfElementArc *_arc;
+	PdfElementEllipse *_ellipse;
+	PdfElementRectangle *_rectangle;
+	PdfElementPolygon *_polygon;
+	PdfElementText *_text;
+	PdfElementImage *_image;
+	
+	for (int i = 0; i < _nodes.size(); i++) {
+		PdfElement e = _nodes.at(i);
+		switch (e.type()) {
+			case PdfLine:
+				_line = (PdfElementLine *)&e;
+				_line->paint(painter);
+				break;
+			case PdfCircle:
+				_circle = (PdfElementCircle *)&e;
+				_circle->paint(painter);
+				break;
+			case PdfArc:
+				_arc = (PdfElementArc *)&e;
+				_arc->paint(painter);
+				break;
+			case PdfEllipse:
+				_ellipse = (PdfElementEllipse *)&e;
+				_ellipse->paint(painter);
+				break;
+			case PdfRectangle:
+				_rectangle = (PdfElementRectangle *)&e;
+				_rectangle->paint(painter);
+				break;
+			case PdfPolygon:
+				_polygon = (PdfElementPolygon *)&e;
+				_polygon->paint(painter);
+				break;
+			case PdfText:
+				_text = (PdfElementText *)&e;
+				_text->paint(painter);
+				break;
+			case PdfImage:
+				_image = (PdfElementImage *)&e;
+				_image->paint(painter);
+				break;
+		}
+	}
+}
 
 PdfElement PdfElement::fromElement(QDomElement element) {
 	PdfElement e;
@@ -41,7 +91,7 @@ void PdfElement::setType(PdfElementType pdfType) {
 }
 
 void PdfElement::parse(QDomNode n) {
-	if (n.isNull() && n.isElement()) {
+	if (!n.isNull() && n.isElement()) {
 		QDomElement e = n.toElement();
 		QString name = n.nodeName();
 		PdfElement elem = parseType(name);
@@ -101,7 +151,7 @@ void PdfElement::setAttributes(const QDomNamedNodeMap attr, const QString cdata)
 // Line
 PdfElementLine::PdfElementLine() : PdfElement() {}
 PdfElementLine::~PdfElementLine() {}
-void PdfElementLine::paint(QPainter painter) {
+void PdfElementLine::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	qreal x1 = _attributes.value("x1", "0").toFloat();
@@ -110,16 +160,16 @@ void PdfElementLine::paint(QPainter painter) {
 	qreal y2 = _attributes.value("y2", "0").toFloat();
 	if (x1 != x2 || x2 != y2) {
 		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter.setPen(pen);
-		painter.setBrush(Qt::NoBrush);
-		painter.drawLine( QPointF(x1, y1), QPointF(x2, y2) );
+		painter->setPen(pen);
+		painter->setBrush(Qt::NoBrush);
+		painter->drawLine( QPointF(x1, y1), QPointF(x2, y2) );
 	}
 }
 
 // Circle
 PdfElementCircle::PdfElementCircle() : PdfElement() {}
 PdfElementCircle::~PdfElementCircle() {}
-void PdfElementCircle::paint(QPainter painter) {
+void PdfElementCircle::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
@@ -129,16 +179,16 @@ void PdfElementCircle::paint(QPainter painter) {
 	qreal ry = _attributes.value("r", "0").toFloat();
 	if (rx > 0 && ry > 0) {
 		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter.setPen(pen);
-		painter.setBrush(Qt::NoBrush);
-		painter.drawEllipse( QPointF(cx, cy), rx, ry );
+		painter->setPen(pen);
+		painter->setBrush(Qt::NoBrush);
+		painter->drawEllipse( QPointF(cx, cy), rx, ry );
 	}
 }
 
 // Ellipse
 PdfElementEllipse::PdfElementEllipse() : PdfElement() {}
 PdfElementEllipse::~PdfElementEllipse() {}
-void PdfElementEllipse::paint(QPainter painter) {
+void PdfElementEllipse::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
@@ -148,23 +198,23 @@ void PdfElementEllipse::paint(QPainter painter) {
 	qreal ry = _attributes.value("ry", "0").toFloat();
 	if (rx > 0 && ry > 0) {
 		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter.setPen(pen);
-		painter.setBrush(Qt::NoBrush);
-		painter.drawEllipse( QPointF(cx, cy), rx, ry );
+		painter->setPen(pen);
+		painter->setBrush(Qt::NoBrush);
+		painter->drawEllipse( QPointF(cx, cy), rx, ry );
 	}
 }
 
 // Arc
 PdfElementArc::PdfElementArc() : PdfElement() {}
 PdfElementArc::~PdfElementArc() {}
-void PdfElementArc::paint(QPainter painter) {
+void PdfElementArc::paint(QPainter *painter) {
 	// TODO: Implement, see also Chord and Pie
 }
 
 // Rectangle
 PdfElementRectangle::PdfElementRectangle() : PdfElement() {}
 PdfElementRectangle::~PdfElementRectangle() {}
-void PdfElementRectangle::paint(QPainter painter) {
+void PdfElementRectangle::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	qreal x = _attributes.value("x", "0").toFloat();
@@ -173,16 +223,16 @@ void PdfElementRectangle::paint(QPainter painter) {
 	qreal h = _attributes.value("height", "0").toFloat();
 	if (w > 0 && h > 0) {
 		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter.setPen(pen);
-		painter.setBrush(Qt::NoBrush);
-		painter.drawRect( QRectF(QPointF(x, y), QSizeF(w, h)) );
+		painter->setPen(pen);
+		painter->setBrush(Qt::NoBrush);
+		painter->drawRect( QRectF(QPointF(x, y), QSizeF(w, h)) );
 	}
 }
 
 // Polygon
 PdfElementPolygon::PdfElementPolygon() : PdfElement() {}
 PdfElementPolygon::~PdfElementPolygon() {}
-void PdfElementPolygon::paint(QPainter painter) {
+void PdfElementPolygon::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
@@ -191,16 +241,16 @@ void PdfElementPolygon::paint(QPainter painter) {
 	QStringList yl = _attributes.value("y", "").split(",", QString::SkipEmptyParts);
 	if ((xl.size() > 0) && (xl.size() == yl.size())) {
 		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter.setPen(pen);
-		painter.setBrush(Qt::NoBrush);
+		painter->setPen(pen);
+		painter->setBrush(Qt::NoBrush);
 		QPolygonF polygon;
 		for (int i = 0; i < xl.size(); i++) {
 			polygon << QPointF(xl.at(i).toFloat(), yl.at(i).toFloat());
 		}
 		if (close) {
-			painter.drawPolygon(polygon);
+			painter->drawPolygon(polygon);
 		} else {
-			painter.drawPolyline(polygon);
+			painter->drawPolyline(polygon);
 		}
 	}
 }
@@ -208,7 +258,7 @@ void PdfElementPolygon::paint(QPainter painter) {
 // Text
 PdfElementText::PdfElementText() : PdfElement() {}
 PdfElementText::~PdfElementText() {}
-void PdfElementText::paint(QPainter painter) {
+void PdfElementText::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
@@ -233,9 +283,9 @@ void PdfElementText::paint(QPainter painter) {
 		font.setPointSizeF(size);
 		
 		//QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter.setPen(Qt::NoPen);
-		painter.setBrush(Qt::black);
-		painter.setFont(font);
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Qt::black);
+		painter->setFont(font);
 		
 		int flags = Qt::TextDontClip;
 		//int flags = 0;
@@ -250,14 +300,14 @@ void PdfElementText::paint(QPainter painter) {
 		
 		if (wordwrap) flags |= Qt::TextWordWrap;
 		
-		painter.drawText( QRectF(QPointF(x, y), QSizeF(w, h)), flags, _attributes.value("cdata", "") );
+		painter->drawText( QRectF(QPointF(x, y), QSizeF(w, h)), flags, _attributes.value("cdata", "") );
 	}
 }
 
 // Image
 PdfElementImage::PdfElementImage() : PdfElement() {}
 PdfElementImage::~PdfElementImage() {}
-void PdfElementImage::paint(QPainter painter) {
+void PdfElementImage::paint(QPainter *painter) {
 	QString image = _attributes.value("file", "");
 	qreal x = _attributes.value("x", "0").toFloat();
 	qreal y = _attributes.value("y", "0").toFloat();
@@ -266,9 +316,9 @@ void PdfElementImage::paint(QPainter painter) {
 	if (w > 0 && h > 0) {
 		QImage picture;
 		if (picture.load(":"+image)) {
-			painter.setPen(Qt::NoPen);
-			painter.setBrush(Qt::NoBrush);
-			painter.drawImage( QRectF(QPointF(x, y), QSizeF(w, h)), picture, QRectF(picture.rect()) );
+			painter->setPen(Qt::NoPen);
+			painter->setBrush(Qt::NoBrush);
+			painter->drawImage( QRectF(QPointF(x, y), QSizeF(w, h)), picture, QRectF(picture.rect()) );
 		}
 	}
 }
