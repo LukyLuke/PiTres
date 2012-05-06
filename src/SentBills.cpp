@@ -2,6 +2,8 @@
 #include "SentBills.h"
 #include "data/Person.h"
 #include "data/Invoice.h"
+#include "data/Reminder.h"
+#include "helper/XmlPdf.h"
 
 #include <QSizePolicy>
 #include <QWidget>
@@ -22,6 +24,9 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QKeySequence>
+#include <QItemSelectionModel>
+#include <QModelIndexList>
 #include <QDebug>
 
 
@@ -41,6 +46,7 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	
 	openDatabase();
 	loadData();
+	createContextMenu();
 	
 	adjustDialog = new QDialog(this);
 	form.setupUi(adjustDialog);
@@ -49,10 +55,28 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	fromtoDialog = new QDialog(this);
 	fromto.setupUi(fromtoDialog);
 	connect(fromto.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifAssets()));
+	
+	// Enable the ContextMenu
+	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showTableContextMenu(const QPoint&)));
 }
 
 SentBills::~SentBills() {
-	// dd.close();
+	// db.close();
+	delete actionSendReminder;
+	delete actionPrintReminder;
+}
+
+void SentBills::createContextMenu() {
+	actionSendReminder = new QAction(tr("&Send Reminder"), this);
+	//actionPrintReminder->setShortcuts(QKeySequence(Qt::CTRL + Qt::Key_R));
+	actionSendReminder->setStatusTip(tr("Create a new Reminder and send it by EMail"));
+	connect(actionSendReminder, SIGNAL(triggered()), this, SLOT(sendNewReminder()));
+	
+	actionPrintReminder = new QAction(tr("&Pdf Reminder"), this);
+	actionPrintReminder->setShortcuts(QKeySequence::Print);
+	actionPrintReminder->setStatusTip(tr("Create a new Reminder and creates a PDF to save and Print it"));
+	connect(actionPrintReminder, SIGNAL(triggered()), this, SLOT(printNewReminder()));
 }
 
 void SentBills::openDatabase() {
@@ -307,4 +331,54 @@ void SentBills::doAdjustDates() {
 	}
 	adjustDialog->hide();
 }
+
+void SentBills::showTableContextMenu(const QPoint &point) {
+	QMenu menu(tableView);
+	menu.addAction(actionSendReminder);
+	menu.addAction(actionPrintReminder);
+	menu.exec(tableView->mapToGlobal(point));
+}
+
+QSet<int> SentBills::getSelectedRows() {
+	QModelIndexList selection = tableView->selectionModel()->selectedIndexes();
+	QSet<int> rows;
+	for (int i = 0; i < selection.size(); i++) {
+		rows << selection.at(i).row();
+	}
+	return rows;
+}
+
+void SentBills::sendNewReminder() {
+	int uid;
+	Reminder reminder;
+	QSet<int> rows = getSelectedRows();
+	
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
+	if (!fileName.isEmpty()) {
+		foreach(const int &i, rows) {
+			uid = tableModel->record(i).value(0).toInt();
+			reminder.loadLast(db, uid);
+			XmlPdf pdf = reminder.createPdf();
+			pdf.print(fileName.replace( QString(".pdf"), QString(".").append(QString::number(reminder.memberUid())).append(".pdf") ));
+		}
+	}
+}
+
+void SentBills::printNewReminder() {
+	int uid;
+	Reminder reminder;
+	QSet<int> rows = getSelectedRows();
+	
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
+	if (!fileName.isEmpty()) {
+		foreach(const int &i, rows) {
+			uid = tableModel->record(i).value(0).toInt();
+			reminder.loadLast(db, uid);
+			XmlPdf pdf = reminder.createPdf();
+			pdf.print(fileName.replace( QString(".pdf"), QString(".").append(QString::number(reminder.memberUid())).append(".pdf") ));
+		}
+	}
+}
+
+
 
