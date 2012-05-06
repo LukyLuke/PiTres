@@ -1,20 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template size="a4">
 	<g part="header">
-		<line stroke="2" x1="10" x2="50" y1="10" y2="100" strokecolor="black" />
-		<line stroke="2" x1="20" x2="60" y1="10" y2="300" strokecolor="black" />
-		<line stroke="2" x1="30" x2="70" y1="10" y2="400" strokecolor="black" />
+		<image x="5" y="5" width="220" height="50" file="logo_german.png" />
+		<text x="280" y="10" width="250" height="67" wordwrap="true" weight="1" size="10"><![CDATA[Piratenpartei Schweiz
+CH-1337 Valorbe
+info@piratenpartei.ch]]></text>
 	</g>
 
-	<g part="logo">
-		<image x="300" y="10" width="200" height="50" file="logo_german.png" />
+	<g part="sender">
+		<rect x="415" y="142" width="150" height="26" stroke="0.2"/>
+		<text x="417" y="144" width="10" height="10" wordwrap="false" weight="5" size="14"><![CDATA[P.P.]]></text>
+		<text x="452" y="147" width="10" height="10" wordwrap="false" weight="1" size="6"><![CDATA[{PP_COUNTRY} - {PP_ZIP}
+{PP_CITY}]]></text>
+		<line x1="415" y1="174" x2="698" y2="174" stroke="0.2" />
+		<text x="617" y="155" width="20" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{PRINT_DATE}]]></text>
 	</g>
 
-	<g part="test">
-		<text x="100" y="500" width="100" height="100"><![CDATA[Some demo text]]></text>
-		<text x="200" y="500" width="100" height="100" underline="true" italic="true"><![CDATA[Some demo text]]></text>
-		<text x="300" y="500" width="100" height="100" weight="3"><![CDATA[Some demo text]]></text>
-		<text x="100" y="700" width="200" height="100" wordwrap="true" valign="justify" halign="top" size="9"><![CDATA[Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text Some more Text ]]></text>
+	<g part="address">
+		<text x="415" y="190" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
+		<text x="415" y="205" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_NAME}]]></text>
+		<text x="415" y="220" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_STREET}]]></text>
+		<text x="415" y="235" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_ZIP} {MEMBER_CITY}]]></text>
+		<text x="415" y="250" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_COUNTRY}]]></text>
+		<text x="415" y="300" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 	</g>
 
+	<g part="memberinfo">
+		<line x1="5" y1="220" x2="5" y2="265" stroke="0.2" />
+
+		<text x="10" y="220" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[Mitgliedernummer:]]></text>
+		<text x="130" y="220" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
+
+		<text x="10" y="235" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[Nickname:]]></text>
+		<text x="130" y="235" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+
+		<text x="10" y="250" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[E-Mail:]]></text>
+		<text x="130" y="250" width="300" height="10" wordwrap="false" weight="1" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
+	</g>
+
+	<g part="text1">
+		<text x="20" y="400" width="500" height="10" wordwrap="false" weight="5" size="12"><![CDATA[Mitgliederrechnung {PRINT_YEAR}]]></text>
+		<text x="20" y="440" width="500" height="10" wordwrap="false" weight="1" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
+		<text x="20" y="465" width="690" height="200" wordwrap="true" weight="1" size="10" halign="justify"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae enim quis odio elementum semper. Ut nec ipsum odio. Fusce nec leo ut tellus rutrum faucibus a non nibh. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean quis arcu et lacus ullamcorper venenatis nec at massa.
+		Quisque et dui ut neque venenatis blandit. Curabitur volutpat lorem nec ante pellentesque hendrerit. Maecenas sem nunc, consequat sit amet sodales quis, dignissim non enim. Nam in purus massa, vel ullamcorper nunc. Sed erat nunc, fermentum vitae convallis non, pulvinar et neque. Proin eu ornare diam. Praesent consectetur ultrices fermentum. Vivamus semper faucibus facilisis. Vivamus diam metus, blandit vel malesuada accumsan, tempus at sapien.]]></text>
+		<text x="20" y="620" width="500" height="10" wordwrap="false" weight="1" size="10"><![CDATA[Besten Dank,
+Piratenpartei Schweiz]]></text>
+	</g>
+
+	<g part="creditslip">
+		<text x="10" y="740" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[Piratenpartei Schweiz]]></text>
+		<text x="10" y="755" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[1337 Valorbe]]></text>
+
+		<text x="90" y="860" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[60-76630-3]]></text>
+		<text x="10" y="885" width="115" height="10" wordwrap="false" weight="1" size="8" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+		<text x="150" y="885" width="60" height="10" wordwrap="false" weight="1" size="8"><![CDATA[00]]></text>
+
+		<text x="280" y="740" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[Piratenpartei Schweiz]]></text>
+		<text x="280" y="755" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[1337 Valorbe]]></text>
+
+		<text x="320" y="860" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[60-76630-3]]></text>
+		<text x="238" y="885" width="115" height="10" wordwrap="false" weight="1" size="8" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+		<text x="385" y="885" width="60" height="10" wordwrap="false" weight="1" size="8"><![CDATA[00]]></text>
+
+		<text x="10" y="920" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{INVOICE_REFERENCE}]]></text>
+
+		<text x="10" y="935" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_PREFIX}]]></text>
+		<text x="10" y="950" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_NAME}]]></text>
+		<text x="10" y="965" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_STREET}]]></text>
+		<text x="10" y="980" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_ZIP} {MEMBER_CITY}]]></text>
+
+		<text x="450" y="815" width="280" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{INVOICE_REFERENCE}]]></text>
+
+		<text x="450" y="875" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_PREFIX}]]></text>
+		<text x="450" y="890" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_NAME}]]></text>
+		<text x="450" y="905" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_STREET}]]></text>
+		<text x="450" y="920" width="300" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{MEMBER_ZIP} {MEMBER_CITY}]]></text>
+
+		<text x="250" y="1020" width="490" height="10" wordwrap="false" weight="1" size="8"><![CDATA[{INVOICE_ESR}]]></text>
+	</g>
 </template>
