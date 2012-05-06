@@ -28,6 +28,10 @@
 SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	
+	QSettings settings;
+	pendingOnly->setChecked(settings.value("sentbills/pending", false).toBool());
+	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate()).toDate());
+	
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
@@ -73,8 +77,7 @@ void SentBills::loadData() {
 	PPSPerson::createTables(db);
 	Invoice::createTables(db);
 	
-	QSqlQuery query("SELECT * FROM pps_invoice;", db);
-	tableModel->setQuery(query);
+	tableModel->setQuery(createQuery());
 	
 	tableModel->setHeaderData(0,  Qt::Horizontal, tr("UID"));
 	tableModel->setHeaderData(1,  Qt::Horizontal, tr("Reference"));
@@ -154,6 +157,10 @@ QSqlQuery SentBills::createQuery() {
 }
 
 void SentBills::searchData() {
+	QSettings settings;
+	settings.setValue("sentbills/pending", pendingOnly->isChecked());
+	settings.setValue("sentbills/sincedate", sinceDate->date());
+	
 	QSqlQuery query = createQuery();
 	tableModel->setQuery(query);
 }

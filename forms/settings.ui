@@ -65,7 +65,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_20">
+               <widget class="QLineEdit" name="sqliteFile">
                 <property name="text">
                  <string>data/userlist.sqlite</string>
                 </property>
@@ -95,7 +95,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox">
+               <widget class="QDoubleSpinBox" name="memberAmountFull">
                 <property name="maximum">
                  <double>9999.989999999999782</double>
                 </property>
@@ -105,7 +105,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+               <widget class="QDoubleSpinBox" name="memberAmountLimited">
                 <property name="maximum">
                  <double>9999.989999999999782</double>
                 </property>
@@ -145,7 +145,7 @@
             <x>0</x>
             <y>0</y>
             <width>766</width>
-            <height>426</height>
+            <height>437</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -205,51 +205,54 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_13">
+               <widget class="QLineEdit" name="ldapHost">
                 <property name="text">
                  <string>localhost</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_14">
-                <property name="text">
-                 <string>1389</string>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_15">
+               <widget class="QLineEdit" name="ldapBindDn">
                 <property name="text">
-                 <string>uniqueIdentifier=&lt;Your UID here&gt;,dc=members,st=ts,dc=piratenpartei,dc=ch</string>
+                 <string>uniqueIdentifier=&lt;Your UID here&gt;,dc=members,st=&lt;Your Section here&gt;,dc=piratenpartei,dc=ch</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_16">
+               <widget class="QLineEdit" name="ldapPassword">
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QLineEdit" name="lineEdit_17">
+               <widget class="QLineEdit" name="ldapBaseDn">
                 <property name="text">
                  <string>dc=members,st=&lt;Your Section here&gt;,dc=piratenpartei,dc=ch</string>
                 </property>
                </widget>
               </item>
               <item row="5" column="1">
-               <widget class="QLineEdit" name="lineEdit_18">
+               <widget class="QLineEdit" name="ldapSearch">
                 <property name="text">
                  <string>(objectClass=ppsPerson)</string>
                 </property>
                </widget>
               </item>
               <item row="6" column="1">
-               <widget class="QLineEdit" name="lineEdit_19">
+               <widget class="QLineEdit" name="ldapSectionRegex">
                 <property name="text">
                  <string>^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="ldapPort">
+                <property name="maximum">
+                 <number>65534</number>
+                </property>
+                <property name="value">
+                 <number>389</number>
                 </property>
                </widget>
               </item>
@@ -294,28 +297,28 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_10">
+               <widget class="QLineEdit" name="ldifNonsectionMembers">
                 <property name="text">
                  <string>uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_11">
+               <widget class="QLineEdit" name="ldifSectionMembers">
                 <property name="text">
                  <string>uniqueIdentifier=%1,dc=members,st=%2,dc=piratenpartei,dc=ch</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_12">
+               <widget class="QLineEdit" name="ldifPaidDueAttribute">
                 <property name="text">
                  <string>ppsVotingRightUntil</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="ldifPaidDueReplace">
                 <property name="text">
                  <string>Check to replace / Uncheck to add the new value</string>
                 </property>
@@ -369,7 +372,7 @@
             <x>0</x>
             <y>0</y>
             <width>766</width>
-            <height>426</height>
+            <height>437</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -415,35 +418,35 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit">
+               <widget class="QLineEdit" name="assetType">
                 <property name="text">
                  <string>Oth A</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_2">
+               <widget class="QLineEdit" name="assetLabel">
                 <property name="text">
                  <string>Membership: </string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_3">
+               <widget class="QLineEdit" name="assetMemo">
                 <property name="text">
                  <string>Member UID: </string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_4">
+               <widget class="QLineEdit" name="assetAccountFull">
                 <property name="text">
                  <string>Membership Default</string>
                 </property>
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QLineEdit" name="lineEdit_5">
+               <widget class="QLineEdit" name="assetAccountLimited">
                 <property name="text">
                  <string>Membership Limited</string>
                 </property>
@@ -466,7 +469,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_6">
+               <widget class="QLineEdit" name="paymentType">
                 <property name="text">
                  <string>Bank</string>
                 </property>
@@ -494,21 +497,21 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_7">
+               <widget class="QLineEdit" name="paymentLabel">
                 <property name="text">
                  <string>Payment: </string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_8">
+               <widget class="QLineEdit" name="paymentMemo">
                 <property name="text">
                  <string>Member UID: </string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_9">
+               <widget class="QLineEdit" name="paymentAccount">
                 <property name="text">
                  <string>Membership Fee</string>
                 </property>

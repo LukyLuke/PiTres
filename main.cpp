@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 	QSettings settings;
 	
 	// Application Settings
-	QCoreApplication::setOrganizationName("Piratenpartei");
+	QCoreApplication::setOrganizationName("PirateParty");
 	QCoreApplication::setOrganizationDomain("piratenpartei.ch");
 	QCoreApplication::setApplicationName("PiTres");
 	QCoreApplication::setApplicationVersion("0.1.0");
