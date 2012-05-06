@@ -35,11 +35,13 @@ LDAPImport::LDAPImport(QWidget *parent) {
 	openDatabase();
 	
 	// Load saved values
-	editServer->setText( settings.value("ldap/server", editServer->text()).toString() );
-	editPort->setText( settings.value("ldap/port", editPort->text()).toString() );
-	editBindDN->setText( settings.value("ldap/binddn", editBindDN->text()).toString() );
-	editBaseDN->setText( settings.value("ldap/basedn", editBaseDN->text()).toString() );
-	editPassword->setText( settings.value("ldap/password", editPassword->text()).toString() );
+	editServer->setText( settings.value("ldap/server", "localhost").toString() );
+	editPort->setValue( settings.value("ldap/port", 389).toInt() );
+	editBindDN->setText( settings.value("ldap/binddn", "uniqueIdentifier=<Your UID here>,dc=members,st=<Your Section here>,dc=piratenpartei,dc=ch").toString() );
+	editBaseDN->setText( settings.value("ldap/basedn", "dc=members,st=<Your Section here>,dc=piratenpartei,dc=ch").toString() );
+	editPassword->setText( settings.value("ldap/password", "").toString() );
+	editSearch->setText( settings.value("ldap/search", "(objectClass=ppsPerson)").toString() );
+	sectionExtract->setText( settings.value("ldap/sectionregex", "^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString() );
 	
 	// Setup StackWidget Navigation
 	connect(btnGoToSearch, SIGNAL(clicked()), this, SLOT(nextPage()));
@@ -74,10 +76,12 @@ void LDAPImport::previousPage() {
 void LDAPImport::saveConfiguration() {
 	QSettings settings;
 	settings.setValue("ldap/server", editServer->text());
-	settings.setValue("ldap/port", editPort->text());
+	settings.setValue("ldap/port", editPort->value());
 	settings.setValue("ldap/binddn", editBindDN->text());
 	settings.setValue("ldap/basedn", editBaseDN->text());
 	settings.setValue("ldap/password", editPassword->text());
+	settings.setValue("ldap/search", editSearch->text());
+	settings.setValue("ldap/sectionregex", sectionExtract->text());
 }
 
 void LDAPImport::disconnectLdap() {
@@ -91,7 +95,7 @@ void LDAPImport::connectLdap() {
 	if (connected) return;
 
 	int rc;
-	QString host = "ldap://" + editServer->text() + ":" + editPort->text();
+	QString host = "ldap://" + editServer->text() + ":" + QString::number(editPort->value());
 	qDebug() << "Trying to connect: " + host;
 	
 	if (LDAP_SUCCESS == ldap_initialize(&ldap, host.toStdString().c_str())) {
