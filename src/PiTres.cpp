@@ -6,6 +6,7 @@
 #include "LDAPImport.h"
 
 #include <QtGui>
+#include <QFileDialog>
 #include <QtGui/QGridLayout>
 #include <QSettings>
 
@@ -27,6 +28,10 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	settingsDialog = new QDialog(this);
 	settingsForm.setupUi(settingsDialog);
 	connect(settingsForm.actionSave, SIGNAL(triggered()), this, SLOT(doSaveSettings()));
+	
+	connect(settingsForm.invoiceSelect, SIGNAL(clicked()), this, SLOT(showInvoiceFileDialog()));
+	connect(settingsForm.reminderSelect, SIGNAL(clicked()), this, SLOT(showReminderFileDialog()));
+	connect(settingsForm.receiptSelect, SIGNAL(clicked()), this, SLOT(showReceiptFileDialog()));
 }
 
 PiTres::~PiTres() {
@@ -124,6 +129,9 @@ void PiTres::showSettings() {
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_limited", 30.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_default", 60.0).toFloat());
+	settingsForm.pdfInvoice->setText(settings.value("pdf/invoce_template", "data/invoice.xml").toString());
+	settingsForm.pdfReminder->setText(settings.value("pdf/reminder_template", "data/reminder.xml").toString());
+	settingsForm.pdfReceipt->setText(settings.value("pdf/receipt_template", "data/receipt.xml").toString());
 	
 	settingsForm.assetType->setText(settings.value("qif/account_asset", "Oth A").toString());
 	settingsForm.assetLabel->setText(settings.value("qif/payee_label", "Membership: ").toString());
@@ -160,6 +168,9 @@ void PiTres::doSaveSettings() {
 	settings.setValue("database/sqlite", settingsForm.sqliteFile->text());
 	settings.setValue("invoice/amount_limited", settingsForm.memberAmountFull->value());
 	settings.setValue("invoice/amount_default", settingsForm.memberAmountLimited->value());
+	settings.setValue("pdf/invoce_template", settingsForm.pdfInvoice->text());
+	settings.setValue("pdf/reminder_template", settingsForm.pdfReminder->text());
+	settings.setValue("pdf/receipt_template", settingsForm.pdfReceipt->text());
 	
 	settings.setValue("qif/account_asset", settingsForm.assetType->text());
 	settings.setValue("qif/payee_label", settingsForm.assetLabel->text());
@@ -186,3 +197,23 @@ void PiTres::doSaveSettings() {
 	settings.setValue("ldif/replace_attribute", settingsForm.ldifPaidDueReplace->isChecked());
 }
 
+void PiTres::showInvoiceFileDialog() {
+	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfInvoice->text(), tr("PDF-Templates (*.xml)"));
+	if (!file.isEmpty()) {
+		settingsForm.pdfInvoice->setText(file);
+	}
+}
+
+void PiTres::showReminderFileDialog() {
+	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfReminder->text(), tr("PDF-Templates (*.xml)"));
+	if (!file.isEmpty()) {
+		settingsForm.pdfReminder->setText(file);
+	}
+}
+
+void PiTres::showReceiptFileDialog() {
+	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfReceipt->text(), tr("PDF-Templates (*.xml)"));
+	if (!file.isEmpty()) {
+		settingsForm.pdfReceipt->setText(file);
+	}
+}

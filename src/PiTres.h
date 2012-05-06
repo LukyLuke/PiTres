@@ -40,6 +40,9 @@ public slots:
 	void showImportPayments();
 	void showSettings();
 	void doSaveSettings();
+	void showInvoiceFileDialog();
+	void showReminderFileDialog();
+	void showReceiptFileDialog();
 };
 
 #endif // PiTres_H
