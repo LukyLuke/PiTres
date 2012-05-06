@@ -2,6 +2,8 @@
 #include "Invoice.h"
 
 #include <QObject>
+#include <QSettings>
+#include <QVariant>
 #include <QString>
 #include <QVariant>
 #include <QDate>
@@ -153,6 +155,13 @@ QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
 	return back;
 }
 
+XmlPdf Invoice::createPdf() {
+	QSettings settings;
+	XmlPdf pdf;
+	pdf.loadTemplate( settings.value("pdf/invoice_template", "data/invoice.xml").toString() );
+	return pdf;
+}
+
 void Invoice::setMemberUid(int memberUid) {
 	i_memberUid = memberUid;
 	emit memberUidChanged(memberUid);
@@ -237,5 +246,4 @@ void Invoice::setForSection(QString forSection) {
 	s_forSection = forSection;
 	emit forSectionChanged(forSection);
 }
-
 

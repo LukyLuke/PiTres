@@ -1,6 +1,8 @@
 #ifndef Data_Invoice_H
 #define Data_Invoice_H
 
+#include "../helper/XmlPdf.h"
+
 #include <QObject>
 #include <QString>
 #include <QDate>
@@ -38,9 +40,10 @@ public:
 	void clear();
 	void setIsLoaded(bool loaded);
 	void loadLast(QSqlDatabase db, int member);
+	XmlPdf createPdf();
 	static QList<Invoice *> getInvoicesForMember(QSqlDatabase db, int member);
 	static void createTables(QSqlDatabase db);
-	
+
 	// InvoiceState in old DB: o_pen, c_anceled, p_aid, u_nknown
 	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3 };
 	
