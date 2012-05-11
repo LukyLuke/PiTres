@@ -8,7 +8,7 @@ class Reminder : public Invoice {
 public:
 	Reminder(QObject *parent = 0);
 	virtual ~Reminder();
-	XmlPdf createPdf();
+	XmlPdf *createPdf();
 };
 
 #endif // Data_Reminder_H 

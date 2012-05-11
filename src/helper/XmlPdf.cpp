@@ -9,7 +9,6 @@
 #include <QFileInfo>
 #include <QIODevice>
 #include <QFontDatabase>
-#include <QHashIterator>
 #include <QPainter>
 #include <QPrinter>
 #include <QDebug>
@@ -53,8 +52,12 @@ void XmlPdf::loadTemplate(QString file) {
 	}
 }
 
+void XmlPdf::setVar(QString name, QString value) {
+	variables.insert(name, value);
+}
+
+
 bool XmlPdf::print(QString file) {
-	QHashIterator<QString, PdfElement> it(elements);
 	QPrinter printer;
 	printer.setPaperSize(QPrinter::A4);
 	printer.setOutputFormat(QPrinter::PdfFormat);
@@ -66,11 +69,17 @@ bool XmlPdf::print(QString file) {
 		return false;
 	}
 	
-	while (it.hasNext()) {
-		it.next();
+	QHash<QString, PdfElement>::const_iterator it = elements.constBegin();
+	while (it != elements.constEnd()) {
 		PdfElement elem = it.value();
+		elem.setVars(&variables);
 		elem.paint(painter);
+		it++;
 	}
 	painter->end();
 	return true;
+}
+
+bool XmlPdf::send(QString email) {
+	
 }

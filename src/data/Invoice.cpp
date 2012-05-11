@@ -37,6 +37,7 @@ void Invoice::clear() {
 	s_addressStreet1 = "";
 	s_addressStreet2 = "";
 	s_addressCity = "";
+	s_addressCountry = "";
 	s_addressEmail = "";
 	s_forSection = "";
 }
@@ -155,10 +156,10 @@ QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
 	return back;
 }
 
-XmlPdf Invoice::createPdf() {
+XmlPdf *Invoice::createPdf() {
 	QSettings settings;
-	XmlPdf pdf;
-	pdf.loadTemplate( settings.value("pdf/invoice_template", "data/invoice.xml").toString() );
+	XmlPdf *pdf = new XmlPdf;
+	pdf->loadTemplate( settings.value("pdf/invoice_template", "data/invoice.xml").toString() );
 	return pdf;
 }
 
@@ -235,6 +236,11 @@ void Invoice::setAddressStreet2(QString addressStreet2) {
 void Invoice::setAddressCity(QString addressCity) {
 	s_addressCity = addressCity;
 	emit addressCityChanged(addressCity);
+}
+
+void Invoice::setAddressCountry(QString addressCountry) {
+	s_addressCountry = addressCountry;
+	emit addressCountryChanged(addressCountry);
 }
 
 void Invoice::setAddressEmail(QString addressEmail) {

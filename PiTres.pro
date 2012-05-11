@@ -33,9 +33,10 @@ OUT_PWD = build
 # Add special Platform-Dependant libraries and sources
 win32 {
 	CONFIG += windows
+	LIBS += -lldap -llber
 }
 unix {
-	LIBS += -lldap
+	LIBS += -lldap -llber
 }
 macx {
 

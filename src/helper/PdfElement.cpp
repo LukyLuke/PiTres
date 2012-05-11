@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QStringList>
+#include <QHashIterator>
+#include <QHash>
 #include <QDomAttr>
 #include <QPen>
 #include <QBrush>
@@ -38,6 +40,7 @@ void PdfElement::paint(QPainter *painter) {
 	
 	for (int i = 0; i < _nodes.size(); i++) {
 		PdfElement e = _nodes.at(i);
+		e.setVars(_variables);
 		switch (e.type()) {
 			case PdfLine:
 				_line = (PdfElementLine *)&e;
@@ -95,6 +98,10 @@ void PdfElement::setTemplatePath(QString templatePath) {
 
 void PdfElement::setType(PdfElementType pdfType) {
 	_type = pdfType;
+}
+
+void PdfElement::setVars(QHash<QString, QString> *variables) {
+	_variables = variables;
 }
 
 void PdfElement::parse(QDomNode n) {
@@ -308,7 +315,14 @@ void PdfElementText::paint(QPainter *painter) {
 		
 		if (wordwrap) flags |= Qt::TextWordWrap;
 		
-		painter->drawText( QRectF(QPointF(x, y), QSizeF(w, h)), flags, _attributes.value("cdata", "") );
+		// Replace variables
+		QString cdata = _attributes.value("cdata", "");
+		QHash<QString, QString>::const_iterator it = _variables->constBegin();
+		while (it != _variables->constEnd()) {
+			cdata.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
+			it++;
+		}
+		painter->drawText( QRectF(QPointF(x, y), QSizeF(w, h)), flags, cdata );
 	}
 }
 

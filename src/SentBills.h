@@ -38,6 +38,7 @@ private:
 	QSqlQuery createQuery();
 	void createContextMenu();
 	QSet<int> getSelectedRows();
+	void createPdfReminds(bool email);
 
 public:
 	SentBills(QWidget *parent = 0);

@@ -349,25 +349,17 @@ QSet<int> SentBills::getSelectedRows() {
 }
 
 void SentBills::sendNewReminder() {
-	int uid;
-	Reminder reminder;
-	QSet<int> rows = getSelectedRows();
-	
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-	if (!fileName.isEmpty()) {
-		fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		foreach(const int &i, rows) {
-			uid = tableModel->record(i).value(0).toInt();
-			reminder.loadLast(db, uid);
-			XmlPdf pdf = reminder.createPdf();
-			pdf.print( QString(fileName).arg(reminder.memberUid()) );
-		}
-	}
+	createPdfReminds(true);
 }
 
 void SentBills::printNewReminder() {
+	createPdfReminds(false);
+}
+
+void SentBills::createPdfReminds(bool email) {
 	int uid;
 	Reminder reminder;
+	XmlPdf *pdf;
 	QSet<int> rows = getSelectedRows();
 	
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
@@ -376,11 +368,14 @@ void SentBills::printNewReminder() {
 		foreach(const int &i, rows) {
 			uid = tableModel->record(i).value(0).toInt();
 			reminder.loadLast(db, uid);
-			XmlPdf pdf = reminder.createPdf();
-			pdf.print( QString(fileName).arg(reminder.memberUid()) );
+			pdf = reminder.createPdf();
+			if (email) {
+				pdf->send( "" );
+			} else {
+				pdf->print( QString(fileName).arg(reminder.memberUid()) );
+			}
 		}
 	}
 }
-
 
 

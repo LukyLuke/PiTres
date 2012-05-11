@@ -28,6 +28,7 @@ Q_PROPERTY(QString addressName READ addressName WRITE setAddressName NOTIFY addr
 Q_PROPERTY(QString addressStreet1 READ addressStreet1 WRITE setAddressStreet1 NOTIFY addressStreet1Changed)
 Q_PROPERTY(QString addressStreet2 READ addressStreet2 WRITE setAddressStreet2 NOTIFY addressStreet2Changed)
 Q_PROPERTY(QString addressCity READ addressCity WRITE setAddressCity NOTIFY addressCityChanged)
+Q_PROPERTY(QString addressCountry READ addressCountry WRITE setAddressCountry NOTIFY addressCountryChanged)
 Q_PROPERTY(QString addressEmail READ addressEmail WRITE setAddressEmail NOTIFY addressEmailChanged)
 Q_PROPERTY(QString forSection READ forSection WRITE setForSection NOTIFY forSectionChanged)
 
@@ -40,7 +41,7 @@ public:
 	void clear();
 	void setIsLoaded(bool loaded);
 	void loadLast(QSqlDatabase db, int member);
-	XmlPdf createPdf();
+	XmlPdf *createPdf();
 	static QList<Invoice *> getInvoicesForMember(QSqlDatabase db, int member);
 	static void createTables(QSqlDatabase db);
 
@@ -63,6 +64,7 @@ public:
 	void setAddressStreet1(QString addressStreet1);
 	void setAddressStreet2(QString addressStreet2);
 	void setAddressCity(QString addressCity);
+	void setAddressCountry(QString addressCountry);
 	void setAddressEmail(QString addressEmail);
 	void setForSection(QString forSection);
 	
@@ -82,6 +84,7 @@ public:
 	QString addressStreet1() const { return s_addressStreet1; };
 	QString addressStreet2() const { return s_addressStreet2; };
 	QString addressCity() const { return s_addressCity; };
+	QString addressCountry() const { return s_addressCountry; };
 	QString addressEmail() const { return s_addressEmail; };
 	QString forSection() const { return s_forSection; };
 	
@@ -101,6 +104,7 @@ signals:
 	void addressStreet1Changed(QString);
 	void addressStreet2Changed(QString);
 	void addressCityChanged(QString);
+	void addressCountryChanged(QString);
 	void addressEmailChanged(QString);
 	void forSectionChanged(QString);
 	
@@ -121,6 +125,7 @@ private:
 	QString s_addressStreet1;
 	QString s_addressStreet2;
 	QString s_addressCity;
+	QString s_addressCountry;
 	QString s_addressEmail;
 	QString s_forSection;
 };

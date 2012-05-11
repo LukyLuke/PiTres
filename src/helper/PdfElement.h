@@ -22,6 +22,7 @@ public:
 	void setAttributes(const QDomNamedNodeMap attr, const QString cdata);
 	void setType(PdfElementType type);
 	void setTemplatePath(QString templatePath);
+	void setVars(QHash<QString, QString> *variables);
 	
 	QHash<QString, QString> attributes() const { return _attributes; };
 	PdfElementType type() const { return _type; };
@@ -34,6 +35,7 @@ protected:
 	PdfElementType _type;
 	QList<PdfElement> _nodes;
 	QHash<QString, QString> _attributes;
+	QHash<QString, QString> *_variables;
 	QString _templatePath;
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
