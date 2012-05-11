@@ -1,8 +1,8 @@
 
-Run qmake once, If no new files are added, there is no reason to run it agan
+run "qmake" first after each checkout
    $ qmake
 
- or if you want Debug-Code
+If you want Debug-Code, run qmake with the DEBUG=1 Parameter
    $ qmake DEBUG=1
 
 Compile with make
@@ -10,3 +10,6 @@ Compile with make
 
 Run PiTres
    $ build/PiTres
+
+The Database is stored relatively from your RunPath unter ./data/userlist.sqlite
+This will be configurable in a later release...
