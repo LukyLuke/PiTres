@@ -21,6 +21,9 @@ private:
 	QHash<QString, PdfElement> elements;
 	QHash<QString, QString> variables;
 	QString templatePath;
+	QDomDocument doc;
+	
+	void loadFonts();
 };
 
 #endif // HELPER_XMLPDF_H

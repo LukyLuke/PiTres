@@ -14,16 +14,16 @@
 #include <QDebug>
 
 XmlPdf::XmlPdf(QObject *parent) {
-	QFontDatabase::addApplicationFont("aller.ttf");
-	QFontDatabase::addApplicationFont("b0.ttf");
-	QFontDatabase::addApplicationFont("allerlight.ttf");
+	doc = QDomDocument("template");
 }
 
-XmlPdf::~XmlPdf() {
+XmlPdf::~XmlPdf() { }
+
+void XmlPdf::loadFonts() {
+	QFontDatabase::addApplicationFont(QString::fromUtf8(":/resources/ocrb.ttf"));
 }
 
 void XmlPdf::loadTemplate(QString file) {
-	QDomDocument doc("template");
 	QFile tpl(file);
 	if (!tpl.open(QIODevice::ReadOnly)) {
 		qDebug() << "Unable to load the File: " + file;
@@ -38,6 +38,7 @@ void XmlPdf::loadTemplate(QString file) {
 	
 	QFileInfo info(file);
 	templatePath = info.canonicalPath();
+	loadFonts();
 	
 	elements.clear();
 	QDomNodeList nl = doc.elementsByTagName("g");

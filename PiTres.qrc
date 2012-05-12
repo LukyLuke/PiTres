@@ -1,6 +1,7 @@
 <RCC>
   <qresource>
     <file>resources/application_logo.svg</file>
+    <file>resources/ocrb.ttf</file>
   </qresource>
   <qresource prefix="buttons">
     <file>resources/buttons/mail-folder-inbox.png</file>

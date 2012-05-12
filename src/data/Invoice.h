@@ -42,6 +42,7 @@ public:
 	void setIsLoaded(bool loaded);
 	void loadLast(QSqlDatabase db, int member);
 	XmlPdf *createPdf();
+	QString getEsr();
 	static QList<Invoice *> getInvoicesForMember(QSqlDatabase db, int member);
 	static void createTables(QSqlDatabase db);
 
@@ -70,7 +71,7 @@ public:
 	
 	// Getter
 	int memberUid() const { return i_memberUid; };
-	QString reference() const { return s_reference; };
+	QString reference();// const { return s_reference; }; // Reformatted
 	QDate issueDate() const { return d_issueDate; };
 	QDate payableDue() const { return d_payableDue; };
 	QDate paidDate() const { return d_paidDate; };
@@ -128,6 +129,9 @@ private:
 	QString s_addressCountry;
 	QString s_addressEmail;
 	QString s_forSection;
+	
+	QList<QString> esrChecksumList;
+	QString esrChecksum(QString num);
 };
 
 #endif // Data_Invoice_H

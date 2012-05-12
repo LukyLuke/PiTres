@@ -22,13 +22,14 @@ XmlPdf *Reminder::createPdf() {
 	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Frauenfeld").toString());
 	pdf->setVar("print_date", QDate::currentDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("print_year", QDate::currentDate().toString("yyyy"));
+	pdf->setVar("account_number", settings.value("pdf/invoice_account_number", "0-0-0").toString());
 	
 	pdf->setVar("invoice_reference", reference());
 	pdf->setVar("invoice_number", reference());
 	pdf->setVar("invoice_date", issueDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("invoice_payable_due", payableDue().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("invoice_amount", QString("%1").arg(amount()));
-	pdf->setVar("invoice_esr", "");
+	pdf->setVar("invoice_esr", getEsr());
 	
 	pdf->setVar("member_number", QString::number(memberUid()));
 	pdf->setVar("member_prefix", addressPrefix());

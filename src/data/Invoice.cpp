@@ -16,6 +16,18 @@
 
 Invoice::Invoice(QObject *parent) : QObject(parent) {
 	clear();
+
+	// Staticly defined values for ESR-Modulo-10 Checksum
+	esrChecksumList.append("09468271350");
+	esrChecksumList.append("94682713509");
+	esrChecksumList.append("46827135098");
+	esrChecksumList.append("68271350947");
+	esrChecksumList.append("82713509466");
+	esrChecksumList.append("27135094685");
+	esrChecksumList.append("71350946824");
+	esrChecksumList.append("13509468273");
+	esrChecksumList.append("35094682712");
+	esrChecksumList.append("50946827131");
 }
 
 Invoice::~Invoice() {}
@@ -105,7 +117,7 @@ void Invoice::loadLast(QSqlDatabase db, int member) {
 	if (_loaded) {
 		QSqlRecord record = query.record();
 		i_memberUid = query.value(record.indexOf("member_uid")).toInt();
-		s_reference = query.value(record.indexOf("reference")).toString();
+		setReference(query.value(record.indexOf("reference")).toString()); // we reformat the Reference
 		d_issueDate = query.value(record.indexOf("issue_date")).toDate();
 		d_payableDue = query.value(record.indexOf("payable_date")).toDate();
 		d_paidDate = query.value(record.indexOf("paid_date")).toDate();
@@ -163,15 +175,77 @@ XmlPdf *Invoice::createPdf() {
 	return pdf;
 }
 
+QString Invoice::getEsr() {
+	QSettings settings;
+	QString esr;
+	if (settings.value("pdf/esr_currency", "CHF").toString() == "EUR") {
+		esr.append("21"); // ESR in CHF: values must not match the boxes exactly
+	} else {
+		esr.append("01"); // ESR in CHF: values must not match the boxes exactly
+	}
+	esr.append(esrChecksum(esr));
+	esr.append(">"); // Checksum and seperator
+	
+	// Add the reference
+	/*QString _ref = reference().remove(QRegExp("\\s+"));
+	_ref.prepend(QString("").fill(QChar('0'), 26-_ref.length()));
+	esr.append(_ref); // Append the Reference
+	esr.append( esrChecksum(_ref) ); // Append the Checksum
+	*/
+	esr.append(reference().remove(" ")); // Append the Reference
+	esr.append("+ "); // Seperator
+	
+	// Add the Account-Number
+	QString account;
+	QStringList accountNumber = settings.value("pdf/invoice_account_number", "0-0-0").toString().split("-", QString::SkipEmptyParts); 
+	if (accountNumber.size() == 3) {
+		account.append(accountNumber.at(0));
+		account.append(QString(accountNumber.at(1)).prepend( QString("").fill(QChar('0'), 8 - accountNumber.at(1).length()) ));
+		account.append(accountNumber.at(2));
+	} else {
+		account.append("000000000"); // No Account-Number
+	}
+	esr.append(account);
+	//esr.append(esrChecksum(account)); // The last Char on the AccountNumber is the Checksum either
+	esr.append(">"); // Seperator
+	
+	return esr;
+}
+
+QString Invoice::esrChecksum(QString num) {
+	QString sum("0");
+	QString::const_iterator it = num.constBegin();
+	for (int i = 0; i < num.length(); i++) {
+		sum = esrChecksumList.at(sum.toInt()).at(num.at(i).digitValue());
+		it++;
+	}
+	return esrChecksumList.at(sum.toInt()).at(10);
+}
+
 void Invoice::setMemberUid(int memberUid) {
 	i_memberUid = memberUid;
 	emit memberUidChanged(memberUid);
 }
 
 void Invoice::setReference(QString reference) {
-	s_reference = s_reference;
-	emit referenceChanged(reference);
+	s_reference = reference.remove(QRegExp("[^\\d]+"));
+	emit referenceChanged(s_reference);
 }
+
+QString Invoice::reference() {
+	QString ref = s_reference;
+	ref.prepend( QString("").fill( QChar('0'), 26 - ref.length()) );
+	
+	QString sum = esrChecksum(ref);
+	ref.append(sum); // Append the Checksum
+	
+	ref.insert(2, " ");
+	ref.insert(8, " ");
+	ref.insert(14, " ");
+	ref.insert(20, " ");
+	ref.insert(26, " ");
+	return ref;
+};
 
 void Invoice::setIssueDate(QDate issueDate) {
 	d_issueDate = issueDate;

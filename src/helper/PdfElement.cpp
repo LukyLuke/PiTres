@@ -279,7 +279,7 @@ void PdfElementText::paint(QPainter *painter) {
 	QString fillColor = _attributes.value("fillcolor", "");
 	QString valign = _attributes.value("valign", "justify");
 	QString halign = _attributes.value("halign", "top");
-	QString font = _attributes.value("font", "Aller light");
+	QString fontfamily = _attributes.value("font", "Aller light");
 	int weight = _attributes.value("weight", "-1").toInt();
 	qreal size = _attributes.value("size", "12").toFloat();
 	bool italic = _attributes.value("italic", "false").toLower() == "true";
@@ -289,9 +289,11 @@ void PdfElementText::paint(QPainter *painter) {
 	qreal y = _attributes.value("y", "0").toFloat();
 	qreal w = _attributes.value("width", "0").toFloat();
 	qreal h = _attributes.value("height", "0").toFloat();
+	qreal s = _attributes.value("spacing", "0").toFloat();
 	
 	if (w > 0 && h > 0) {
 		QFont font = QApplication::font();
+		font.setFamily(fontfamily);
 		font.setWeight(weight);
 		font.setItalic(italic);
 		font.setUnderline(underline);
@@ -322,7 +324,17 @@ void PdfElementText::paint(QPainter *painter) {
 			cdata.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
 			it++;
 		}
-		painter->drawText( QRectF(QPointF(x, y), QSizeF(w, h)), flags, cdata );
+		
+		// split into different paragraphs
+		QStringList paragraphs = cdata.split(QRegExp("(\r|\n)"), QString::SkipEmptyParts);
+		
+		// paint the text
+		QRectF *bounding = new QRectF;
+		QRectF rect = QRectF(QPointF(x, y), QSizeF(w, h));
+		for (int i = 0; i < paragraphs.size(); i++) {
+			painter->drawText(rect, flags, paragraphs.at(i).trimmed(), bounding);
+			rect.adjust(0, bounding->height() + s, 0, 0);
+		}
 	}
 }
 
