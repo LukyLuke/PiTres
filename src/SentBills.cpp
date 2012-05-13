@@ -200,7 +200,7 @@ void SentBills::doExportQifAssets() {
 	QSettings settings;
 	QString qif("!Type:" + settings.value("qif/account_asset", "Oth A").toString());
 	float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
-	float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
+	//float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
 	
 	QSqlQuery query(db);
 	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
@@ -358,22 +358,26 @@ void SentBills::printNewReminder() {
 
 void SentBills::createPdfReminds(bool email) {
 	int uid;
+	QString fileName;
 	Reminder reminder;
 	XmlPdf *pdf;
 	QSet<int> rows = getSelectedRows();
 	
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-	if (!fileName.isEmpty()) {
-		fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		foreach(const int &i, rows) {
-			uid = tableModel->record(i).value(0).toInt();
-			reminder.loadLast(db, uid);
-			pdf = reminder.createPdf();
-			if (email) {
-				pdf->send( "" );
-			} else {
-				pdf->print( QString(fileName).arg(reminder.memberUid()) );
-			}
+	if (!email) {
+		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
+		if (!fileName.isEmpty()) {
+			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
+		}
+	}
+	foreach(const int &i, rows) {
+		uid = tableModel->record(i).value(0).toInt();
+		reminder.loadLast(db, uid);
+		if (email) {
+			pdf = reminder.createPdf("invoice");
+			pdf->send(reminder.addressEmail());
+		} else {
+			pdf = reminder.createPdf("reminder");
+			pdf->print( QString(fileName).arg(reminder.memberUid()) );
 		}
 	}
 }

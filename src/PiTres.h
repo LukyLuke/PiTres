@@ -3,6 +3,7 @@
 
 #include "../ui_PiTres.h"
 #include "../ui_settings.h"
+#include "../ui_invoicewizard.h"
 
 #include <QtGui/QMainWindow>
 #include <QWidget>
@@ -28,16 +29,13 @@ public:
 	void showStatusMessage(QString msg);
 
 public slots:
-	void openFile();
-	void openRecently();
 	void importFromLDAP();
-	void importFromFile();
-	void importFromClipboard();
 	void showAbout();
 	void showHelp(int page = 0);
 	void showUsers();
 	void showSentBills();
 	void showImportPayments();
+	void showInvoiceWizard();
 	void showSettings();
 	void doSaveSettings();
 	void showInvoiceFileDialog();

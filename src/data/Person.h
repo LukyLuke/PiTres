@@ -42,7 +42,7 @@ public:
 	virtual ~PPSPerson();
 	void save(QSqlDatabase db);
 	void clear();
-	void load(QSqlDatabase db, int uid);
+	bool load(QSqlDatabase db, int uid);
 	Invoice *getInvoice();
 	static void createTables(QSqlDatabase db);
 	static void emptyTables(QSqlDatabase db);
@@ -83,6 +83,7 @@ public:
 	void setLdapPaidDue(QDate paidDue);
 	
 	// Getter
+	bool isLoaded() { return i_uid > 0; };
 	int uid() const { return i_uid; };
 	QString section() const { return s_section; };
 	ContributionClass contributionClass() const { return m_contributionClass; };

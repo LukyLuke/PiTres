@@ -4,6 +4,7 @@
 #include "SentBills.h"
 #include "PaymentImport.h"
 #include "LDAPImport.h"
+#include "InvoiceWizard.h"
 
 #include <QtGui>
 #include <QFileDialog>
@@ -49,17 +50,14 @@ void PiTres::showStatusMessage(QString msg) {
 }
 
 void PiTres::connectActions() {
-	connect(action_Open, SIGNAL(triggered()), this, SLOT(openFile()));
-	connect(action_Recently_opend, SIGNAL(triggered()), this, SLOT(openRecently()));
 	connect(actionFrom_LDAP, SIGNAL(triggered()), this, SLOT(importFromLDAP()));
-	connect(actionFrom_File, SIGNAL(triggered()), this, SLOT(importFromFile()));
-	connect(actionFrom_Clipboard, SIGNAL(triggered()), this, SLOT(importFromClipboard()));
 	connect(action_About_PiTres, SIGNAL(triggered()), this, SLOT(showAbout()));
 	connect(actionHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
 	connect(actionShow_Users, SIGNAL(triggered()), this, SLOT(showUsers()));
 	connect(actionShow_Bills, SIGNAL(triggered()), this, SLOT(showSentBills()));
 	connect(actionImport_Payments, SIGNAL(triggered()), this, SLOT(showImportPayments()));
 	connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(showSettings()));
+	connect(actionInvoiceWizard, SIGNAL(triggered()), this, SLOT(showInvoiceWizard()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -75,25 +73,9 @@ void PiTres::setContent(QWidget* widget) {
 }
 
 // SLOTS
-void PiTres::openFile() {
-	debugAction(QString("Open File"));
-}
-
-void PiTres::openRecently() {
-	debugAction(QString("Open Recently"));
-}
-
 void PiTres::importFromLDAP() {
 	LDAPImport *widget = new LDAPImport;
 	setContent(widget);
-}
-
-void PiTres::importFromFile() {
-	debugAction(QString("Import from File"));
-}
-
-void PiTres::importFromClipboard() {
-	debugAction(QString("Import from Clipboard"));
 }
 
 void PiTres::showAbout() {
@@ -123,13 +105,18 @@ void PiTres::showImportPayments() {
 	setContent(widget);
 }
 
+void PiTres::showInvoiceWizard() {
+	InvoiceWizard *widget = new InvoiceWizard;
+	setContent(widget);
+}
+
 void PiTres::showSettings() {
 	QSettings settings;
 	
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_limited", 30.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_default", 60.0).toFloat());
-	settingsForm.pdfInvoice->setText(settings.value("pdf/invoce_template", "data/invoice.xml").toString());
+	settingsForm.pdfInvoice->setText(settings.value("pdf/invoice_template", "data/invoice.xml").toString());
 	settingsForm.pdfReminder->setText(settings.value("pdf/reminder_template", "data/reminder.xml").toString());
 	settingsForm.pdfReceipt->setText(settings.value("pdf/receipt_template", "data/receipt.xml").toString());
 	
@@ -168,7 +155,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("database/sqlite", settingsForm.sqliteFile->text());
 	settings.setValue("invoice/amount_limited", settingsForm.memberAmountFull->value());
 	settings.setValue("invoice/amount_default", settingsForm.memberAmountLimited->value());
-	settings.setValue("pdf/invoce_template", settingsForm.pdfInvoice->text());
+	settings.setValue("pdf/invoice_template", settingsForm.pdfInvoice->text());
 	settings.setValue("pdf/reminder_template", settingsForm.pdfReminder->text());
 	settings.setValue("pdf/receipt_template", settingsForm.pdfReceipt->text());
 	

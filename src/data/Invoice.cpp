@@ -1,6 +1,9 @@
 
 #include "Invoice.h"
+#include "Person.h"
 
+#include <cstdlib>
+#include <ctime>
 #include <QObject>
 #include <QSettings>
 #include <QVariant>
@@ -15,6 +18,7 @@
 #include <QDebug>
 
 Invoice::Invoice(QObject *parent) : QObject(parent) {
+	srand(time(NULL));
 	clear();
 
 	// Staticly defined values for ESR-Modulo-10 Checksum
@@ -95,6 +99,7 @@ void Invoice::save(QSqlDatabase db) {
 	query.bindValue(":section", s_forSection);
 	query.exec();
 	
+	setIsLoaded(true);
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
 		qDebug() << query.lastError();
@@ -103,7 +108,7 @@ void Invoice::save(QSqlDatabase db) {
 
 void Invoice::loadLast(QSqlDatabase db, int member) {
 	clear();
-	QSqlQuery query;
+	QSqlQuery query(db);
 	query.prepare("SELECT * FROM pps_invoice WHERE member_uid=? ORDER BY issue_date DESC;");
 	query.bindValue(0, member);
 	query.exec();
@@ -138,8 +143,8 @@ void Invoice::loadLast(QSqlDatabase db, int member) {
 QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
 	QList<Invoice *> back;
 	
-	QSqlQuery query;
-	query.prepare("SELECT * FROM pps_invoice WHERE id=? ORDER BY issue_date DESC;");
+	QSqlQuery query(db);
+	query.prepare("SELECT * FROM pps_invoice WHERE member_uid=? ORDER BY issue_date DESC;");
 	query.bindValue(0, member);
 	query.exec();
 	QSqlRecord record = query.record();
@@ -168,10 +173,81 @@ QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
 	return back;
 }
 
-XmlPdf *Invoice::createPdf() {
+void Invoice::create(QSqlDatabase db, PPSPerson *person) {
+	QSettings settings;
+	setIsLoaded(false);
+	
+	setMemberUid(person->uid());
+	setReference(createReference(person->uid()));
+	setIssueDate(QDate::currentDate());
+	setPayableDue(QDate::currentDate().addMonths(1));
+	setPaidDate(QDate(1900, 1, 1));
+	if (person->contributionClass() == PPSPerson::ContributeFull) {
+		setAmount(settings.value("invoice/amount_default", 60).toFloat());
+	} else {
+		setAmount(settings.value("invoice/amount_limited", 30).toFloat());
+	}
+	setAmountPaid(0);
+	setState(Invoice::StateOpen);
+	switch (person->gender()) {
+		case PPSPerson::GenderMale:
+			setAddressPrefix(tr("Mr."));
+			break;
+		case PPSPerson::GenderFemale:
+			setAddressPrefix(tr("Mrs."));
+			break;
+		default:
+			setAddressPrefix("");
+			break;
+	}
+	setAddressCompany("");
+	setAddressName(person->givenName() + " " + person->familyName());
+	setAddressStreet1(person->street());
+	setAddressStreet2("");
+	setAddressCity(person->postalCode() + " " + person->city());
+	setAddressCountry(person->country());
+	if (person->email().size() > 0) {
+		setAddressEmail(person->email().first());
+	}
+	setForSection(person->section());
+	setLanguage((Language)person->language());
+	//save(db);
+}
+
+XmlPdf *Invoice::createPdf(QString tpl) {
 	QSettings settings;
 	XmlPdf *pdf = new XmlPdf;
-	pdf->loadTemplate( settings.value("pdf/invoice_template", "data/invoice.xml").toString() );
+	if (tpl == NULL || tpl.isEmpty()) {
+		tpl = QString("invoice");
+	}
+	pdf->loadTemplate( settings.value(QString("pdf/%1_template").arg(tpl), "data/invoice.xml").toString() );
+	
+	pdf->setVar("pp_country", settings.value("pdf/var_pp_country", "CH").toString());
+	pdf->setVar("pp_zip", settings.value("pdf/var_pp_zip", "8500").toString());
+	pdf->setVar("pp_city", settings.value("pdf/var_pp_city", "Frauenfeld").toString());
+	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Frauenfeld").toString());
+	pdf->setVar("print_date", QDate::currentDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
+	pdf->setVar("print_year", QDate::currentDate().toString("yyyy"));
+	pdf->setVar("account_number", settings.value("pdf/invoice_account_number", "0-0-0").toString());
+	
+	pdf->setVar("invoice_reference", reference());
+	pdf->setVar("invoice_number", reference());
+	pdf->setVar("invoice_date", issueDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
+	pdf->setVar("invoice_payable_due", payableDue().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
+	pdf->setVar("invoice_amount", QString("%1").arg(amount()));
+	pdf->setVar("invoice_esr", getEsr());
+	
+	pdf->setVar("member_number", QString::number(memberUid()));
+	pdf->setVar("member_prefix", addressPrefix());
+	pdf->setVar("member_company", addressCompany());
+	pdf->setVar("member_name", addressName());
+	pdf->setVar("member_street", addressStreet1());
+	pdf->setVar("member_street2", addressStreet2());
+	pdf->setVar("member_city", addressCity());
+	pdf->setVar("member_country", addressCountry());
+	pdf->setVar("member_email", addressEmail());
+	pdf->setVar("member_section", forSection());
+	
 	return pdf;
 }
 
@@ -187,11 +263,6 @@ QString Invoice::getEsr() {
 	esr.append(">"); // Checksum and seperator
 	
 	// Add the reference
-	/*QString _ref = reference().remove(QRegExp("\\s+"));
-	_ref.prepend(QString("").fill(QChar('0'), 26-_ref.length()));
-	esr.append(_ref); // Append the Reference
-	esr.append( esrChecksum(_ref) ); // Append the Checksum
-	*/
 	esr.append(reference().remove(" ")); // Append the Reference
 	esr.append("+ "); // Seperator
 	
@@ -230,6 +301,19 @@ void Invoice::setMemberUid(int memberUid) {
 void Invoice::setReference(QString reference) {
 	s_reference = reference.remove(QRegExp("[^\\d]+"));
 	emit referenceChanged(s_reference);
+}
+
+QString Invoice::createReference(int memberUid) {
+	// Format: Random(2) Member-0-prepend(10) yyyy0 MMdd0 Random(4)
+	//         xx0000000UIDyyyy0MMdd0XXXX
+	// Formatted reference for a swiss credit slip (P = CheckDigit): 12 00000 01234 20120 05130 3415P
+	QString ref(QString::number( (rand() % 10) + 10 )); // Random(2)
+	QString uid = QString::number(memberUid);
+	uid.prepend( QString("").fill(QChar('0'), 10-uid.size()) );
+	ref.append(uid); // UID and '0' prepend to 10 chars
+	ref.append(QDate::currentDate().toString("yyyy0MMdd0")); // Current date
+	ref.append(QString::number( (rand() % 1000) + 1000 )); // Random(4)
+	return ref;
 }
 
 QString Invoice::reference() {
@@ -327,3 +411,7 @@ void Invoice::setForSection(QString forSection) {
 	emit forSectionChanged(forSection);
 }
 
+void Invoice::setLanguage(Language language) {
+	m_language = language;
+	emit languageChanged(language);
+}

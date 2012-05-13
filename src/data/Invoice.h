@@ -9,6 +9,7 @@
 #include <QList>
 #include <QSqlDatabase>
 
+class PPSPerson;
 class Invoice : public QObject {
 Q_OBJECT
 Q_PROPERTY(int memberUid READ memberUid WRITE setMemberUid NOTIFY memberUidChanged)
@@ -31,8 +32,10 @@ Q_PROPERTY(QString addressCity READ addressCity WRITE setAddressCity NOTIFY addr
 Q_PROPERTY(QString addressCountry READ addressCountry WRITE setAddressCountry NOTIFY addressCountryChanged)
 Q_PROPERTY(QString addressEmail READ addressEmail WRITE setAddressEmail NOTIFY addressEmailChanged)
 Q_PROPERTY(QString forSection READ forSection WRITE setForSection NOTIFY forSectionChanged)
+Q_PROPERTY(Language language READ language WRITE setLanguage NOTIFY languageChanged)
 
 Q_ENUMS(State)
+Q_ENUMS(Language)
 
 public:
 	Invoice(QObject *parent = 0);
@@ -41,13 +44,15 @@ public:
 	void clear();
 	void setIsLoaded(bool loaded);
 	void loadLast(QSqlDatabase db, int member);
-	XmlPdf *createPdf();
+	XmlPdf *createPdf(QString tpl = 0);
 	QString getEsr();
+	void create(QSqlDatabase db, PPSPerson *person);
 	static QList<Invoice *> getInvoicesForMember(QSqlDatabase db, int member);
 	static void createTables(QSqlDatabase db);
 
 	// InvoiceState in old DB: o_pen, c_anceled, p_aid, u_nknown
 	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3 };
+	enum Language { DE=0, FR=1, IT=2, EN=3 };
 	
 	// Setter
 	void setMemberUid(int memberUid);
@@ -68,6 +73,7 @@ public:
 	void setAddressCountry(QString addressCountry);
 	void setAddressEmail(QString addressEmail);
 	void setForSection(QString forSection);
+	void setLanguage(Language language);
 	
 	// Getter
 	int memberUid() const { return i_memberUid; };
@@ -88,6 +94,7 @@ public:
 	QString addressCountry() const { return s_addressCountry; };
 	QString addressEmail() const { return s_addressEmail; };
 	QString forSection() const { return s_forSection; };
+	Language language() const { return m_language; };
 	
 signals:
 	void memberUidChanged(int);
@@ -108,6 +115,7 @@ signals:
 	void addressCountryChanged(QString);
 	void addressEmailChanged(QString);
 	void forSectionChanged(QString);
+	void languageChanged(Language);
 	
 private:
 	bool _loaded;
@@ -129,9 +137,11 @@ private:
 	QString s_addressCountry;
 	QString s_addressEmail;
 	QString s_forSection;
+	Language m_language;
 	
 	QList<QString> esrChecksumList;
 	QString esrChecksum(QString num);
+	QString createReference(int memberUid);
 };
 
 #endif // Data_Invoice_H

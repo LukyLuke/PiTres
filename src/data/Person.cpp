@@ -183,54 +183,57 @@ void PPSPerson::clear() {
 	_invoice.clear();
 }
 
-void PPSPerson::load(QSqlDatabase db, int uid) {
+bool PPSPerson::load(QSqlDatabase db, int uid) {
+	clear();
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM ldap_persons WHERE uid=?;");
 	query.bindValue(0, uid);
 	query.exec();
-	query.first();
-	
-	QSqlRecord record = query.record();
-	i_uid = query.value(record.indexOf("uid")).toInt();
-	s_section = query.value(record.indexOf("section")).toString();
-	m_contributionClass = (ContributionClass)query.value(record.indexOf("contribution")).toInt();
-	s_nickname = query.value(record.indexOf("nickname")).toString();
-	m_gender = (Gender)query.value(record.indexOf("gender")).toInt();
-	s_familyName = query.value(record.indexOf("familyname")).toString();
-	s_givenName = query.value(record.indexOf("givenname")).toString();
-	s_street = query.value(record.indexOf("address")).toString();
-	s_postalCode = query.value(record.indexOf("plz")).toString();
-	s_city = query.value(record.indexOf("city")).toString();
-	s_country = query.value(record.indexOf("country")).toString();
-	s_state = query.value(record.indexOf("state")).toString();
-	d_birthdate = query.value(record.indexOf("birthday")).toDate();
-	d_joining = query.value(record.indexOf("joining")).toDate();
-	m_language = (Language)query.value(record.indexOf("language")).toInt();
-	d_paidDue = query.value(record.indexOf("paid_due")).toDate();
-	
-	// Load telephone, mobile and email
-	query.prepare("SELECT number FROM ldap_persons_telephone WHERE uid=?;");
-	query.bindValue(0, uid);
-	query.exec();
-	while (query.next()) {
-		l_telephone << Formatter::telephone(query.value(0).toString());
+
+	if (query.first()) {
+		QSqlRecord record = query.record();
+		i_uid = query.value(record.indexOf("uid")).toInt();
+		s_section = query.value(record.indexOf("section")).toString();
+		m_contributionClass = (ContributionClass)query.value(record.indexOf("contribution")).toInt();
+		s_nickname = query.value(record.indexOf("nickname")).toString();
+		m_gender = (Gender)query.value(record.indexOf("gender")).toInt();
+		s_familyName = query.value(record.indexOf("familyname")).toString();
+		s_givenName = query.value(record.indexOf("givenname")).toString();
+		s_street = query.value(record.indexOf("address")).toString();
+		s_postalCode = query.value(record.indexOf("plz")).toString();
+		s_city = query.value(record.indexOf("city")).toString();
+		s_country = query.value(record.indexOf("country")).toString();
+		s_state = query.value(record.indexOf("state")).toString();
+		d_birthdate = query.value(record.indexOf("birthday")).toDate();
+		d_joining = query.value(record.indexOf("joining")).toDate();
+		m_language = (Language)query.value(record.indexOf("language")).toInt();
+		d_paidDue = query.value(record.indexOf("paid_due")).toDate();
+		
+		// Load telephone, mobile and email
+		query.prepare("SELECT number FROM ldap_persons_telephone WHERE uid=?;");
+		query.bindValue(0, uid);
+		query.exec();
+		while (query.next()) {
+			l_telephone << Formatter::telephone(query.value(0).toString());
+		}
+		
+		query.prepare("SELECT number FROM ldap_persons_mobile WHERE uid=?;");
+		query.bindValue(0, uid);
+		query.exec();
+		while (query.next()) {
+			l_mobile << Formatter::telephone(query.value(0).toString());
+		}
+		
+		query.prepare("SELECT mail FROM ldap_persons_email WHERE uid=?;");
+		query.bindValue(0, uid);
+		query.exec();
+		while (query.next()) {
+			l_email << query.value(0).toString();
+		}
+		
+		_invoice.loadLast(db, uid);
 	}
-	
-	query.prepare("SELECT number FROM ldap_persons_mobile WHERE uid=?;");
-	query.bindValue(0, uid);
-	query.exec();
-	while (query.next()) {
-		l_mobile << Formatter::telephone(query.value(0).toString());
-	}
-	
-	query.prepare("SELECT mail FROM ldap_persons_email WHERE uid=?;");
-	query.bindValue(0, uid);
-	query.exec();
-	while (query.next()) {
-		l_email << query.value(0).toString();
-	}
-	
-	_invoice.loadLast(db, uid);
+	return isLoaded();
 }
 
 Invoice *PPSPerson::getInvoice() {

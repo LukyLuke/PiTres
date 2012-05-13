@@ -45,18 +45,15 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Open"/>
-    <addaction name="action_Recently_opend"/>
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
    <widget class="QMenu" name="menu_Import">
     <property name="title">
-     <string>&amp;Import</string>
+     <string>Functions</string>
     </property>
     <addaction name="actionFrom_LDAP"/>
-    <addaction name="actionFrom_File"/>
-    <addaction name="actionFrom_Clipboard"/>
+    <addaction name="actionInvoiceWizard"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -88,9 +85,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_Open"/>
    <addaction name="actionFrom_LDAP"/>
-   <addaction name="actionFrom_File"/>
+   <addaction name="actionInvoiceWizard"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="sizePolicy">
@@ -219,23 +215,6 @@
     </layout>
    </widget>
   </widget>
-  <action name="action_Open">
-   <property name="icon">
-    <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/folder-documents.png</normaloff>:/icons/resources/icons/folder-documents.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Open</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="action_Recently_opend">
-   <property name="text">
-    <string>&amp;Recently opend</string>
-   </property>
-  </action>
   <action name="action_Exit">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
@@ -254,31 +233,25 @@
      <normaloff>:/icons/resources/icons/repository.png</normaloff>:/icons/resources/icons/repository.png</iconset>
    </property>
    <property name="text">
-    <string>From &amp;LDAP</string>
+    <string>Import from &amp;LDAP</string>
+   </property>
+   <property name="toolTip">
+    <string>Synchronize the USertable with the LDAP-Database</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
    </property>
   </action>
-  <action name="actionFrom_File">
+  <action name="actionInvoiceWizard">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
      <normaloff>:/icons/resources/icons/text-x-ldif.png</normaloff>:/icons/resources/icons/text-x-ldif.png</iconset>
    </property>
    <property name="text">
-    <string>From &amp;File</string>
+    <string>Invoice Wizard</string>
    </property>
-  </action>
-  <action name="actionFrom_Clipboard">
-   <property name="icon">
-    <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/edit-paste.png</normaloff>:/icons/resources/icons/edit-paste.png</iconset>
-   </property>
-   <property name="text">
-    <string>From &amp;Clipboard</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
+   <property name="toolTip">
+    <string>Create new Invoices based on different Selections and Settings</string>
    </property>
   </action>
   <action name="action_About_PiTres">

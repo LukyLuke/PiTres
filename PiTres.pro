@@ -8,8 +8,8 @@ DEPENDPATH += .
 INCLUDEPATH += . src
 
 # Main sources
-HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h
-SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp
+HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h src/InvoiceWizard.h
+SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp src/InvoiceWizard.cpp
 
 # Data Objects
 HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h
@@ -27,7 +27,9 @@ SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.
 CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml
-FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui forms/adjustpaiddate.ui forms/fromtodates.ui forms/settings.ui
+FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
+        forms/adjustpaiddate.ui forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
+        forms/payment.ui
 OUT_PWD = build
 
 # Add special Platform-Dependant libraries and sources
