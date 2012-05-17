@@ -82,10 +82,7 @@ void InvoiceWizard::invoiceMembers() {
 	QString fileName;
 	
 	if (checkPrint->isChecked()) {
-		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-		if (!fileName.isEmpty()) {
-			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		}
+		fileName = getSaveFileName();
 	}
 	
 	for (int i = 0; i < memberUidList->count(); i++) {
@@ -104,23 +101,39 @@ void InvoiceWizard::invoiceMembers() {
 }
 
 void InvoiceWizard::invoiceNewMembers() {
-	PPSPerson pers;
-	Invoice invoice;
-	XmlPdf *pdf;
-	QString fileName;
 	QSqlQuery query(db);
 	query.prepare("SELECT uid FROM ldap_persons WHERE joining>=?;");
 	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
 	query.exec();
+	doCreateInvoices(&query);
+}
+
+void InvoiceWizard::invoiceUntilDate() {
+	QSqlQuery query(db);
+	query.prepare("SELECT uid FROM ldap_persons WHERE paid_due<? OR paid_due IS NULL or paid_due='';");
+	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
+	query.exec();
+	doCreateInvoices(&query);
+}
+
+void InvoiceWizard::invoiceAllMembers() {
+	QSqlQuery query(db);
+	query.prepare("SELECT uid FROM ldap_persons;");
+	query.exec();
+	doCreateInvoices(&query);
+}
+
+void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
+	PPSPerson pers;
+	Invoice invoice;
+	XmlPdf *pdf;
+	QString fileName;
 	
 	if (checkPrintDate->isChecked()) {
-		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-		if (!fileName.isEmpty()) {
-			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		}
+		fileName = getSaveFileName();
 	}
 	
-	int num = query.size();
+	int num = query->size();
 	int cnt = 0;
 	QProgressDialog bar(this);
 	bar.setRange(0, num);
@@ -129,13 +142,13 @@ void InvoiceWizard::invoiceNewMembers() {
 	bar.setWindowModality(Qt::WindowModal);
 	bar.show();
 	
-	while (query.next()) {
+	while (query->next()) {
 		if (bar.wasCanceled()) {
 			break;
 		}
 		bar.setValue(cnt++);
 		
-		if (pers.load(db, query.value(0).toInt())) {
+		if (pers.load(db, query->value(0).toInt())) {
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
 			
 			invoice.create(db, &pers);
@@ -151,95 +164,19 @@ void InvoiceWizard::invoiceNewMembers() {
 	bar.setValue(num);
 }
 
-void InvoiceWizard::invoiceUntilDate() {
-	PPSPerson pers;
-	Invoice invoice;
-	XmlPdf *pdf;
+QString InvoiceWizard::getSaveFileName() {
 	QString fileName;
-	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE paid_due<? OR paid_due IS NULL or paid_due='';");
-	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
-	query.exec();
-	
-	if (checkPrintDate->isChecked()) {
-		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-		if (!fileName.isEmpty()) {
-			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		}
-	}
-	
-	int num = query.size();
-	int cnt = 0;
-	QProgressDialog bar(this);
-	bar.setRange(0, num);
-	bar.setCancelButtonText(tr("&Cancel"));
-	bar.setWindowTitle(tr("Create Invoices"));
-	bar.setWindowModality(Qt::WindowModal);
-	bar.show();
-	
-	while (query.next()) {
-		if (bar.wasCanceled()) {
-			break;
-		}
-		bar.setValue(cnt++);
-		
-		if (pers.load(db, query.value(0).toInt())) {
-			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
-			
-			invoice.create(db, &pers);
-			if (checkPrintDate->isChecked()) {
-				pdf = invoice.createPdf("reminder");
-				pdf->print( QString(fileName).arg(invoice.memberUid()) );
+	while (true) {
+			fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
+			if (!fileName.isEmpty()) {
+				fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
+				break;
 			} else {
-				pdf = invoice.createPdf("invoice");
-				pdf->send(invoice.addressEmail());
+				int ret = QMessageBox::question(this, tr("Print instead of Save?"), tr("You have not given a Filename. Do you want to print the Invoices instead of save them as PDF?"), tr("Print Invoices"), tr("Save as PDF"));
+				if (ret == 0) {
+					break;
+				}
 			}
 		}
-	}
-}
-
-void InvoiceWizard::invoiceAllMembers() {
-	PPSPerson pers;
-	Invoice invoice;
-	XmlPdf *pdf;
-	QString fileName;
-	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons;");
-	query.exec();
-	
-	if (checkPrintDate->isChecked()) {
-		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-		if (!fileName.isEmpty()) {
-			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		}
-	}
-	
-	int num = query.size();
-	int cnt = 0;
-	QProgressDialog bar(this);
-	bar.setRange(0, num);
-	bar.setCancelButtonText(tr("&Cancel"));
-	bar.setWindowTitle(tr("Create Invoices"));
-	bar.setWindowModality(Qt::WindowModal);
-	bar.show();
-	
-	while (query.next()) {
-		if (bar.wasCanceled()) {
-			break;
-		}
-		bar.setValue(cnt++);
-		
-		if (pers.load(db, query.value(0).toInt())) {
-			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
-			
-			invoice.create(db, &pers);
-			if (checkPrintDate->isChecked()) {
-				pdf = invoice.createPdf("reminder");
-				pdf->print( QString(fileName).arg(invoice.memberUid()) );
-			} else {
-				pdf = invoice.createPdf("invoice");
-				pdf->send(invoice.addressEmail());
-			}
-		}
-	}
+		return fileName;
 }

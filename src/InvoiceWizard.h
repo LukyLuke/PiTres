@@ -19,11 +19,13 @@
 #ifndef INVOICEWIZARD_H
 #define INVOICEWIZARD_H
 
+#include "ui_invoicewizard.h"
+
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QString>
-#include <ui_invoicewizard.h>
-
+#include <QSqlQuery>
+#include <QSqlError>
 
 class InvoiceWizard:public QWidget, private Ui::InvoiceForm {
 Q_OBJECT
@@ -34,6 +36,8 @@ public:
 private:
 	QSqlDatabase db;
 	void openDatabase();
+	void doCreateInvoices(QSqlQuery *query);
+	QString getSaveFileName();
 	
 public slots:
 	void insertMemberUid();
