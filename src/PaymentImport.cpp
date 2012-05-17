@@ -127,7 +127,7 @@ void PaymentImport::continueImport() {
 		QString member = tablePay->item(i, 2)->text();
 		QString valuta = tablePay->item(i, 3)->text();
 		QString name = tablePay->item(i, 4)->text();
-		QString section = tablePay->item(i, 6)->text();
+		//QString section = tablePay->item(i, 6)->text();
 		
 		// Payment QIF
 		qif.append("\nD" + valuta);

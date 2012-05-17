@@ -44,6 +44,9 @@
        <property name="displayFormat">
         <string>dddd, dd. MMMM yyyy</string>
        </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>

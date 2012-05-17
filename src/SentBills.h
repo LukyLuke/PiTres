@@ -4,6 +4,7 @@
 #include "../ui_sentbills.h"
 #include "../ui_adjustpaiddate.h"
 #include "../ui_fromtodates.h"
+#include "../ui_dateform.h"
 #include "data/Reminder.h"
 
 #include <QWidget>
@@ -31,8 +32,10 @@ private:
 	
 	QDialog *adjustDialog;
 	QDialog *fromtoDialog;
+	QDialog *exportPaymentsDialog;
 	Ui::adjustPaidDateForm form;
 	Ui::fromToDatesForm fromto;
+	Ui::DateForm dateform;
 	
 	QSqlQuery createQuery();
 	void createContextMenu();
@@ -51,6 +54,8 @@ public slots:
 	void doAdjustDates();
 	void exportQifAssets();
 	void doExportQifAssets();
+	void exportQifPayments();
+	void doExportQifPayments();
 	void showTableContextMenu(const QPoint &point);
 	void sendNewReminder();
 	void printNewReminder();

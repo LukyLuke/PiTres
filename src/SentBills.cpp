@@ -43,6 +43,7 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	connect(btnSyncUsers, SIGNAL(clicked()), this, SLOT(syncUserPaidDate()));
 	connect(pendingOnly, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
+	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
 	
 	tableModel = new QSqlQueryModel(tableView);
 	
@@ -56,6 +57,10 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	fromtoDialog = new QDialog(this);
 	fromto.setupUi(fromtoDialog);
 	connect(fromto.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifAssets()));
+	
+	exportPaymentsDialog = new QDialog(this);
+	dateform.setupUi(exportPaymentsDialog);
+	connect(dateform.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifPayments()));
 	
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -179,6 +184,11 @@ void SentBills::exportQifAssets() {
 	fromtoDialog->show();
 }
 
+void SentBills::exportQifPayments() {
+	dateform.fromDate->setDate(QDate::currentDate());
+	exportPaymentsDialog->show();
+}
+
 void SentBills::doExportQifAssets() {
 	QSettings settings;
 	QString qif("!Type:" + settings.value("qif/account_asset", "Oth A").toString());
@@ -220,6 +230,43 @@ void SentBills::doExportQifAssets() {
 		}
 	}
 	fromtoDialog->hide();
+}
+
+void SentBills::doExportQifPayments() {
+	QSettings settings;
+	QString qif("!Type:" + settings.value("qif/account_cash", "Cash").toString());
+	
+	QSqlQuery query(db);
+	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name FROM pps_invoice WHERE paid_date >= :date;");
+	query.bindValue(":date1", dateform.fromDate->date().toString("yyyy-MM-dd"));
+	query.exec();
+	
+	while (query.next()) {
+		QString member = query.value(0).toString();
+		QString ref = query.value(1).toString();
+		QString amount = query.value(2).toString();
+		QString valuta = query.value(3).toString();
+		QString name = query.value(4).toString();
+		
+		// Payment QIF
+		qif.append("\nD" + valuta);
+		qif.append("\nT" + amount);
+		qif.append("\nP"+ settings.value("qif/payee_label", tr("Payment: ")).toString() + name + "("+member+")");
+		qif.append("\nN" + ref);
+		qif.append("\nM"+ settings.value("qif/memo", tr("Member UID: ")).toString() + member);
+		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
+		qif.append("\n^\n");
+	}
+	
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
+	if (!fileName.isEmpty()) {
+		QFile f(fileName);
+		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+			QTextStream out(&f);
+			out << qif;
+		}
+	}
+	exportPaymentsDialog->close();
 }
 
 void SentBills::syncUserPaidDate() {
