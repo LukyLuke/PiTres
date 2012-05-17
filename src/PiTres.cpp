@@ -9,6 +9,7 @@
 #include <QtGui>
 #include <QFileDialog>
 #include <QtGui/QGridLayout>
+#include <QFileInfo>
 #include <QSettings>
 
 PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
@@ -33,6 +34,16 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	connect(settingsForm.invoiceSelect, SIGNAL(clicked()), this, SLOT(showInvoiceFileDialog()));
 	connect(settingsForm.reminderSelect, SIGNAL(clicked()), this, SLOT(showReminderFileDialog()));
 	connect(settingsForm.receiptSelect, SIGNAL(clicked()), this, SLOT(showReceiptFileDialog()));
+	
+	// Load the Database
+	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
+	if (!dbfile.absoluteDir().exists()) {
+		dbfile.absoluteDir().mkpath(dbfile.absolutePath());
+		qDebug() << "Path did not exists, created: " + dbfile.absolutePath();
+	}
+	db = QSqlDatabase::addDatabase("QSQLITE");
+	db.setDatabaseName(dbfile.absoluteFilePath());
+	db.open();
 }
 
 PiTres::~PiTres() {
@@ -43,6 +54,9 @@ PiTres::~PiTres() {
 	settings.setValue("core/size", size());
 	settings.setValue("core/maximized", isMaximized());
 	settings.setValue("core/fullscreen", isFullScreen());
+	
+	// Close the Database at the End
+	db.close();
 }
 
 void PiTres::showStatusMessage(QString msg) {
@@ -89,10 +103,6 @@ void PiTres::showHelp(int page) {
 void PiTres::showUsers() {
 	Userlist *widget = new Userlist;
 	setContent(widget);
-#ifdef USE_SQLITE
-//	SqliteStorage storage;
-//	storage.load("data/userlist.db");
-#endif
 }
 
 void PiTres::showSentBills() {

@@ -11,7 +11,6 @@
 #include <QVariant>
 #include <QDate>
 #include <QList>
-#include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
@@ -62,7 +61,8 @@ void Invoice::setIsLoaded(bool loaded) {
 	_loaded = loaded;
 }
 
-void Invoice::createTables(QSqlDatabase db) {
+void Invoice::createTables() {
+	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS pps_invoice (member_uid INTEGER, reference TEXT, issue_date DATE, payable_date DATE, paid_date DATE, "
 	              "amount FLOAT, amount_paid FLOAT, state INTEGER, address_prefix TEXT, address_company TEXT, address_name TEXT, address_street1 TEXT, "
@@ -74,15 +74,31 @@ void Invoice::createTables(QSqlDatabase db) {
 	}
 }
 
-void Invoice::save(QSqlDatabase db) {
+void Invoice::save() {
+	if (i_memberUid <= 0) return;
 	QSqlQuery query(db);
-	query.prepare(QString(_loaded ? "UPDATE" : "INSERT INTO") + " pps_invoice (member_uid,reference,issue_date,payable_date,paid_date,amount,amount_paid,state,"
-	              "address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section) VALUES ("
-	              ":member,:reference,:issued,:payable,:paid,:amount,:amount_paid,:state,:prefix,:company,:name,"
-	              ":street1,:street2,:city,:email,:section)" + QString(_loaded ? " WHERE member_uid=:member" : "") + ";");
-
+	if (_loaded) {
+		query.prepare("UPDATE pps_invoice SET member_uid=:member,reference=:reference,issue_date=:issued,payable_date=:payable,paid_date=:paid,"
+		              "amount=:amount,amount_paid=:amount_paid,state=:state,address_prefix=:prefix,address_company=:company,address_name=:name,"
+		              "address_street1=:street1,address_street2=:street2,address_city=:city,address_email=:email,for_section=:section"
+		              " WHERE reference=:reference_where;");
+	} else {
+		query.prepare("INSERT INTO pps_invoice (member_uid,reference,issue_date,payable_date,paid_date,amount,amount_paid,state,"
+		              "address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section) VALUES ("
+		              ":member,:reference,:issued,:payable,:paid,:amount,:amount_paid,:state,:prefix,:company,:name,"
+		              ":street1,:street2,:city,:email,:section);");
+	}
+	
+	// This is for all old References
+	QString ref(s_reference);
+	if (ref.length() == 16) {
+		ref.insert(4, " ");
+		ref.insert(9, " ");
+		ref.insert(14, " ");
+	}
+	
 	query.bindValue(":member", i_memberUid);
-	query.bindValue(":reference", s_reference);
+	query.bindValue(":reference", ref);
 	query.bindValue(":issued", d_issueDate);
 	query.bindValue(":payable", d_payableDue);
 	query.bindValue(":paid", d_paidDate);
@@ -97,16 +113,20 @@ void Invoice::save(QSqlDatabase db) {
 	query.bindValue(":city", s_addressCity);
 	query.bindValue(":email", s_addressEmail);
 	query.bindValue(":section", s_forSection);
+	if (_loaded) {
+		query.bindValue(":reference_where", ref);
+	}
 	query.exec();
 	
 	setIsLoaded(true);
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
 		qDebug() << query.lastError();
+		setIsLoaded(false);
 	}
 }
 
-void Invoice::loadLast(QSqlDatabase db, int member) {
+void Invoice::loadLast(int member) {
 	clear();
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM pps_invoice WHERE member_uid=? ORDER BY issue_date DESC;");
@@ -140,9 +160,57 @@ void Invoice::loadLast(QSqlDatabase db, int member) {
 	}
 }
 
-QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
-	QList<Invoice *> back;
+void Invoice::loadByReference(QString reference) {
+	clear();
+	QString ref = QString(reference);
+	if (ref.size() > 0) {
+		ref.remove(QChar(' '), Qt::CaseInsensitive);
+		ref = ref.left(ref.size()-1); // Last Char is the Checksum which isn't in the Database
+	}
 	
+	// This is for all old References
+	if (ref.left(10) == "0000000000") {
+		ref = ref.right(16);
+		ref.insert(4, " ");
+		ref.insert(9, " ");
+		ref.insert(14, " ");
+	}
+	
+	QSqlQuery query(db);
+	query.prepare("SELECT * FROM pps_invoice WHERE reference=?;");
+	query.bindValue(0, ref);
+	query.exec();
+	
+	if (query.lastError().type() != QSqlError::NoError) {
+		qDebug() << query.lastQuery();
+		qDebug() << query.lastError();
+	}
+	
+	_loaded = query.first();
+	if (_loaded) {
+		QSqlRecord record = query.record();
+		i_memberUid = query.value(record.indexOf("member_uid")).toInt();
+		setReference(query.value(record.indexOf("reference")).toString()); // we reformat the Reference
+		d_issueDate = query.value(record.indexOf("issue_date")).toDate();
+		d_payableDue = query.value(record.indexOf("payable_date")).toDate();
+		d_paidDate = query.value(record.indexOf("paid_date")).toDate();
+		f_amount = query.value(record.indexOf("amount")).toFloat();
+		f_amountPaid = query.value(record.indexOf("amount_paid")).toFloat();
+		m_state = (State) query.value(record.indexOf("state")).toInt();
+		s_addressPrefix = query.value(record.indexOf("address_prefix")).toString();
+		s_addressCompany = query.value(record.indexOf("address_company")).toString();
+		s_addressName = query.value(record.indexOf("address_name")).toString();
+		s_addressStreet1 = query.value(record.indexOf("address_street1")).toString();
+		s_addressStreet2 = query.value(record.indexOf("address_street2")).toString();
+		s_addressCity = query.value(record.indexOf("address_city")).toString();
+		s_addressEmail = query.value(record.indexOf("address_email")).toString();
+		s_forSection = query.value(record.indexOf("for_section")).toString();
+	}
+}
+
+QList<Invoice *> Invoice::getInvoicesForMember(int member) {
+	QList<Invoice *> back;
+	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM pps_invoice WHERE member_uid=? ORDER BY issue_date DESC;");
 	query.bindValue(0, member);
@@ -150,7 +218,7 @@ QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
 	QSqlRecord record = query.record();
 	
 	while(query.next()) {
-		Invoice *invoice;
+		Invoice *invoice = new Invoice;
 		invoice->setMemberUid(query.value(record.indexOf("member_uid")).toInt());
 		invoice->setReference(query.value(record.indexOf("reference")).toString());
 		invoice->setIssueDate(query.value(record.indexOf("issue_date")).toDate());
@@ -173,7 +241,7 @@ QList<Invoice *> Invoice::getInvoicesForMember(QSqlDatabase db, int member) {
 	return back;
 }
 
-void Invoice::create(QSqlDatabase db, PPSPerson *person) {
+void Invoice::create(PPSPerson *person) {
 	QSettings settings;
 	setIsLoaded(false);
 	
@@ -211,7 +279,26 @@ void Invoice::create(QSqlDatabase db, PPSPerson *person) {
 	}
 	setForSection(person->section());
 	setLanguage((Language)person->language());
-	//save(db);
+	save();
+}
+
+bool Invoice::pay(QDate *date) {
+	return pay(amount(), date);
+}
+
+bool Invoice::pay(float amount, QDate *date) {
+	if (date == NULL) {
+		setPaidDate(QDate::currentDate());
+	} else {
+		setPaidDate(QDate(date->year(), date->month(), date->day()));
+	}
+	setAmountPaid(amount);
+	
+	if (f_amount <= amountPaid()) {
+		setState(StatePaid);
+	}
+	save();
+	return _loaded;
 }
 
 XmlPdf *Invoice::createPdf(QString tpl) {
@@ -247,6 +334,10 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("member_country", addressCountry());
 	pdf->setVar("member_email", addressEmail());
 	pdf->setVar("member_section", forSection());
+	
+	PPSPerson person;
+	person.load(memberUid());
+	pdf->setVar("member_nick", person.nickname());
 	
 	return pdf;
 }

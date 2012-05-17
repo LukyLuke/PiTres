@@ -9,13 +9,14 @@
 #include <QWidget>
 #include <QDialog>
 #include <QString>
+#include <QSqlDatabase>
 
 class PiTres : public QMainWindow, private Ui::MainWindow {
 Q_OBJECT
 private:
 	QDialog *settingsDialog;
 	Ui::settingsForm settingsForm;
-	
+	QSqlDatabase db;
 	QWidget *content;
 	void setContent(QWidget* widget);
 

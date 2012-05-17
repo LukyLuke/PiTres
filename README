@@ -13,3 +13,5 @@ Run PiTres
 
 The Database is stored relatively from your RunPath unter ./data/userlist.sqlite
 This will be configurable in a later release...
+
+For LDAP-Attributes see http://wiki.piratecomic.net/wiki/Mitglieder_DB/LDAP_Database_Fields

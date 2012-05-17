@@ -26,26 +26,9 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continueImport()));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(paySelectedInvoice()));
-	
-	openDatabase();
-}
-PaymentImport::~PaymentImport() {
-	//db.close();
 }
 
-void PaymentImport::openDatabase() {
-	QSettings settings;
-	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	qDebug() << "Loading DB: " + dbfile.absoluteFilePath();
-	
-	if (!dbfile.absoluteDir().exists()) {
-		dbfile.absoluteDir().mkpath(dbfile.absolutePath());
-		qDebug() << "Path did not exists, created: " + dbfile.absolutePath();
-	}
-	
-	db = QSqlDatabase::addDatabase("QSQLITE");
-	db.setDatabaseName(dbfile.absoluteFilePath());
-	db.open();
+PaymentImport::~PaymentImport() {
 }
 
 void PaymentImport::timerEvent(QTimerEvent *event) {

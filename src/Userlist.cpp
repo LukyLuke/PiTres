@@ -2,10 +2,12 @@
 #include "Userlist.h"
 #include "data/Person.h"
 #include "data/Invoice.h"
+#include "PaymentWizard.h"
 
 #include <QSizePolicy>
 #include <QWidget>
 #include <QTableView>
+#include <QModelIndexList>
 #include <QVariant>
 #include <QString>
 #include <QStringList>
@@ -33,7 +35,9 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	connect(tableView, SIGNAL(activated(QModelIndex)), this, SLOT(showDetails(QModelIndex)));
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	
-	openDatabase();
+	tableModel = new QSqlQueryModel(tableView);
+	
+	createContextMenu();
 	loadSections();
 	loadData();
 	
@@ -43,30 +47,20 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 }
 
 Userlist::~Userlist() {
-	//db.close();
+	delete actionManualPayment;
 }
 
-void Userlist::openDatabase() {
-	QSettings settings;
-	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	qDebug() << "Loading DB: " + dbfile.absoluteFilePath();
-	
-	if (!dbfile.absoluteDir().exists()) {
-		dbfile.absoluteDir().mkpath(dbfile.absolutePath());
-		qDebug() << "Path did not exists, created: " + dbfile.absolutePath();
-	}
-	
-	db = QSqlDatabase::addDatabase("QSQLITE");
-	db.setDatabaseName(dbfile.absoluteFilePath());
-	db.open();
-	
-	tableModel = new QSqlQueryModel(tableView);
+void Userlist::createContextMenu() {
+	actionManualPayment = new QAction(tr("&Pay Memberfee"), this);
+	actionManualPayment->setShortcuts(QKeySequence::Print);
+	actionManualPayment->setStatusTip(tr("User pays current Memberfee cash"));
+	connect(actionManualPayment, SIGNAL(triggered()), this, SLOT(payMemberfeeCash()));
 }
 
 void Userlist::loadData() {
 	// Create Persons Database Tables if needed
-	PPSPerson::createTables(db);
-	Invoice::createTables(db);
+	PPSPerson::createTables();
+	Invoice::createTables();
 	
 	QSqlQuery query("SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons;", db);
 	tableModel->setQuery(query);
@@ -122,7 +116,7 @@ QSqlQuery Userlist::createQuery() {
 		if (i > 0) {
 			search.append(" AND ");
 		}
-		search.append(QString("(nickname LIKE :p1_").append(QString::number(i)).append(" OR familyname LIKE :p2_").append(QString::number(i)).append(" OR givenname LIKE :p3_").append(QString::number(i)).append(")"));
+		search.append(QString("(uid=:uid").append(QString::number(i)).append(" OR nickname LIKE :nick").append(QString::number(i)).append(" OR familyname LIKE :family").append(QString::number(i)).append(" OR givenname LIKE :given").append(QString::number(i)).append(")"));
 	}
 	
 	QSqlQuery query(db);
@@ -146,9 +140,10 @@ QSqlQuery Userlist::createQuery() {
 		query.bindValue(":section", section);
 	}
 	for (int i = 0; i < sl.size(); i++) {
-		query.bindValue(QString(":p1_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-		query.bindValue(QString(":p2_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-		query.bindValue(QString(":p3_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
+		query.bindValue(QString(":uid").append(QString::number(i)), sl.at(i));
+		query.bindValue(QString(":nick").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
+		query.bindValue(QString(":family").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
+		query.bindValue(QString(":given").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
 	}
 	return query;
 }
@@ -175,7 +170,7 @@ void Userlist::showDetails(QModelIndex index) {
 void Userlist::showDetails(int index) {
 	int uid = tableModel->record(index).value(0).toInt();
 	PPSPerson person;
-	person.load(db, uid);
+	person.load(uid);
 	
 	detailUid->setText(QString::number(person.uid()));
 	detailNickname->setText(person.nickname());
@@ -263,6 +258,25 @@ void Userlist::exportData() {
 }
 
 void Userlist::showTableContextMenu(const QPoint &point) {
-	
+	QMenu menu(tableView);
+	menu.addAction(actionManualPayment);
+	menu.exec(tableView->mapToGlobal(point));
 }
 
+int Userlist::getFirstSelectedUid() {
+	QModelIndexList selection = tableView->selectionModel()->selectedIndexes();
+	if (selection.size() > 0) {
+		int row = selection.at(0).row();
+		return tableModel->record(row).value(0).toInt();
+	}
+	return 0;
+}
+
+void Userlist::payMemberfeeCash() {
+	PaymentWizard *wizard = new PaymentWizard(this);
+	int uid = getFirstSelectedUid();
+	if (uid > 0) {
+		wizard->setPerson(uid);
+		wizard->show();
+	}
+}

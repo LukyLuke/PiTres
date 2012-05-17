@@ -48,7 +48,7 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 }
 
 void InvoiceWizard::openDatabase() {
-	QSettings settings;
+	/*QSettings settings;
 	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	qDebug() << "Loading DB: " + dbfile.absoluteFilePath();
 	
@@ -59,7 +59,7 @@ void InvoiceWizard::openDatabase() {
 	
 	db = QSqlDatabase::addDatabase("QSQLITE");
 	db.setDatabaseName(dbfile.absoluteFilePath());
-	db.open();
+	db.open();*/
 }
 
 InvoiceWizard::~InvoiceWizard() {
@@ -67,7 +67,7 @@ InvoiceWizard::~InvoiceWizard() {
 
 void InvoiceWizard::insertMemberUid() {
 	PPSPerson pers;
-	if (pers.load(db, memberUid->text().toInt())) { 
+	if (pers.load(memberUid->text().toInt())) { 
 		memberUidList->addItem(memberUid->text());
 		memberUid->clear();
 	} else {
@@ -87,8 +87,8 @@ void InvoiceWizard::invoiceMembers() {
 	
 	for (int i = 0; i < memberUidList->count(); i++) {
 		QListWidgetItem *item = memberUidList->item(i);
-		if (pers.load(db, item->text().toInt())) {
-			invoice.create(db, &pers);
+		if (pers.load(item->text().toInt())) {
+			invoice.create(&pers);
 			if (checkPrint->isChecked()) {
 				pdf = invoice.createPdf("reminder");
 				pdf->print( QString(fileName).arg(invoice.memberUid()) );
@@ -148,10 +148,10 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 		}
 		bar.setValue(cnt++);
 		
-		if (pers.load(db, query->value(0).toInt())) {
+		if (pers.load(query->value(0).toInt())) {
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
 			
-			invoice.create(db, &pers);
+			invoice.create(&pers);
 			if (checkPrintDate->isChecked()) {
 				pdf = invoice.createPdf("reminder");
 				pdf->print( QString(fileName).arg(invoice.memberUid()) );
@@ -167,16 +167,16 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 QString InvoiceWizard::getSaveFileName() {
 	QString fileName;
 	while (true) {
-			fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-			if (!fileName.isEmpty()) {
-				fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
+		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
+		if (!fileName.isEmpty()) {
+			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
+			break;
+		} else {
+			int ret = QMessageBox::question(this, tr("Print instead of Save?"), tr("You have not given a Filename. Do you want to print the Invoices instead of save them as PDF?"), tr("Print Invoices"), tr("Save as PDF"));
+			if (ret == 0) {
 				break;
-			} else {
-				int ret = QMessageBox::question(this, tr("Print instead of Save?"), tr("You have not given a Filename. Do you want to print the Invoices instead of save them as PDF?"), tr("Print Invoices"), tr("Save as PDF"));
-				if (ret == 0) {
-					break;
-				}
 			}
 		}
-		return fileName;
+	}
+	return fileName;
 }

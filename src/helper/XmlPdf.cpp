@@ -11,10 +11,13 @@
 #include <QFontDatabase>
 #include <QPainter>
 #include <QPrinter>
+#include <QPrintDialog>
+#include <QMetaEnum>
 #include <QDebug>
 
 XmlPdf::XmlPdf(QObject *parent) {
 	doc = QDomDocument("template");
+	paperSize = QPrinter::A4;
 }
 
 XmlPdf::~XmlPdf() { }
@@ -39,15 +42,34 @@ void XmlPdf::loadTemplate(QString file) {
 	QFileInfo info(file);
 	templatePath = info.canonicalPath();
 	loadFonts();
-	
 	elements.clear();
-	QDomNodeList nl = doc.elementsByTagName("g");
-	for (int i = 0; i < nl.size(); i++) {
-		QDomNode n = nl.item(i);
-		if (n.isElement()) {
-			QDomElement elem = n.toElement();
-			if (elem.hasAttribute("part") && !elem.attribute("part").isEmpty()) {
-				elements.insert(elem.attribute("part").toLower(), PdfElement::fromElement(elem, templatePath));
+	
+	QDomNodeList tl = doc.elementsByTagName("template");
+	if (tl.size() > 0 && tl.at(0).isElement()) {
+		QDomElement t = tl.at(0).toElement();
+		if (t.hasAttribute("size")) {
+			QString size = t.attribute("size").toUpper();
+			if (size == "A4") {
+				paperSize = QPrinter::A4;
+			} else if (size == "A5") {
+				paperSize = QPrinter::A5;
+			} else if (size == "A6") {
+				paperSize = QPrinter::A6;
+			} else if (size == "LETTER") {
+				paperSize = QPrinter::Letter;
+			} else {
+				paperSize = QPrinter::A4;
+			}
+		}
+		
+		QDomNodeList nl = t.childNodes();
+		for (int i = 0; i < nl.size(); i++) {
+			QDomNode n = nl.item(i);
+			if (n.isElement() && n.nodeName().toLower() == "g") {
+				QDomElement elem = n.toElement();
+				if (elem.hasAttribute("part") && !elem.attribute("part").isEmpty()) {
+					elements.insert(elem.attribute("part").toLower(), PdfElement::fromElement(elem, templatePath));
+				}
 			}
 		}
 	}
@@ -57,12 +79,21 @@ void XmlPdf::setVar(QString name, QString value) {
 	variables.insert(name, value);
 }
 
-
 bool XmlPdf::print(QString file) {
-	QPrinter printer;
-	printer.setPaperSize(QPrinter::A4);
+	QPrinter printer(QPrinter::PrinterResolution);
+	printer.setPaperSize(paperSize);
 	printer.setOutputFormat(QPrinter::PdfFormat);
-	printer.setOutputFileName(file);
+	
+	if (file.isEmpty()) {
+		QPrintDialog *dialog = new QPrintDialog(&printer);
+		dialog->setWindowTitle(QObject::tr("Print Document"));
+		if (dialog->exec() != QDialog::Accepted) {
+			qDebug() << "Printing aborted and no Filename given, canceled printing...";
+			return false;
+		}
+	} else {
+		printer.setOutputFileName(file);
+	}
 	
 	QPainter *painter = new QPainter();
 	if (!painter->begin(&printer)) {
@@ -82,5 +113,6 @@ bool XmlPdf::print(QString file) {
 }
 
 bool XmlPdf::send(QString email) {
-	
+	qDebug() << "Sending EMail with PDF not implemented currently :(";
+	return false;
 }

@@ -32,7 +32,6 @@ LDAPImport::LDAPImport(QWidget *parent) {
 	connected = FALSE;
 	version = LDAP_VERSION3;
 	stackedWidget->setCurrentIndex(0);
-	openDatabase();
 	
 	// Load saved values
 	editServer->setText( settings.value("ldap/server", "localhost").toString() );
@@ -183,7 +182,7 @@ void LDAPImport::importFromLdap() {
 	qDebug() << QString("Search for %1 succeed").arg(editSearch->text());
 	
 	// Create Persons Database Tables if needed
-	PPSPerson::createTables(db);
+	PPSPerson::createTables();
 	
 	// Prepare the Progress-Bar
 	int max = ldap_count_entries(ldap, res);
@@ -233,7 +232,7 @@ void LDAPImport::importFromLdap() {
 		}
 		ldap_memfree(attribute);
 		
-		person->save(db);
+		person->save();
 		person->clear();
 	}
 	
@@ -252,23 +251,8 @@ void LDAPImport::importFromLdap() {
 	}
 }
 
-void LDAPImport::openDatabase() {
-	QSettings settings;
-	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	
-	// Load the Database
-	if (!dbfile.absoluteDir().exists()) {
-		dbfile.absoluteDir().mkpath(dbfile.absolutePath());
-		qDebug() << "Path did not exists, created: " + dbfile.absolutePath();
-	}
-	
-	db = QSqlDatabase::addDatabase("QSQLITE");
-	db.setDatabaseName(dbfile.absoluteFilePath());
-	db.open();
-}
-
 void LDAPImport::emptyDatabase() {
-	PPSPerson::emptyTables(db);
+	PPSPerson::emptyTables();
 }
 
 void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value) {

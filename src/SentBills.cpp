@@ -44,7 +44,8 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	connect(pendingOnly, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	
-	openDatabase();
+	tableModel = new QSqlQueryModel(tableView);
+	
 	loadData();
 	createContextMenu();
 	
@@ -62,7 +63,6 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 }
 
 SentBills::~SentBills() {
-	// db.close();
 	delete actionSendReminder;
 	delete actionPrintReminder;
 }
@@ -79,27 +79,10 @@ void SentBills::createContextMenu() {
 	connect(actionPrintReminder, SIGNAL(triggered()), this, SLOT(printNewReminder()));
 }
 
-void SentBills::openDatabase() {
-	QSettings settings;
-	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	qDebug() << "Loading DB: " + dbfile.absoluteFilePath();
-	
-	if (!dbfile.absoluteDir().exists()) {
-		dbfile.absoluteDir().mkpath(dbfile.absolutePath());
-		qDebug() << "Path did not exists, created: " + dbfile.absolutePath();
-	}
-	
-	db = QSqlDatabase::addDatabase("QSQLITE");
-	db.setDatabaseName(dbfile.absoluteFilePath());
-	db.open();
-	
-	tableModel = new QSqlQueryModel(tableView);
-}
-
 void SentBills::loadData() {
 	// Create Persons Database Tables if needed
-	PPSPerson::createTables(db);
-	Invoice::createTables(db);
+	PPSPerson::createTables();
+	Invoice::createTables();
 	
 	tableModel->setQuery(createQuery());
 	
@@ -371,7 +354,7 @@ void SentBills::createPdfReminds(bool email) {
 	}
 	foreach(const int &i, rows) {
 		uid = tableModel->record(i).value(0).toInt();
-		reminder.loadLast(db, uid);
+		reminder.loadLast(uid);
 		if (email) {
 			pdf = reminder.createPdf("invoice");
 			pdf->send(reminder.addressEmail());

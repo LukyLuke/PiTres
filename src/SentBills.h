@@ -34,7 +34,6 @@ private:
 	Ui::adjustPaidDateForm form;
 	Ui::fromToDatesForm fromto;
 	
-	void openDatabase();
 	QSqlQuery createQuery();
 	void createContextMenu();
 	QSet<int> getSelectedRows();

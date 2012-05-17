@@ -25,7 +25,6 @@ private:
 	
 	void connectLdap();
 	void disconnectLdap();
-	void openDatabase();
 	void setPersonValue(PPSPerson *person, QString field, QString value);
 
 public:

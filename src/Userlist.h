@@ -8,6 +8,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QString>
+#include <QAction>
+#include <QSet>
 #include <QSqlQueryModel>
 #include <QModelIndex>
 #include <QTimerEvent>
@@ -18,10 +20,12 @@ private:
 	QSqlDatabase db;
 	QSqlQueryModel *tableModel;
 	int searchTimer;
+	QAction *actionManualPayment;
 	
-	void openDatabase();
 	void loadSections();
 	QSqlQuery createQuery();
+	void createContextMenu();
+	int getFirstSelectedUid();
 
 public:
 	Userlist(QWidget *parent = 0);
@@ -36,6 +40,7 @@ public slots:
 	void showDetails(QModelIndex index);
 	void showTableContextMenu(const QPoint &point);
 	void exportData();
+	void payMemberfeeCash();
 
 protected:
 	void timerEvent(QTimerEvent *event);

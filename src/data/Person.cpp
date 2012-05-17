@@ -20,7 +20,8 @@ PPSPerson::PPSPerson(QObject *parent) : QObject(parent) {
 
 PPSPerson::~PPSPerson() {}
 
-void PPSPerson::createTables(QSqlDatabase db) {
+void PPSPerson::createTables() {
+	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons (uid INTEGER, contribution INTEGER, nickname TEXT, gender TEXT, familyname TEXT, "
 	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
@@ -53,7 +54,8 @@ void PPSPerson::createTables(QSqlDatabase db) {
 	}
 }
 
-void PPSPerson::emptyTables(QSqlDatabase db) {
+void PPSPerson::emptyTables() {
+	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("DELETE FROM ldap_persons;");
 	query.exec();
@@ -87,7 +89,7 @@ void PPSPerson::emptyTables(QSqlDatabase db) {
 	query.exec();
 }
 
-void PPSPerson::save(QSqlDatabase db) {
+void PPSPerson::save() {
 	int i;
 	QSqlQuery query(db);
 	query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section, paid_due, ldap_paid_due) "
@@ -183,7 +185,7 @@ void PPSPerson::clear() {
 	_invoice.clear();
 }
 
-bool PPSPerson::load(QSqlDatabase db, int uid) {
+bool PPSPerson::load(int uid) {
 	clear();
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM ldap_persons WHERE uid=?;");
@@ -231,13 +233,17 @@ bool PPSPerson::load(QSqlDatabase db, int uid) {
 			l_email << query.value(0).toString();
 		}
 		
-		_invoice.loadLast(db, uid);
+		_invoice.loadLast(uid);
 	}
 	return isLoaded();
 }
 
 Invoice *PPSPerson::getInvoice() {
 	return &_invoice;
+}
+
+QList<Invoice *> PPSPerson::getInvoices() {
+	return Invoice::getInvoicesForMember(uid());
 }
 
 void PPSPerson::setUid(int uid) {

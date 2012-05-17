@@ -16,35 +16,41 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef INVOICEWIZARD_H
-#define INVOICEWIZARD_H
+#ifndef PAYMENTWIZARD_H
+#define PAYMENTWIZARD_H
 
-#include "ui_invoicewizard.h"
+#include "ui_payment.h"
+#include "data/Person.h"
+#include "data/Invoice.h"
 
 #include <QWidget>
+#include <QDialog>
+#include <QModelIndex>
 #include <QSqlDatabase>
 #include <QString>
+#include <QVariant>
 #include <QSqlQuery>
 #include <QSqlError>
 
-class InvoiceWizard : public QWidget, private Ui::InvoiceForm {
+class PaymentWizard : public QDialog, private Ui::PaymentForm {
 Q_OBJECT
 public:
-	InvoiceWizard(QWidget *parent = 0);
-	virtual ~InvoiceWizard();
-
+	PaymentWizard(QWidget * parent = 0);
+	virtual ~PaymentWizard();
+	void setPerson(int uid);
+	
 private:
 	QSqlDatabase db;
-	void openDatabase();
-	void doCreateInvoices(QSqlQuery *query);
-	QString getSaveFileName();
+	PPSPerson person;
+	Invoice invoice;
+	QString reference;
+	void doPayInvoice();
 	
 public slots:
-	void insertMemberUid();
-	void invoiceMembers();
-	void invoiceNewMembers();
-	void invoiceUntilDate();
-	void invoiceAllMembers();
+	void selectRow(QModelIndex index);
+	void createCashPayment();
+	void paySelectedInCash();
+	
 };
 
-#endif // INVOICEWIZARD_H
+#endif // PAYMENTWIZARD_H

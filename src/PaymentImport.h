@@ -17,8 +17,6 @@ Q_OBJECT
 private:
 	QSqlDatabase db;
 	int searchTimer;
-	
-	void openDatabase();
 
 public:
 	PaymentImport(QWidget *parent = 0);

@@ -40,12 +40,13 @@ Q_ENUMS(Language)
 public:
 	PPSPerson(QObject *parent = 0);
 	virtual ~PPSPerson();
-	void save(QSqlDatabase db);
+	void save();
 	void clear();
-	bool load(QSqlDatabase db, int uid);
+	bool load(int uid);
 	Invoice *getInvoice();
-	static void createTables(QSqlDatabase db);
-	static void emptyTables(QSqlDatabase db);
+	QList<Invoice *> getInvoices();
+	static void createTables();
+	static void emptyTables();
 	
 	enum ContributionClass { ContributeFull=0, ContributeStudent=1 };
 	enum Gender { GenderMale=0, GenderFemale=1, GenderBoth=2, GenderNone=3, GenderUnknown=-1 };
@@ -137,6 +138,7 @@ signals:
 	void ldapPaidDueChanged(QDate);
 
 private:
+	QSqlDatabase db;
 	int i_uid;
 	QString s_section;
 	ContributionClass m_contributionClass;

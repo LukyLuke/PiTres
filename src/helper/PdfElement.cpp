@@ -174,8 +174,7 @@ void PdfElementLine::paint(QPainter *painter) {
 	qreal x2 = _attributes.value("x2", "0").toFloat();
 	qreal y2 = _attributes.value("y2", "0").toFloat();
 	if (x1 != x2 || x2 != y2) {
-		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter->setPen(pen);
+		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 		painter->setBrush(Qt::NoBrush);
 		painter->drawLine( QPointF(x1, y1), QPointF(x2, y2) );
 	}
@@ -193,9 +192,12 @@ void PdfElementCircle::paint(QPainter *painter) {
 	qreal rx = _attributes.value("r", "0").toFloat();
 	qreal ry = _attributes.value("r", "0").toFloat();
 	if (rx > 0 && ry > 0) {
-		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter->setPen(pen);
-		painter->setBrush(Qt::NoBrush);
+		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+		if (!fillColor.isEmpty()) {
+			painter->setBrush(QBrush(QColor(fillColor)));
+		} else {
+			painter->setBrush(Qt::NoBrush);
+		}
 		painter->drawEllipse( QPointF(cx, cy), rx, ry );
 	}
 }
@@ -212,9 +214,12 @@ void PdfElementEllipse::paint(QPainter *painter) {
 	qreal rx = _attributes.value("rx", "0").toFloat();
 	qreal ry = _attributes.value("ry", "0").toFloat();
 	if (rx > 0 && ry > 0) {
-		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter->setPen(pen);
-		painter->setBrush(Qt::NoBrush);
+		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+		if (!fillColor.isEmpty()) {
+			painter->setBrush(QBrush(QColor(fillColor)));
+		} else {
+			painter->setBrush(Qt::NoBrush);
+		}
 		painter->drawEllipse( QPointF(cx, cy), rx, ry );
 	}
 }
@@ -232,14 +237,18 @@ PdfElementRectangle::~PdfElementRectangle() {}
 void PdfElementRectangle::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
+	QString fillColor = _attributes.value("fillcolor", "");
 	qreal x = _attributes.value("x", "0").toFloat();
 	qreal y = _attributes.value("y", "0").toFloat();
 	qreal w = _attributes.value("width", "0").toFloat();
 	qreal h = _attributes.value("height", "0").toFloat();
 	if (w > 0 && h > 0) {
-		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter->setPen(pen);
-		painter->setBrush(Qt::NoBrush);
+		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+		if (!fillColor.isEmpty()) {
+			painter->setBrush(QBrush(QColor(fillColor)));
+		} else {
+			painter->setBrush(Qt::NoBrush);
+		}
 		painter->drawRect( QRectF(QPointF(x, y), QSizeF(w, h)) );
 	}
 }
@@ -255,9 +264,12 @@ void PdfElementPolygon::paint(QPainter *painter) {
 	QStringList xl = _attributes.value("x", "").split(",", QString::SkipEmptyParts);
 	QStringList yl = _attributes.value("y", "").split(",", QString::SkipEmptyParts);
 	if ((xl.size() > 0) && (xl.size() == yl.size())) {
-		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
-		painter->setPen(pen);
-		painter->setBrush(Qt::NoBrush);
+		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+		if (!fillColor.isEmpty()) {
+			painter->setBrush(QBrush(QColor(fillColor)));
+		} else {
+			painter->setBrush(Qt::NoBrush);
+		}
 		QPolygonF polygon;
 		for (int i = 0; i < xl.size(); i++) {
 			polygon << QPointF(xl.at(i).toFloat(), yl.at(i).toFloat());
@@ -280,7 +292,7 @@ void PdfElementText::paint(QPainter *painter) {
 	QString valign = _attributes.value("valign", "justify");
 	QString halign = _attributes.value("halign", "top");
 	QString fontfamily = _attributes.value("font", "Aller light");
-	int weight = _attributes.value("weight", "-1").toInt();
+	QString weight = _attributes.value("weight", "normal");
 	qreal size = _attributes.value("size", "12").toFloat();
 	bool italic = _attributes.value("italic", "false").toLower() == "true";
 	bool underline = _attributes.value("underline", "false").toLower() == "true";
@@ -294,7 +306,19 @@ void PdfElementText::paint(QPainter *painter) {
 	if (w > 0 && h > 0) {
 		QFont font = QApplication::font();
 		font.setFamily(fontfamily);
-		font.setWeight(weight);
+		if (weight == "light") {
+			font.setWeight(QFont::Light);
+		} else if (weight == "normal") {
+			font.setWeight(QFont::Normal);
+		} else if (weight == "demibold") {
+			font.setWeight(QFont::DemiBold);
+		} else if (weight == "bold") {
+			font.setWeight(QFont::Bold);
+		} else if (weight == "black") {
+			font.setWeight(QFont::Black);
+		} else {
+			font.setWeight(QFont::Normal);
+		}
 		font.setItalic(italic);
 		font.setUnderline(underline);
 		font.setPointSizeF(size);

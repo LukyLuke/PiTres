@@ -40,15 +40,18 @@ Q_ENUMS(Language)
 public:
 	Invoice(QObject *parent = 0);
 	virtual ~Invoice();
-	void save(QSqlDatabase db);
+	void save();
 	void clear();
 	void setIsLoaded(bool loaded);
-	void loadLast(QSqlDatabase db, int member);
+	void loadLast(int member);
 	XmlPdf *createPdf(QString tpl = 0);
 	QString getEsr();
-	void create(QSqlDatabase db, PPSPerson *person);
-	static QList<Invoice *> getInvoicesForMember(QSqlDatabase db, int member);
-	static void createTables(QSqlDatabase db);
+	void create(PPSPerson *person);
+	void loadByReference(QString reference);
+	bool pay(QDate *date = 0);
+	bool pay(float amount, QDate *date = 0);
+	static QList<Invoice *> getInvoicesForMember(int member);
+	static void createTables();
 
 	// InvoiceState in old DB: o_pen, c_anceled, p_aid, u_nknown
 	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3 };
@@ -118,6 +121,7 @@ signals:
 	void languageChanged(Language);
 	
 private:
+	QSqlDatabase db;
 	bool _loaded;
 	int i_memberUid;
 	QString s_reference;

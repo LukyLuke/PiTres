@@ -8,6 +8,12 @@
 #include <QPrinter>
 #include <QString>
 
+struct StaticQtMetaObject : public QObject {
+	static inline const QMetaObject& get() {
+		return staticQtMetaObject;
+	}
+};
+
 class XmlPdf {
 public:
 	XmlPdf(QObject *parent = 0);
@@ -21,6 +27,7 @@ private:
 	QHash<QString, PdfElement> elements;
 	QHash<QString, QString> variables;
 	QString templatePath;
+	QPrinter::PageSize paperSize;
 	QDomDocument doc;
 	
 	void loadFonts();
