@@ -35,7 +35,6 @@ public:
 
 private:
 	QSqlDatabase db;
-	void openDatabase();
 	void doCreateInvoices(QSqlQuery *query);
 	QString getSaveFileName();
 	

@@ -43,23 +43,6 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	connect(btnInvoiceNew, SIGNAL(clicked()), this, SLOT(invoiceNewMembers()));
 	connect(btnInvoiceUntil, SIGNAL(clicked()), this, SLOT(invoiceUntilDate()));
 	connect(btnInvoiceAll, SIGNAL(clicked()), this, SLOT(invoiceAllMembers()));
-	
-	openDatabase();
-}
-
-void InvoiceWizard::openDatabase() {
-	/*QSettings settings;
-	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	qDebug() << "Loading DB: " + dbfile.absoluteFilePath();
-	
-	if (!dbfile.absoluteDir().exists()) {
-		dbfile.absoluteDir().mkpath(dbfile.absolutePath());
-		qDebug() << "Path did not exists, created: " + dbfile.absolutePath();
-	}
-	
-	db = QSqlDatabase::addDatabase("QSQLITE");
-	db.setDatabaseName(dbfile.absoluteFilePath());
-	db.open();*/
 }
 
 InvoiceWizard::~InvoiceWizard() {
