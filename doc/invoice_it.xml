@@ -39,35 +39,33 @@ CH-1337 Valorbe]]></text>
 		<text x="10" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[E-Mail:]]></text>
 		<text x="130" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-		<!--
 		<text x="10" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Nickname:]]></text>
 		<text x="130" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NICK}]]></text>
-		-->
 	</g>
 
 	<g part="text1">
-		<text x="20" y="400" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
+		<text x="20" y="400" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Fattura annuale per membri {PRINT_YEAR}]]></text>
 		<text x="20" y="440" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-		<text x="20" y="465" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Es ist so weit: Damit du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest du den Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF mit untenstehenden Daten begleichen.
-		Ohne den Mitgliederbeitrag, bist du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst du bei den PiVote Abstimmungen und Meiningsbildern teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was dir als Sympathisant leider verwehrt bleibt.
-		Da Politik leider nicht gratis zu machen ist, sind wir und die Sektionen dankbar, für jeden Zustupf den wir kriegen, du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen und gleichzeitig mit dem Mitgliederbeitrag noch eine Spende tätigen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
-		Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell deine neuen Daten inkl. der Mitgliedernummer {MEMBER_NUMBER} an die info@piratenpartei.ch
-		Die Piratenpartei Schweiz und deine Sektion danken dir für deinen Beitrag und die allfällige zusätzliche Spende...]]></text>
+		<text x="20" y="465" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[È di nuovo l'ora: affinché tu possa goderti la vita nel partito pirata nell'anno {PRINT_YEAR}, ti preghiamo di pagare la tassa annuale di {INVOICE_AMOUNT}.00 CHF usando i dati sottostanti.
+		Senza pagare la tassa, sei semplicemente un simpatizzante del partito: non avrai diritto di voto alle sedute dei pirati e non ti sarà possibile prendere parte alle votazioni via PiVote e non potrai praticare politica in nome del partito. Essendo un membro del partito avrai la possibilità di aggiudicarti una carica un una delle sezioni o addirittura a livello nazionale, cosa che non ti sarà possibile da simpatizzanze.
+		Purtroppo è impossibile fare politica senza i necessari mezzi finanziari, per questo motivo siamo grati per ogni sostengno che riceviamo, per cui puoi anche aumentare l'importo di {INVOICE_AMOUNT}.00 CHF secondo le tue possibilità. A questo punto vogliamo informarti che le donazioni che superano i 500.00 CHF verrano pubblicate sul nostro sito internet.
+		A proposito, abbiamo ancora il tuo indirizzo email attuale? In caso contrario ti preghiamo di inviarci un email con i tuoi nuovi dati incl. il tuo numero di membro {MEMBER_NUMBER}, al seguente indirizzo: info@piratenpartei.ch
+		Il Partito Pirata Svizzero e la tua sezione ti ringraziano per il tuo sostegno e l'eventuale donazione...]]></text>
 	</g>
 
 	<g part="invoiceinfo">
 		<line x1="20" y1="745" x2="715" y2="745" stroke="0.5" />
 		<line x1="20" y1="925" x2="710" y2="925" stroke="0.5" />
-		<text x="30" y="725" width="300" height="10" wordwrap="false" weight="75" size="10"><![CDATA[Zahlungsinformationen:]]></text>
+		<text x="30" y="725" width="300" height="10" wordwrap="false" weight="75" size="10"><![CDATA[Informazioni di pagamento:]]></text>
 
-		<text x="60" y="755" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Einzahlung für:]]></text>
+		<text x="60" y="755" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Pagamento per:]]></text>
 		<text x="170" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
 		<text x="170" y="770" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
 
-		<text x="60" y="785" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Finanzinstitut:]]></text>
+		<text x="60" y="785" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Instituto di finanza:]]></text>
 		<text x="170" y="785" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Schweizerische Post / Postfinance]]></text>
 		
-		<text x="60" y="800" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Kontonummer:]]></text>
+		<text x="60" y="800" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Numero di conto:]]></text>
 		<text x="170" y="800" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[60-307660-3]]></text>
 
 		<text x="60" y="815" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[IBAN:]]></text>
@@ -76,14 +74,14 @@ CH-1337 Valorbe]]></text>
 		<text x="60" y="830" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[BIC:]]></text>
 		<text x="170" y="830" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[POFICHBEXXX]]></text>
 
-		<text x="60" y="845" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Betrag:]]></text>
+		<text x="60" y="845" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Ammonto:]]></text>
 		<text x="170" y="845" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{INVOICE_AMOUNT}.00 CHF]]></text>
 
-		<text x="60" y="860" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Referenz:]]></text>
+		<text x="60" y="860" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Referenza:]]></text>
 		<text x="170" y="860" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-		<text x="170" y="875" width="100" height="10" wordwrap="false" weight="63" italic="true" size="7"><![CDATA[Unbedingt angeben, führende Nullen können weggelassen werden.]]></text>
+		<text x="170" y="875" width="100" height="10" wordwrap="false" weight="63" italic="true" size="7"><![CDATA[Importante!]]></text>
 
-		<text x="60" y="890" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Kommentar:]]></text>
-		<text x="170" y="890" width="400" height="10" wordwrap="true" weight="50" size="9"><![CDATA[Deine Mitgliedernummer, die Referenznummer oder was immer du unserem Schatzmeister sonst noch mitteilen willst ;-)]]></text>
+		<text x="60" y="890" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Commento:]]></text>
+		<text x="170" y="890" width="400" height="10" wordwrap="true" weight="50" size="9"><![CDATA[Il tuo numero di membro, il numero di referenza o qualsiasi altra cosa tu voglia comunicare al nostro tesoriere ;-)]]></text>
 	</g>
 </template>

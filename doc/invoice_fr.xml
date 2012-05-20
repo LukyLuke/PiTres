@@ -39,20 +39,18 @@ CH-1337 Valorbe]]></text>
 		<text x="10" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[E-Mail:]]></text>
 		<text x="130" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-		<!--
 		<text x="10" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Nickname:]]></text>
 		<text x="130" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NICK}]]></text>
-		-->
 	</g>
 
 	<g part="text1">
-		<text x="20" y="400" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
-		<text x="20" y="440" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-		<text x="20" y="465" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Es ist so weit: Damit du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest du den Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF mit untenstehenden Daten begleichen.
-		Ohne den Mitgliederbeitrag, bist du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst du bei den PiVote Abstimmungen und Meiningsbildern teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was dir als Sympathisant leider verwehrt bleibt.
-		Da Politik leider nicht gratis zu machen ist, sind wir und die Sektionen dankbar, für jeden Zustupf den wir kriegen, du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen und gleichzeitig mit dem Mitgliederbeitrag noch eine Spende tätigen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
-		Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell deine neuen Daten inkl. der Mitgliedernummer {MEMBER_NUMBER} an die info@piratenpartei.ch
-		Die Piratenpartei Schweiz und deine Sektion danken dir für deinen Beitrag und die allfällige zusätzliche Spende...]]></text>
+		<text x="20" y="400" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Facturation des membres pour l'année {PRINT_YEAR}]]></text>
+		<text x="20" y="440" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoy {MEMBER_NAME}]]></text>
+		<text x="20" y="465" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[C'est ainsi: afin de profiter pleinement de la vie de pirate en {PRINT_YEAR}, un droit d'adhésion de {INVOICE_AMOUNT}.00 CHF est à payer au moyen des données indiquées ci-dessous.
+		Sans payer les frais d'adhésion, tu es juste un sympathisant et n'as ni le droit de vote lors des assemblées pirates, ni droit de participer au PiVote "Meiningsbildern" et tu ne peux pas non plus faire de la politique au nom du Parti Pirate. Grâce à ton adhésion, tu peux obtenir un poste dans les sections ou au niveau national, ce qui te sera malheureusement refusé en tant que sympathisant.
+		Puisque la politique n'est pas gratuite, nous sommes reconnaissants auprès des sections pour chaque "Zustupf", tandis que tu peux aussi augmenter le les frais d'adhésion de {INVOICE_AMOUNT}.00 CHF à ta guise ou faire un don. Nous te rappelons toutefois que le nom de tout auteur d'un don dépassant le montant de 500,00 CHF sera publié sur notre site internet.
+		Soit dit en passant, avons-nous effectivement encore ton adresse exacte? Si non, envoie-nous vite tes nouvelles coordonnées accompagnées de ton numéro de membre {MEMBER_NUMBER} à info@piratenpartei.ch
+		Le Parti Pirate Suisse et ta section te remercient pour ta contribution ainsi que pour tout montant supplémentaire...]]></text>
 	</g>
 
 	<g part="invoiceinfo">
