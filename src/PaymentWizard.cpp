@@ -99,13 +99,13 @@ void PaymentWizard::doPayInvoice() {
 	invoice.pay(amountBox->value(), new QDate(paidDate->date()));
 	
 	XmlPdf *pdf;
-	QString fileName;
+	QString fileName = "";
 	if (saveReceipt->isChecked()) {
 		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
 		if (!fileName.isEmpty()) {
-			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
+			fileName.replace(QRegExp("\\.pdf$"), QString("_%1.pdf").arg(invoice.memberUid()));
 		}
 	}
 	pdf = invoice.createPdf("receipt");
-	pdf->print( QString(fileName).arg(invoice.memberUid()) );
+	pdf->print(fileName);
 }

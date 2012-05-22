@@ -304,10 +304,14 @@ bool Invoice::pay(float amount, QDate *date) {
 XmlPdf *Invoice::createPdf(QString tpl) {
 	QSettings settings;
 	XmlPdf *pdf = new XmlPdf;
+	PPSPerson person;
+	person.load(memberUid());
 	if (tpl == NULL || tpl.isEmpty()) {
 		tpl = QString("invoice");
 	}
-	pdf->loadTemplate( settings.value(QString("pdf/%1_template").arg(tpl), "data/invoice.xml").toString() );
+	QString templateFile = settings.value(QString("pdf/%1_template").arg(tpl), "data/invoice_de.xml").toString();
+	templateFile.replace(QRegExp("^(.*_)([a-zA-Z]{2})(\\.xml)$"), "\\1" + getLanguageString((Language)person.language()) + "\\3");
+	pdf->loadTemplate(templateFile);
 	
 	pdf->setVar("pp_country", settings.value("pdf/var_pp_country", "CH").toString());
 	pdf->setVar("pp_zip", settings.value("pdf/var_pp_zip", "8500").toString());
@@ -335,11 +339,19 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("member_email", addressEmail());
 	pdf->setVar("member_section", forSection());
 	
-	PPSPerson person;
-	person.load(memberUid());
 	pdf->setVar("member_nick", person.nickname());
 	
 	return pdf;
+}
+
+QString Invoice::getLanguageString(Language lang) {
+	switch (lang) {
+		case DE: return QString("de"); break;
+		case FR: return QString("fr"); break;
+		case IT: return QString("it"); break;
+		case EN: return QString("en"); break;
+	}
+	return QString("en");
 }
 
 QString Invoice::getEsr() {

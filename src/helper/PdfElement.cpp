@@ -329,7 +329,6 @@ void PdfElementText::paint(QPainter *painter) {
 		painter->setFont(font);
 		
 		int flags = Qt::TextDontClip;
-		//int flags = 0;
 		if (halign == "left") flags |= Qt::AlignLeft;
 		else if (halign == "right") flags |= Qt::AlignRight;
 		else if (halign == "justify") flags |= Qt::AlignJustify;

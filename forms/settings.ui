@@ -123,6 +123,9 @@
               <string>PDF-Settings</string>
              </property>
              <layout class="QFormLayout" name="formLayout_7">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::ExpandingFieldsGrow</enum>
+              </property>
               <item row="0" column="0">
                <widget class="QLabel" name="label_26">
                 <property name="text">
@@ -194,6 +197,22 @@
                  </widget>
                 </item>
                </layout>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="labelTemplateHint">
+                <property name="minimumSize">
+                 <size>
+                  <width>518</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>The Filename for the PDF-Templates must be &quot;xxxx_LANGUAGE.xml&quot;, where LANGUAGE is the 2-Char Language-Identifier of the Language itself (de, en, fr, it)</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>

@@ -146,6 +146,7 @@ private:
 	QList<QString> esrChecksumList;
 	QString esrChecksum(QString num);
 	QString createReference(int memberUid);
+	QString getLanguageString(Language lang);
 };
 
 #endif // Data_Invoice_H
