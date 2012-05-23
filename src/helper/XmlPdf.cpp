@@ -1,6 +1,7 @@
 
 #include "XmlPdf.h"
 #include "PdfElement.h"
+#include "Smtp.h"
 
 #include <QDomDocument>
 #include <QDomNode>
@@ -14,6 +15,7 @@
 #include <QPrintDialog>
 #include <QMetaEnum>
 #include <QDebug>
+#include <QSettings>
 
 XmlPdf::XmlPdf(QObject *parent) {
 	doc = QDomDocument("template");
@@ -112,7 +114,13 @@ bool XmlPdf::print(QString file) {
 	return true;
 }
 
-bool XmlPdf::send(QString email) {
-	qDebug() << "Sending EMail with PDF not implemented currently :(";
-	return false;
+bool XmlPdf::send(QString email, QString subject) {
+	QSettings settings;
+	Smtp mail(settings.value("smtp/host", "localhost").toString(), settings.value("smtp/port", 587).toInt());
+	if (settings.value("smtp/authentication", "login").toString() == "login") {
+		mail.authLogin(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
+	} else {
+		mail.authPlain(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
+	}
+	return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject, "Message Body incl. PDF-Attachment");
 }

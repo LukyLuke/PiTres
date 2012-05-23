@@ -23,16 +23,20 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QString>
+#include <QChar>
 #include <QTextStream>
 #include <QDebug>
 #include <QMessageBox>
 
-class Smtp:public QObject {
+class Smtp : public QObject {
 Q_OBJECT
 
 public:
-	Smtp(const QString &from, const QString &to, const QString &subject, const QString &body);
+	Smtp(const QString &host, const int port);
 	virtual ~Smtp();
+	void authLogin(const QString &username, const QString &password);
+	void authPlain(const QString &username, const QString &password);
+	bool send(const QString &from, const QString &to, const QString &subject, const QString &body);
 	
 signals:
 	void status(const QString &);
@@ -45,13 +49,19 @@ private slots:
 	void readyRead();
  
 private:
+	bool isConnected;
+	bool _authLogin;
+	QString username;
+	QString password;
+	QString host;
+	int port;
 	QString message;
 	QTextStream *textStream;
 	QTcpSocket *socket;
 	QString from;
 	QString rcpt;
 	QString response;
-	enum states { Rcpt, Mail, Data, Init, Body, Quit, Close };
+	enum states { Init, Auth, User, Pass, Rcpt, Mail, Data, Body, Quit, Close };
 	int state;
 	QString DateHeader();
 };

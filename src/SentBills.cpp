@@ -404,7 +404,7 @@ void SentBills::createPdfReminds(bool email) {
 		reminder.loadLast(uid);
 		if (email) {
 			pdf = reminder.createPdf("invoice");
-			pdf->send(reminder.addressEmail());
+			pdf->send(reminder.addressEmail(), tr("Invoice for Membership of PirateParty Switzerland"));
 		} else {
 			pdf = reminder.createPdf("reminder");
 			pdf->print( QString(fileName).arg(reminder.memberUid()) );

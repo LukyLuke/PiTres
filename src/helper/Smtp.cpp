@@ -22,22 +22,38 @@
 #include <cstdlib>
 #include <ctime>
 #include <QDateTime>
+#include <QByteArray>
 #include <QSettings>
 
-Smtp::Smtp(const QString & from, const QString & to, const QString & subject, const QString & body) {
-	QSettings settings;
+Smtp::Smtp(const QString &host, const int port):QObject() {
+	this->host = host;
+	this->port = port;
+	_authLogin = false;
+}
+
+Smtp::~Smtp() {
+	delete textStream;
+	delete socket;
+}
+
+bool Smtp::send(const QString & from, const QString & to, const QString & subject, const QString & body) {
+	int timeout = 5000;
+	
 	socket = new QTcpSocket(this);
- 
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-	connect(socket, SIGNAL(error(SocketError)), this, SLOT(errorReceived(SocketError)));
-	connect(socket, SIGNAL(stateChanged(SocketState)), this, SLOT(stateChanged(SocketState)));
+	connect(socket, SIGNAL(error(QTcpSocket::SocketError)), this, SLOT(errorReceived(QTcpSocket::SocketError)));
+	connect(socket, SIGNAL(stateChanged(QTcpSocket::SocketState)), this, SLOT(stateChanged(QTcpSocket::SocketState)));
 	connect(socket, SIGNAL(disconnectedFromHost()), this, SLOT(disconnected()));
 	
 	message = DateHeader() + "\n";
+	message.append("X-Accept-Language: en-us, en\n");
+	message.append("MIME-Version: 1.0\n");
 	message.append("To: " + to + "\n");
 	message.append("From: " + from + "\n");
 	message.append("Subject: " + subject + "\n");
+	message.append("Content-Type: text/plain; charset=UTF8;\n");
+	message.append("Content-transfer-encoding: 7BIT\n\n\n\n");
 	message.append(body);
 	message.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
 	message.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
@@ -46,17 +62,58 @@ Smtp::Smtp(const QString & from, const QString & to, const QString & subject, co
 	rcpt = to;
 	state = Init;
 	
-	socket->connectToHost(settings.value("smtp/server", "localhost").toString(), settings.value("smtp/port", 25).toInt());
-	if (socket->waitForConnected(30000)) {
-		qDebug() << "Smtp: Connected";
+	isConnected = false;
+	socket->connectToHost(host, port);
+	if (socket->waitForConnected(timeout)) {
+		qDebug() << "Smtp: Connected on " << host << ":" << QString::number(port);
+		if (socket->waitForReadyRead(timeout)) {
+			qDebug() << "Smtp: emit from waitForReadyRead, connect can go on...";
+			isConnected = true;
+		}
 	}
+	textStream = new QTextStream(socket);
 	
-	textStream = new QTextStream(socket); 
+	return socket->waitForDisconnected(-1);
 }
 
-Smtp::~Smtp() {
-	delete textStream;
-	delete socket;
+QString Smtp::DateHeader() {
+	// mail rfc; Date format! http://www.faqs.org/rfcs/rfc788.html
+	QDateTime currentTime = QDateTime::currentDateTime();
+	QStringList RfcDays = QStringList() << "Mon" << "Tue" << "Wed" << "Thu" << "Fri" << "Sat" << "Sun";
+	QStringList RfcMonths = QStringList() << "Jan" << "Feb" << "Mar" << "Apr" << "May" << "Jun" << "Jul" << "Aug" << "Sep" << "Oct" << "Nov" << "Dec";
+	
+	return QString("Date: %1, %2 %3 %4 %5").arg(
+		RfcDays.at(currentTime.date().dayOfWeek()-1),
+		QString::number(currentTime.date().day()),
+		RfcMonths.at(currentTime.date().month()-1),
+		QString::number(currentTime.date().year()),
+		currentTime.toString("hh:mm:ss")
+	);
+}
+
+void Smtp::authLogin(const QString &username, const QString &password) {
+	_authLogin = true;
+	QByteArray ba;
+	ba.append(username);
+	this->username = ba.toBase64();
+	ba.clear();
+	ba.append(password);
+	this->password = ba.toBase64();
+}
+
+void Smtp::authPlain(const QString &username, const QString &password) {
+	_authLogin = false;
+	this->username = "";
+	QByteArray ba;
+	ba.append(username);
+	this->username.append(ba.toBase64());
+	this->username.append(QChar::Null);
+	this->username.append(ba.toBase64());
+	this->username.append(QChar::Null);
+	
+	ba.clear();
+	ba.append(password);
+	this->username.append(ba.toBase64());
 }
 
 void Smtp::stateChanged(QTcpSocket::SocketState socketState) {
@@ -90,6 +147,7 @@ void Smtp::readyRead() {
 	
 	// Close
 	if (state == Close) {
+		socket->disconnectFromHost();
 		deleteLater();
 		return;
 	}
@@ -104,7 +162,7 @@ void Smtp::readyRead() {
 	}
 	
 	// Every other Smtp-Code must be from 2xx
-	if (responseLine[0] != '2') {
+	if (responseLine[0] != '2' && state != User && state != Pass) {
 		qDebug() << "Smtp: Unexpected reply from SMTP-Host: : \n" << response;
 		state = Close;
 		response = "";
@@ -114,7 +172,33 @@ void Smtp::readyRead() {
 	switch (state) {
 		// Initialize
 		case Init:
-			*textStream << "EHLO " << settings.value("smtp/ehlo_host", "here.local").toString() << "\r\n";
+			*textStream << "EHLO " << settings.value("smtp/ehlo_host", "nohost.local").toString() << "\r\n";
+			textStream->flush();
+			state = username.isEmpty() ? Mail : Auth;
+			break;
+		
+		// Authentication header
+		case Auth:
+			if (_authLogin) {
+				*textStream << "AUTH LOGIN\r\n";
+				state = User;
+			} else {
+				*textStream << "AUTH PLAIN " + username + "\r\n";
+				state = Mail;
+			}
+			textStream->flush();
+			break;
+		
+		// Username for AUTH LOGIN
+		case User:
+			*textStream << username + "\r\n";
+			textStream->flush();
+			state = Pass;
+			break;
+		
+		// Password for AUTH LOGIN
+		case Pass:
+			*textStream << password + "\r\n";
 			textStream->flush();
 			state = Mail;
 			break;
@@ -149,20 +233,5 @@ void Smtp::readyRead() {
 			break;
 	}
 	response = "";
-}
-
-// mail rfc; Date format! http://www.faqs.org/rfcs/rfc788.html
-QString Smtp::DateHeader() {
-	QDateTime currentTime = QDateTime::currentDateTime();
-	QStringList RfcDays = QStringList() << "Mon" << "Tue" << "Wed" << "Thu" << "Fri" << "Sat" << "Sun";
-	QStringList RfcMonths = QStringList() << "Jan" << "Feb" << "Mar" << "Apr" << "May" << "Jun" << "Jul" << "Aug" << "Sep" << "Oct" << "Nov" << "Dec";
-	
-	return QString("Date: %1, %2 %3 %4 %5").arg(
-		RfcDays.at(currentTime.date().dayOfWeek()-1),
-		QString::number(currentTime.date().day()),
-		RfcMonths.at(currentTime.date().month()-1),
-		QString::number(currentTime.date().year()),
-		currentTime.toString("hh:mm:ss")
-	);
 }
 

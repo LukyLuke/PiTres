@@ -77,7 +77,7 @@ void InvoiceWizard::invoiceMembers() {
 				pdf->print( QString(fileName).arg(invoice.memberUid()) );
 			} else {
 				pdf = invoice.createPdf("invoice");
-				pdf->send(invoice.addressEmail());
+				pdf->send(invoice.addressEmail(), tr("Invoice for Membership of PirateParty Switzerland"));
 			}
 		}
 	}
@@ -140,7 +140,7 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 				pdf->print( QString(fileName).arg(invoice.memberUid()) );
 			} else {
 				pdf = invoice.createPdf("invoice");
-				pdf->send(invoice.addressEmail());
+				pdf->send(invoice.addressEmail(), tr("Invoice for Membership of PirateParty Switzerland"));
 			}
 		}
 	}
