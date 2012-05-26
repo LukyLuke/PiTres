@@ -19,11 +19,18 @@
 
 #include "Smtp.h"
 
+#include <magic.h>
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
+
 #include <QDateTime>
 #include <QByteArray>
+#include <QUuid>
 #include <QSettings>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 
 Smtp::Smtp(const QString &host, const int port):QObject() {
 	this->host = host;
@@ -36,33 +43,62 @@ Smtp::~Smtp() {
 	delete socket;
 }
 
-bool Smtp::send(const QString & from, const QString & to, const QString & subject, const QString & body) {
+bool Smtp::send(const QString & from, const QString & to, const QString & subject) {
 	int timeout = 5000;
 	
 	socket = new QTcpSocket(this);
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-	connect(socket, SIGNAL(error(QTcpSocket::SocketError)), this, SLOT(errorReceived(QTcpSocket::SocketError)));
-	connect(socket, SIGNAL(stateChanged(QTcpSocket::SocketState)), this, SLOT(stateChanged(QTcpSocket::SocketState)));
+	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorReceived(QAbstractSocket::SocketError)));
+	connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(stateChanged(QAbstractSocket::SocketState)));
 	connect(socket, SIGNAL(disconnectedFromHost()), this, SLOT(disconnected()));
 	
-	message = DateHeader() + "\n";
-	message.append("X-Accept-Language: en-us, en\n");
-	message.append("MIME-Version: 1.0\n");
-	message.append("To: " + to + "\n");
-	message.append("From: " + from + "\n");
-	message.append("Subject: " + subject + "\n");
-	message.append("Content-Type: text/plain; charset=UTF8;\n");
-	message.append("Content-transfer-encoding: 7BIT\n\n\n\n");
-	message.append(body);
-	message.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
-	message.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
+	QString msgBoundary = generateBoundary();
+	QString bodyBoundary = generateBoundary();
+	
+	QString msgBody = body.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
+	msgBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
+	msgBody = chuckSplit(msgBody);
+	
+	message = DateHeader() + "\r\n";
+	message.append("MIME-Version: 1.0\r\n");
+	message.append("To: " + to + "\r\n");
+	message.append("From: " + from + "\r\n");
+	message.append("Subject: " + subject + "\r\n");
+	message.append("Content-Type: multipart/mixed;\r\n\tboundary=\""+msgBoundary+"\"\r\n");
+	message.append("Content-transfer-encoding: 7BIT\r\n\r\n");
+	message.append("This is a multi-part message in MIME format.\r\n\r\n");
+	message.append("--" + msgBoundary);
+	message.append("\r\nContent-Type: multipart/alternative;\r\n\tboundary=\""+bodyBoundary+"\"\r\n\r\n");
+	message.append("--" + bodyBoundary + "\r\n");
+	message.append("Content-Type: text/plain; charset=\"utf-8\"\r\n");
+	message.append("Content-Transfer-Encoding: quoted-printable\r\n\r\n");
+	message.append(msgBody);
+	message.append("\r\n\r\n--" + bodyBoundary + "\r\n");
+	message.append("Content-Type: text/html; charset=\"utf-8\"\r\n");
+	message.append("Content-Transfer-Encoding: quoted-printable\r\n\r\n");
+	message.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"><html><head><style></style></head><body>\r\n");
+	message.append(msgBody + "</body></html>\r\n");
+	message.append("--" + bodyBoundary + "--\r\n\r\n");
+	
+	// Attachments
+	QString boundary;
+	for (int i = 0; i < attachments.length(); i++) {
+		attachment_t a = attachments.at(i);
+		message.append("--" + msgBoundary + "\r\n");
+		message.append("Content-Type: " + a.mimeType + ";\r\n\tname=\"" + a.fileName + "\"\r\n");
+		message.append("Content-Transfer-Encoding: base64\r\n");
+		message.append("Content-Disposition: " + a.contentDisposition + ";\r\n\tfilename=\"" + a.fileName + "\"\r\n\r\n");
+		message.append(chuckSplit(a.data));
+		message.append("\r\n--" + msgBoundary + "--\r\n\r\n");
+	}
 	
 	this->from = from;
 	rcpt = to;
 	state = Init;
 	
 	isConnected = false;
+	textStream = new QTextStream(socket);
 	socket->connectToHost(host, port);
 	if (socket->waitForConnected(timeout)) {
 		qDebug() << "Smtp: Connected on " << host << ":" << QString::number(port);
@@ -71,9 +107,18 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 			isConnected = true;
 		}
 	}
-	textStream = new QTextStream(socket);
 	
 	return socket->waitForDisconnected(-1);
+}
+
+QString Smtp::chuckSplit(const QString &data) {
+	QStringList list;
+	int i = 0, max = data.size() + SMTP_CHUNK_SIZE;
+	while (i < max) {
+		list.append(data.mid(i, SMTP_CHUNK_SIZE));
+		i += SMTP_CHUNK_SIZE;
+	}
+	return list.join("\r\n");
 }
 
 QString Smtp::DateHeader() {
@@ -116,11 +161,11 @@ void Smtp::authPlain(const QString &username, const QString &password) {
 	this->username.append(ba.toBase64());
 }
 
-void Smtp::stateChanged(QTcpSocket::SocketState socketState) {
+void Smtp::stateChanged(QAbstractSocket::SocketState socketState) {
 	qDebug() << "Smtp: State Changed:" << socketState;
 }
 
-void Smtp::errorReceived(QTcpSocket::SocketError socketError) {
+void Smtp::errorReceived(QAbstractSocket::SocketError socketError) {
 	qDebug() << "Smtp: Socket-Error:" << socketError;
 }
 
@@ -135,7 +180,6 @@ void Smtp::connected() {
 
 void Smtp::readyRead() {
 	QSettings settings;
-	qDebug() << "Smtp: Ready for reading...";
 	
 	// Read Line-by-Line
 	QString responseLine;
@@ -144,6 +188,7 @@ void Smtp::readyRead() {
 		response += responseLine;
 	} while(socket->canReadLine() && responseLine[3] != ' '); // first 3 chars are the State-Number like 250
 	responseLine.truncate(3); // remove everything after the State-Number
+	qDebug() << "Smtp: " << response.trimmed();
 	
 	// Close
 	if (state == Close) {
@@ -235,3 +280,57 @@ void Smtp::readyRead() {
 	response = "";
 }
 
+void Smtp::setMessage(const QString &body) {
+	this->body = body;
+}
+
+void Smtp::attach(const QString &file, const QString &name) {
+	QFile f(file);
+	f.open(QIODevice::ReadOnly);
+	QFileInfo fi(file);
+	qDebug() << "Smtp: Attach File: " << file;
+	
+	attachment_t a;
+	a.boundary = generateBoundary();
+	a.fileName = name.isEmpty() ? fi.fileName() : name;
+	a.contentDisposition = "attachment; filename=\"" + name + "\"";
+	a.mimeType = getMimeType(file);
+	a.data = f.readAll().toBase64();
+	attachments.append(a);
+	f.close();
+}
+
+QString Smtp::generateBoundary() {
+	QString s = QUuid::createUuid().toString().replace(QRegExp("\\{\\}"), "");
+	s.prepend("----=_NextPart_");
+	return s;
+}
+
+QString Smtp::getMimeType(const QString &fileName) {
+	// Thanks to Sorokin Vasiliy
+	// http://va-sorokin.blogspot.com/2011/03/how-to-get-mime-type-on-nix-system.html
+	// ToDo: Windows-Version
+	// ToDo: Mac-Version
+	QString result("applicatin/octet-stream");
+	magic_t magicMimePredictor;
+	
+	magicMimePredictor = magic_open(MAGIC_MIME_TYPE);
+	if (!magicMimePredictor) {
+		qDebug() << "Smtp: LibMagic failed initialize...";
+		
+	} else {
+		// Loading the DB returns '0'
+		if (magic_load(magicMimePredictor, 0)) {
+			qDebug() << "Smtp: LibMagic failed to load the Mime-Database";
+			
+		} else {
+			char *file = fileName.toAscii().data();
+			const char *mime;
+			mime = magic_file(magicMimePredictor, file);
+			result = QString(mime);
+		}
+		magic_close(magicMimePredictor);
+	}
+	qDebug() << "Smtp: LibMagic found Mimetype '" + result + "' for file " + fileName;
+	return result;
+}

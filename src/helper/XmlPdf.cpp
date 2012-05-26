@@ -49,6 +49,7 @@ void XmlPdf::loadTemplate(QString file) {
 	QDomNodeList tl = doc.elementsByTagName("template");
 	if (tl.size() > 0 && tl.at(0).isElement()) {
 		QDomElement t = tl.at(0).toElement();
+		paperSize = QPrinter::A4;
 		if (t.hasAttribute("size")) {
 			QString size = t.attribute("size").toUpper();
 			if (size == "A4") {
@@ -59,8 +60,14 @@ void XmlPdf::loadTemplate(QString file) {
 				paperSize = QPrinter::A6;
 			} else if (size == "LETTER") {
 				paperSize = QPrinter::Letter;
-			} else {
-				paperSize = QPrinter::A4;
+			}
+		}
+		
+		paperOrientation = QPrinter::Portrait;
+		if (t.hasAttribute("orientation")) {
+			QString orient = t.attribute("orientation").toLower();
+			if (orient == "landscape") {
+				paperOrientation = QPrinter::Landscape;
 			}
 		}
 		
@@ -82,8 +89,9 @@ void XmlPdf::setVar(QString name, QString value) {
 }
 
 bool XmlPdf::print(QString file) {
-	QPrinter printer(QPrinter::PrinterResolution);
+	QPrinter printer(QPrinter::HighResolution);
 	printer.setPaperSize(paperSize);
+	printer.setOrientation(paperOrientation);
 	printer.setOutputFormat(QPrinter::PdfFormat);
 	
 	if (file.isEmpty()) {
@@ -116,11 +124,22 @@ bool XmlPdf::print(QString file) {
 
 bool XmlPdf::send(QString email, QString subject) {
 	QSettings settings;
+	char fname [L_tmpnam];
+	tmpnam(fname);
+	QString fileName(fname);
+	print(fileName);
+	
 	Smtp mail(settings.value("smtp/host", "localhost").toString(), settings.value("smtp/port", 587).toInt());
 	if (settings.value("smtp/authentication", "login").toString() == "login") {
 		mail.authLogin(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
 	} else {
 		mail.authPlain(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
 	}
-	return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject, "Message Body incl. PDF-Attachment");
+	mail.setMessage("0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz");
+	mail.attach(fileName, "Invoice.pdf");
+	
+	remove(fname);
+	// TODO: Uncomment for final Release :o)
+	//return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject);
+	return false;
 }

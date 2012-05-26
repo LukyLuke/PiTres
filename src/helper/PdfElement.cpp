@@ -162,6 +162,10 @@ void PdfElement::setAttributes(const QDomNamedNodeMap attr, const QString cdata)
 	}
 }
 
+qreal PdfElement::toQReal(QString value) {
+	qreal val = value.toFloat();
+	return val * 12.5;
+}
 
 // Line
 PdfElementLine::PdfElementLine() : PdfElement() {}
@@ -169,10 +173,10 @@ PdfElementLine::~PdfElementLine() {}
 void PdfElementLine::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
-	qreal x1 = _attributes.value("x1", "0").toFloat();
-	qreal y1 = _attributes.value("y1", "0").toFloat();
-	qreal x2 = _attributes.value("x2", "0").toFloat();
-	qreal y2 = _attributes.value("y2", "0").toFloat();
+	qreal x1 = toQReal(_attributes.value("x1", "0"));
+	qreal y1 = toQReal(_attributes.value("y1", "0"));
+	qreal x2 = toQReal(_attributes.value("x2", "0"));
+	qreal y2 = toQReal(_attributes.value("y2", "0"));
 	if (x1 != x2 || x2 != y2) {
 		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 		painter->setBrush(Qt::NoBrush);
@@ -187,10 +191,10 @@ void PdfElementCircle::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
-	qreal cx = _attributes.value("cx", "0").toFloat();
-	qreal cy = _attributes.value("cy", "0").toFloat();
-	qreal rx = _attributes.value("r", "0").toFloat();
-	qreal ry = _attributes.value("r", "0").toFloat();
+	qreal cx = toQReal(_attributes.value("cx", "0"));
+	qreal cy = toQReal(_attributes.value("cy", "0"));
+	qreal rx = toQReal(_attributes.value("r", "0"));
+	qreal ry = toQReal(_attributes.value("r", "0"));
 	if (rx > 0 && ry > 0) {
 		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 		if (!fillColor.isEmpty()) {
@@ -209,10 +213,10 @@ void PdfElementEllipse::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
-	qreal cx = _attributes.value("cx", "0").toFloat();
-	qreal cy = _attributes.value("cy", "0").toFloat();
-	qreal rx = _attributes.value("rx", "0").toFloat();
-	qreal ry = _attributes.value("ry", "0").toFloat();
+	qreal cx = toQReal(_attributes.value("cx", "0"));
+	qreal cy = toQReal(_attributes.value("cy", "0"));
+	qreal rx = toQReal(_attributes.value("rx", "0"));
+	qreal ry = toQReal(_attributes.value("ry", "0"));
 	if (rx > 0 && ry > 0) {
 		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 		if (!fillColor.isEmpty()) {
@@ -238,10 +242,10 @@ void PdfElementRectangle::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
-	qreal x = _attributes.value("x", "0").toFloat();
-	qreal y = _attributes.value("y", "0").toFloat();
-	qreal w = _attributes.value("width", "0").toFloat();
-	qreal h = _attributes.value("height", "0").toFloat();
+	qreal x = toQReal(_attributes.value("x", "0"));
+	qreal y = toQReal(_attributes.value("y", "0"));
+	qreal w = toQReal(_attributes.value("width", "0"));
+	qreal h = toQReal(_attributes.value("height", "0"));
 	if (w > 0 && h > 0) {
 		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 		if (!fillColor.isEmpty()) {
@@ -272,7 +276,7 @@ void PdfElementPolygon::paint(QPainter *painter) {
 		}
 		QPolygonF polygon;
 		for (int i = 0; i < xl.size(); i++) {
-			polygon << QPointF(xl.at(i).toFloat(), yl.at(i).toFloat());
+			polygon << QPointF(toQReal(xl.at(i)), toQReal(yl.at(i)));
 		}
 		if (close) {
 			painter->drawPolygon(polygon);
@@ -286,7 +290,7 @@ void PdfElementPolygon::paint(QPainter *painter) {
 PdfElementText::PdfElementText() : PdfElement() {}
 PdfElementText::~PdfElementText() {}
 void PdfElementText::paint(QPainter *painter) {
-	qreal width = _attributes.value("stroke", "2").toFloat();
+	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	QString valign = _attributes.value("valign", "justify");
@@ -297,11 +301,11 @@ void PdfElementText::paint(QPainter *painter) {
 	bool italic = _attributes.value("italic", "false").toLower() == "true";
 	bool underline = _attributes.value("underline", "false").toLower() == "true";
 	bool wordwrap = _attributes.value("wordwrap", "true").toLower() == "true";
-	qreal x = _attributes.value("x", "0").toFloat();
-	qreal y = _attributes.value("y", "0").toFloat();
-	qreal w = _attributes.value("width", "0").toFloat();
-	qreal h = _attributes.value("height", "0").toFloat();
-	qreal s = _attributes.value("spacing", "0").toFloat();
+	qreal x = toQReal(_attributes.value("x", "0"));
+	qreal y = toQReal(_attributes.value("y", "0"));
+	qreal w = toQReal(_attributes.value("width", "0"));
+	qreal h = toQReal(_attributes.value("height", "0"));
+	qreal s = toQReal(_attributes.value("spacing", "0"));
 	
 	if (w > 0 && h > 0) {
 		QFont font = QApplication::font();
@@ -366,10 +370,10 @@ PdfElementImage::PdfElementImage() : PdfElement() {}
 PdfElementImage::~PdfElementImage() {}
 void PdfElementImage::paint(QPainter *painter) {
 	QString image = _templatePath.append("/").append(_attributes.value("file", ""));
-	qreal x = _attributes.value("x", "0").toFloat();
-	qreal y = _attributes.value("y", "0").toFloat();
-	qreal w = _attributes.value("width", "0").toFloat();
-	qreal h = _attributes.value("height", "0").toFloat();
+	qreal x = toQReal(_attributes.value("x", "0"));
+	qreal y = toQReal(_attributes.value("y", "0"));
+	qreal w = toQReal(_attributes.value("width", "0"));
+	qreal h = toQReal(_attributes.value("height", "0"));
 	if (w > 0 && h > 0) {
 		QImage picture;
 		if (picture.load(image)) {

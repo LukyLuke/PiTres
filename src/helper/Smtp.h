@@ -27,23 +27,36 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QMessageBox>
+#include <QPrinter>
+#include <QList>
 
 class Smtp : public QObject {
 Q_OBJECT
 
 public:
+	const int SMTP_CHUNK_SIZE = 76;
 	Smtp(const QString &host, const int port);
 	virtual ~Smtp();
 	void authLogin(const QString &username, const QString &password);
 	void authPlain(const QString &username, const QString &password);
-	bool send(const QString &from, const QString &to, const QString &subject, const QString &body);
+	void attach(const QString &file, const QString &name);
+	void setMessage(const QString &body);
+	bool send(const QString &from, const QString &to, const QString &subject);
+	
+	struct attachment_t {
+		QString fileName;
+		QString mimeType;
+		QString data;
+		QString contentDisposition;
+		QString boundary;
+	};
 	
 signals:
 	void status(const QString &);
 	
 private slots:
-	void stateChanged(QTcpSocket::SocketState socketState);
-	void errorReceived(QTcpSocket::SocketError socketError);
+	void stateChanged(QAbstractSocket::SocketState socketState);
+	void errorReceived(QAbstractSocket::SocketError socketError);
 	void disconnected();
 	void connected();
 	void readyRead();
@@ -56,6 +69,7 @@ private:
 	QString host;
 	int port;
 	QString message;
+	QString body;
 	QTextStream *textStream;
 	QTcpSocket *socket;
 	QString from;
@@ -63,7 +77,12 @@ private:
 	QString response;
 	enum states { Init, Auth, User, Pass, Rcpt, Mail, Data, Body, Quit, Close };
 	int state;
+	QList<attachment_t> attachments;
+	
 	QString DateHeader();
+	QString generateBoundary();
+	QString getMimeType(const QString &fileName);
+	QString chuckSplit(const QString &data);
 };
 
 #endif // SMTP_H

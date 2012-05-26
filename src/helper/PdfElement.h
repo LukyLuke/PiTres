@@ -39,6 +39,7 @@ protected:
 	QString _templatePath;
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
+	qreal toQReal(QString value);
 };
 
 class PdfElementLine : public PdfElement {

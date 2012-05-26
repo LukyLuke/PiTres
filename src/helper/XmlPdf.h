@@ -28,6 +28,7 @@ private:
 	QHash<QString, QString> variables;
 	QString templatePath;
 	QPrinter::PageSize paperSize;
+	QPrinter::Orientation paperOrientation;
 	QDomDocument doc;
 	
 	void loadFonts();

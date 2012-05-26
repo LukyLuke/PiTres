@@ -6,6 +6,9 @@
 #include "LDAPImport.h"
 #include "InvoiceWizard.h"
 
+#include "data/Person.h"
+#include "helper/XmlPdf.h"
+
 #include <QtGui>
 #include <QFileDialog>
 #include <QtGui/QGridLayout>
