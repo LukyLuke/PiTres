@@ -40,7 +40,8 @@ public:
 	void authLogin(const QString &username, const QString &password);
 	void authPlain(const QString &username, const QString &password);
 	void attach(const QString &file, const QString &name);
-	void setMessage(const QString &body);
+	void setTextMessage(const QString &body);
+	void setHtmlMessage(const QString &body);
 	bool send(const QString &from, const QString &to, const QString &subject);
 	
 	struct attachment_t {
@@ -69,7 +70,8 @@ private:
 	QString host;
 	int port;
 	QString message;
-	QString body;
+	QString textBody;
+	QString htmlBody;
 	QTextStream *textStream;
 	QTcpSocket *socket;
 	QString from;
@@ -82,7 +84,7 @@ private:
 	QString DateHeader();
 	QString generateBoundary();
 	QString getMimeType(const QString &fileName);
-	QString chuckSplit(const QString &data);
+	QString chuckSplit(const QString &data, bool wordwise = false, bool isHtml = false);
 };
 
 #endif // SMTP_H

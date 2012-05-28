@@ -21,7 +21,7 @@ public:
 	void loadTemplate(QString file);
 	void setVar(QString name, QString value);
 	bool print(QString file);
-	bool send(QString email, QString subject);
+	bool send(QString email);
 
 private:
 	QHash<QString, PdfElement> elements;

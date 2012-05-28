@@ -56,9 +56,13 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	QString msgBoundary = generateBoundary();
 	QString bodyBoundary = generateBoundary();
 	
-	QString msgBody = body.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
-	msgBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
-	msgBody = chuckSplit(msgBody);
+	QString msgTextBody = textBody.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
+	msgTextBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
+	msgTextBody = chuckSplit(msgTextBody, true);
+	
+	QString msgHtmlBody = htmlBody.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
+	msgHtmlBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
+	//msgHtmlBody = chuckSplit(msgHtmlBody, false, true);
 	
 	message = DateHeader() + "\r\n";
 	message.append("MIME-Version: 1.0\r\n");
@@ -73,12 +77,11 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	message.append("--" + bodyBoundary + "\r\n");
 	message.append("Content-Type: text/plain; charset=\"utf-8\"\r\n");
 	message.append("Content-Transfer-Encoding: quoted-printable\r\n\r\n");
-	message.append(msgBody);
+	message.append(msgTextBody);
 	message.append("\r\n\r\n--" + bodyBoundary + "\r\n");
 	message.append("Content-Type: text/html; charset=\"utf-8\"\r\n");
 	message.append("Content-Transfer-Encoding: quoted-printable\r\n\r\n");
-	message.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"><html><head><style></style></head><body>\r\n");
-	message.append(msgBody + "</body></html>\r\n");
+	message.append(msgHtmlBody + "\r\n");
 	message.append("--" + bodyBoundary + "--\r\n\r\n");
 	
 	// Attachments
@@ -111,14 +114,26 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	return socket->waitForDisconnected(-1);
 }
 
-QString Smtp::chuckSplit(const QString &data) {
+QString Smtp::chuckSplit(const QString &data, bool wordwise, bool isHtml) {
 	QStringList list;
-	int i = 0, max = data.size() + SMTP_CHUNK_SIZE;
-	while (i < max) {
-		list.append(data.mid(i, SMTP_CHUNK_SIZE));
-		i += SMTP_CHUNK_SIZE;
+	
+	if (data.size() == 0) {
+		list.append(" ");
+		
+	} else if (wordwise) {
+		// Line by Line
+		QStringList li = data.split(QRegExp("\r?\n"), QString::KeepEmptyParts);
+		for (int j = 0; j < li.size(); j++) {
+			list.append(li.at(j));
+		}
+	} else {
+		int i = 0, max = data.size() + SMTP_CHUNK_SIZE;
+		while (i < max) {
+			list.append(data.mid(i, SMTP_CHUNK_SIZE));
+			i += SMTP_CHUNK_SIZE;
+		}
 	}
-	return list.join("\r\n");
+	return list.join(QString(isHtml ? "=" : "").append("\r\n"));
 }
 
 QString Smtp::DateHeader() {
@@ -209,6 +224,8 @@ void Smtp::readyRead() {
 	// Every other Smtp-Code must be from 2xx
 	if (responseLine[0] != '2' && state != User && state != Pass) {
 		qDebug() << "Smtp: Unexpected reply from SMTP-Host: : \n" << response;
+		*textStream << "QUIT\r\n";
+		textStream->flush();
 		state = Close;
 		response = "";
 		return;
@@ -280,8 +297,16 @@ void Smtp::readyRead() {
 	response = "";
 }
 
-void Smtp::setMessage(const QString &body) {
-	this->body = body;
+void Smtp::setTextMessage(const QString &body) {
+	textBody = body;
+}
+
+void Smtp::setHtmlMessage(const QString &body) {
+	htmlBody = body;
+	if (htmlBody.indexOf("<html", 0, Qt::CaseInsensitive) < 0) {
+		htmlBody.prepend("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"><html><head><style></style></head><body>");
+		htmlBody.append("</body></html>");
+	}
 }
 
 void Smtp::attach(const QString &file, const QString &name) {

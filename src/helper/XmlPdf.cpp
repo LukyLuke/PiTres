@@ -122,8 +122,10 @@ bool XmlPdf::print(QString file) {
 	return true;
 }
 
-bool XmlPdf::send(QString email, QString subject) {
+bool XmlPdf::send(QString email) {
 	QSettings settings;
+	
+	// Create a tmp file form the PDF
 	char fname [L_tmpnam];
 	tmpnam(fname);
 	QString fileName(fname);
@@ -135,11 +137,53 @@ bool XmlPdf::send(QString email, QString subject) {
 	} else {
 		mail.authPlain(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
 	}
-	mail.setMessage("0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz");
-	mail.attach(fileName, "Invoice.pdf");
 	
+	// Attach the PDF and remove the tmp file
+	mail.attach(fileName, "Invoice.pdf");
 	remove(fname);
-	// TODO: Uncomment for final Release :o)
-	//return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject);
-	return false;
+	
+	// Get the EMail-Message from the Template
+	QString subject;
+	QString textMessage;
+	QString htmlMessage;
+	QString type;
+	QDomNodeList tl = doc.elementsByTagName("email");
+	for (int j = 0; j < tl.size(); j++) {
+		if (tl.at(j).isElement()) {
+			QDomElement t = tl.at(j).toElement();
+			if (t.hasAttribute("type")) {
+				type = t.attribute("type").toLower();
+				
+				QDomNodeList nl = t.childNodes();
+				for (int i = 0; i < nl.size(); i++) {
+					QDomNode n = nl.item(i);
+					
+					if (n.isElement() && n.nodeName().toLower() == "subject") {
+						subject = n.toElement().text();
+					} else if (n.isElement() && n.nodeName().toLower() == "content") {
+						if (type == "text") {
+							textMessage = QString::fromLatin1(n.toElement().text().toUtf8());
+						} else if (type == "html") {
+							htmlMessage = QString::fromLatin1(n.toElement().text().toUtf8());
+						}
+					}
+				}
+				
+			}
+		}
+	}
+	
+	// Replace variables in Email-Texts
+	QHash<QString, QString>::const_iterator it = variables.constBegin();
+	while (it != variables.constEnd()) {
+		subject.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
+		textMessage.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
+		htmlMessage.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
+		it++;
+	}
+	mail.setTextMessage(textMessage);
+	mail.setHtmlMessage(htmlMessage);
+	
+	// Send the Mail
+	return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject);
 }
