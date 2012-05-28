@@ -47,6 +47,10 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	db = QSqlDatabase::addDatabase("QSQLITE");
 	db.setDatabaseName(dbfile.absoluteFilePath());
 	db.open();
+	
+	// Set some default values we need later
+	settings.setValue("sentbills/sincedate", QDate::currentDate().addMonths(-3));
+	settings.setValue("sentbills/maxdate", QDate::currentDate().addDays(1));
 }
 
 PiTres::~PiTres() {

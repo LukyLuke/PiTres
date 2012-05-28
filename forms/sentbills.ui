@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>645</width>
-    <height>468</height>
+    <width>743</width>
+    <height>491</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -59,6 +59,40 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Issued before:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="maxDate">
+       <property name="displayFormat">
+        <string>yyyy-MM-dd</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QTableView" name="tableView">
      <property name="alternatingRowColors">
       <bool>true</bool>
@@ -96,13 +130,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="btnInvoiceQif">
-       <property name="text">
-        <string>Export Invoices</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -124,6 +151,13 @@
       <widget class="QPushButton" name="btnPaymentsExport">
        <property name="text">
         <string>Export Payments QIF</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnInvoiceQif">
+       <property name="text">
+        <string>Export Invoices QIF</string>
        </property>
       </widget>
      </item>

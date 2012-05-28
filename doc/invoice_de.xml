@@ -45,13 +45,13 @@ CH-1337 Valorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
-			<text x="20" y="440" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="465" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Es ist so weit: Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du den Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF mit untenstehenden Daten begleichen.
-			Ohne den Mitgliederbeitrag, bist Du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst du bei den PiVote Abstimmungen und Meinungsbildern teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was dir als Sympathisant leider verwehrt bleibt.
-			Da Politik leider nicht gratis zu machen ist, sind wir und die Sektionen dankbar, für jeden Zustupf den wir kriegen, Du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen und gleichzeitig mit dem Mitgliederbeitrag noch eine Spende tätigen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
-			Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell Deine neuen Daten inkl. der Mitgliedernummer {MEMBER_NUMBER} an die info@piratenpartei.ch
-			Die Piratenpartei Schweiz und deine Sektion danken Dir für deinen Beitrag und die allfällige zusätzliche Spende...]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
+			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, musst Du deinen Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF anhand der untenstehenden Daten begleichen.
+			Ohne den Mitgliederbeitrag bist Du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst Du bei den PiVote Abstimmungen teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst Du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was Dir als Sympathisant leider verwehrt bleibt.
+			Da Politik nicht gratis zu machen ist, sind wir und die Sektionen dankbar für jeden noch so kleine Spende, Du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
+			Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell Deine neuen Daten inkl. der Mitgliedernummer '{MEMBER_NUMBER}' an die info@piratenpartei.ch
+			Die Piratenpartei Schweiz und deine Sektion danken Dir für deinen Beitrag, insbesondere für eine zusätzliche Spende...]]></text>
 		</g>
 
 		<g part="invoiceinfo">
@@ -80,7 +80,7 @@ CH-1337 Valorbe]]></text>
 
 			<text x="60" y="860" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Referenz:]]></text>
 			<text x="170" y="860" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-			<text x="170" y="875" width="100" height="10" wordwrap="false" weight="63" italic="true" size="7"><![CDATA[Unbedingt angeben, führende Nullen können weggelassen werden.]]></text>
+			<text x="170" y="875" width="100" height="10" wordwrap="false" weight="63" italic="true" size="7"><![CDATA[Unbedingt angeben, sonst können wir die Zahlung nicht Dir zuordnen]]></text>
 
 			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Kommentar:]]></text>
 			<text x="170" y="890" width="400" height="10" wordwrap="true" weight="50" size="9"><![CDATA[Deine Mitgliedernummer, die Referenznummer oder was immer du unserem Schatzmeister sonst noch mitteilen willst ;-)]]></text>
@@ -90,12 +90,16 @@ CH-1337 Valorbe]]></text>
 	<email type="text">
 		<subject><![CDATA[Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[Ahoi {MEMBER_NAME},
-damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du den Mitgliederbeitrag mit den Daten im angehängten PDF schnellstmöglich begleichen. Die Zahlungsinformationen und alle anderen Daten findest Du ebenfals dort.
+im Anhang findest Du deine Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.
 
-Für Fragen stehen dir die Sektionsvorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
+Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
 Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
 
-Der Vorstand der Piratenpartei Schweiz]]></content>
+Der Vorstand der Piratenpartei Schweiz
+
+PS: Nicht vergessen, am 9/10 Juni ist der Piraten-Sommerkongress in Aarau!
+Wenn du dich noch nicht angemeldet hast: https://my.piratenpartei.ch/pvreg/index.php
+Mehr Informaitonen findest du unter http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
 	</email>
 	
 	<email type="html">
@@ -170,10 +174,15 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 		<div class="content">
 			<div class="header">Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz</div>
 			<p><strong>Ahoi {MEMBER_NAME},</strong></p>
-			<p>damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du den Mitgliederbeitrag mit den Daten im angehängten PDF schnellstmöglich begleichen. Die Zahlungsinformationen und alle anderen Daten findest Du ebenfals dort.</p>
-			<p>Für Fragen stehen dir die Sektionsvorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
-				<br/>Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...</p>
-			<p>Der Vorstand der Piratenpartei Schweiz</p>
+			<p>im Anhang findest Du die Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.</p>
+			<p>Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
+				<br/>Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
+			</p>
+			<p><strong>Der Vorstand der Piratenpartei Schweiz</strong></p>
+			<p>PS: Nicht vergessen, am 9/10 Juni ist der Piraten-Sommerkongress in Aarau!
+				<br/>Wenn du dich noch nicht angemeldet hast: <a href="https://my.piratenpartei.ch/pvreg/index.php">PV-Anmeldung</a>
+				<br/>Mehr Informaitonen findest du unter <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
+			</p>
 		</div>
 	</div>
 </body></html>]]></content>

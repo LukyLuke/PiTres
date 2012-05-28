@@ -45,44 +45,45 @@ CH-1337 Valorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="380" width="500" height="10" wordwrap="false" weight="75" size="12"><![CDATA[Facturation des membres pour l'année {PRINT_YEAR}]]></text>
-			<text x="20" y="410" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoy {MEMBER_NAME}]]></text>
-			<text x="20" y="435" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[C'est ainsi: afin de profiter pleinement de la vie de pirate en {PRINT_YEAR}, un droit d'adhésion de {INVOICE_AMOUNT}.00 CHF est à payer au moyen du bulletin de versement ci-joint.
-			Nous t'avons précédemment envoyé cette facture à ton adresse email {MEMBER_EMAIL} et nous n'avons encore enregistré aucun paiement. Avons-nous une mauvaise adresse email? SI c'est le cas, envoie-nous vite tes nouvelles coordonnées ainsi que ton numéro de membre {MEMBER_NUMBER} à info@piratenpartei.ch.
-			Sans le paiement de tes frais d'adhésion, tu es seulement un sympathisant et ne possède ni le droit de vote aux assemblées pirates, si le droit de participer au PiVote et "Meiningsbildern", tu ne peux pas non plus faire de la politique au nom du Parti Pirate. Grâce à ton adhésion, tu peux obtenir un poste dans les sections ou au niveau national, ce qui te sera malheureusement refusé en tant que sympathisant.
-			Le Parti Pirate Suisse et ta section te remercient pour ta contribution ainsi que pour tout montant supplémentaire...]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Members invoice for year {PRINT_YEAR}]]></text>
+			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in {PRINT_YEAR}, you have to pay your membership fee of {INVOICE_AMOUNT}.00 CHF within below data.
+			Without paying you are only a sympathizer and you don't have any rights to vote on Pirate-Meetings, you'r not allowed to vote or proclaim vour opinion by PiVote nor can you officially politicize as a Pirate. With the Membership, you can fill also regional politics or national ones, which you can't as a sympathizer.
+			Because politics isn't for free, we and your regional section will welcome every small donation, just adjust the amount below to your wants. Please note, that all donations above 500.00 CHF will be printed with names on the Website of the Pirateparty Switzerland.
+			By the way, do we still have your correct data? If not, please send us your new ones, inclusive your Membernumber '{MEMBER_NUMBER}' to info@piratenpartei.ch
+			The Pirateparty Switzerland and your Section give thanks for your due, and specially for your donation...]]></text>
 		</g>
 
 		<g part="creditslip">
-			<text x="10" y="720" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="10" y="735" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="5" y="740" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="5" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
 
-			<text x="90" y="850" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="10" y="885" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
-			<text x="150" y="885" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
+			<text x="90" y="855" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
+			<text x="10" y="888" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="150" y="888" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
 
-			<text x="220" y="720" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="220" y="735" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="220" y="740" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="220" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
 
-			<text x="320" y="850" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="238" y="885" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
-			<text x="385" y="885" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
+			<text x="320" y="855" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
+			<text x="238" y="888" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="385" y="888" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
 
-			<text x="10" y="920" width="300" height="10" wordwrap="false" weight="50" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
+			<text x="5" y="923" width="300" height="10" wordwrap="false" weight="50" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
-			<text x="10" y="935" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="10" y="950" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="10" y="965" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="10" y="980" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="5" y="935" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
+			<text x="5" y="950" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
+			<text x="5" y="965" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
+			<text x="5" y="980" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
 
-			<text x="450" y="815" width="280" height="10" wordwrap="false" weight="50" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
+			<text x="460" y="825" width="280" height="10" wordwrap="false" weight="50" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
 			<text x="450" y="875" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
 			<text x="450" y="890" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
 			<text x="450" y="905" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
 			<text x="450" y="920" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
 
-			<text x="248" y="1018" width="480" height="10" wordwrap="false" weight="50" size="10" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="256" y="1013" width="480" height="10" wordwrap="false" weight="50" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 

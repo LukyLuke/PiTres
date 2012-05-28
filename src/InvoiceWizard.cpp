@@ -68,10 +68,22 @@ void InvoiceWizard::invoiceMembers() {
 		fileName = getSaveFileName();
 	}
 	
-	for (int i = 0; i < memberUidList->count(); i++) {
+	QProgressDialog bar(this);
+	int max = memberUidList->count();
+	bar.setRange(0, max);
+	bar.setCancelButtonText(tr("&Cancel"));
+	bar.setWindowTitle(tr("Create Invoices"));
+	bar.setWindowModality(Qt::WindowModal);
+	bar.show();
+	
+	for (int i = 0; i < max; i++) {
 		QListWidgetItem *item = memberUidList->item(i);
+		bar.setValue(i);
 		if (pers.load(item->text().toInt())) {
+			if (bar.wasCanceled()) break;
+			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(i).arg(max) );
 			invoice.create(&pers);
+			
 			if (checkPrint->isChecked()) {
 				pdf = invoice.createPdf("reminder");
 				pdf->print( QString(fileName).arg(invoice.memberUid()) );
@@ -81,6 +93,7 @@ void InvoiceWizard::invoiceMembers() {
 			}
 		}
 	}
+	bar.setValue(max);
 }
 
 void InvoiceWizard::invoiceNewMembers() {
@@ -132,6 +145,7 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 		bar.setValue(cnt++);
 		
 		if (pers.load(query->value(0).toInt())) {
+			if (bar.wasCanceled()) break;
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
 			
 			invoice.create(&pers);

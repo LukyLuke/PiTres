@@ -20,6 +20,7 @@
 #include <QModelIndex>
 #include <QVariant>
 #include <QSqlRecord>
+#include <QSqlDriver>
 #include <QPoint>
 #include <QMenu>
 #include <QMessageBox>
@@ -35,7 +36,8 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	
 	QSettings settings;
 	pendingOnly->setChecked(settings.value("sentbills/pending", false).toBool());
-	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate()).toDate());
+	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate().addMonths(-3)).toDate());
+	maxDate->setDate(settings.value("sentbills/maxdate", QDate::currentDate().addDays(1)).toDate());
 	
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
@@ -43,6 +45,7 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	connect(btnSyncUsers, SIGNAL(clicked()), this, SLOT(syncUserPaidDate()));
 	connect(pendingOnly, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
+	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
 	
 	tableModel = new QSqlQueryModel(tableView);
@@ -50,17 +53,19 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	loadData();
 	createContextMenu();
 	
-	adjustDialog = new QDialog(this);
-	form.setupUi(adjustDialog);
-	connect(form.actionAdjust, SIGNAL(triggered()), this, SLOT(doAdjustDates()));
+	adjustMemberdateDialog = new QDialog(this);
+	adjustMembersDueDateForm.setupUi(adjustMemberdateDialog);
+	connect(adjustMembersDueDateForm.actionAdjust, SIGNAL(triggered()), this, SLOT(doAdjustDates()));
 	
-	fromtoDialog = new QDialog(this);
-	fromto.setupUi(fromtoDialog);
-	connect(fromto.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifAssets()));
+	invoiceQifDialog = new QDialog(this);
+	exportInvoiceQifForm.setupUi(invoiceQifDialog);
+	exportInvoiceQifForm.hintLabel->setText(tr("Export all created Invoices, issued in this Daterange, as a QIF to import in GnuCash."));
+	connect(exportInvoiceQifForm.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifAssets()));
 	
-	exportPaymentsDialog = new QDialog(this);
-	dateform.setupUi(exportPaymentsDialog);
-	connect(dateform.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifPayments()));
+	paymentQifDialog = new QDialog(this);
+	exportPaymentQifForm.setupUi(paymentQifDialog);
+	exportPaymentQifForm.hintLabel->setText(tr("Export all Payments, payed in this Daterange, as a QIF to import in GnuCash."));
+	connect(exportPaymentQifForm.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifPayments()));
 	
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -125,10 +130,10 @@ void SentBills::searchDataTimeout(QString data) {
 QSqlQuery SentBills::createQuery() {
 	QSqlQuery query(db);
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
-	QString qs("SELECT * FROM pps_invoice WHERE issue_date >= :issued_after");
+	QString qs("SELECT * FROM pps_invoice WHERE issue_date >= :issued_after AND issue_date <= :issued_before");
 	
 	if (pendingOnly->isChecked()) {
-		qs.append(" AND paid_date=''");
+		qs.append(" AND state=" + QString::number((int)Invoice::StateOpen));
 	}
 	
 	if (sl.size() > 0) {
@@ -148,6 +153,7 @@ QSqlQuery SentBills::createQuery() {
 	
 	query.prepare(qs);
 	query.bindValue(":issued_after", sinceDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(":issued_before", maxDate->date().toString("yyyy-MM-dd"));
 	
 	if (sl.size() > 0) {
 		query.bindValue(":reference", QString("%%1%").arg(sl.join(" ")));
@@ -172,6 +178,7 @@ void SentBills::searchData() {
 	QSettings settings;
 	settings.setValue("sentbills/pending", pendingOnly->isChecked());
 	settings.setValue("sentbills/sincedate", sinceDate->date());
+	settings.setValue("sentbills/maxdate", maxDate->date());
 	
 	QSqlQuery query = createQuery();
 	tableModel->setQuery(query);
@@ -179,14 +186,16 @@ void SentBills::searchData() {
 
 void SentBills::exportQifAssets() {
 	QDate now = QDate::currentDate();
-	fromto.fromDate->setDate(QDate(now.year()-1, 1, 1));
-	fromto.toDate->setDate(QDate(now.year(), 1, 1));
-	fromtoDialog->show();
+	exportInvoiceQifForm.fromDate->setDate(QDate(now.year()-1, 1, 1));
+	exportInvoiceQifForm.toDate->setDate(QDate(now.year(), 1, 1));
+	invoiceQifDialog->show();
 }
 
 void SentBills::exportQifPayments() {
-	dateform.fromDate->setDate(QDate::currentDate());
-	exportPaymentsDialog->show();
+	QDate now = QDate::currentDate();
+	exportPaymentQifForm.fromDate->setDate(now.addMonths(-1));
+	exportPaymentQifForm.toDate->setDate(now);
+	paymentQifDialog->show();
 }
 
 void SentBills::doExportQifAssets() {
@@ -197,8 +206,8 @@ void SentBills::doExportQifAssets() {
 	
 	QSqlQuery query(db);
 	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
-	query.bindValue(":date1", fromto.fromDate->date().toString("yyyy-MM-dd"));
-	query.bindValue(":date2", fromto.toDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(":date1", exportInvoiceQifForm.fromDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(":date2", exportInvoiceQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
 	
 	while (query.next()) {
@@ -229,7 +238,7 @@ void SentBills::doExportQifAssets() {
 			out << qif;
 		}
 	}
-	fromtoDialog->hide();
+	invoiceQifDialog->hide();
 }
 
 void SentBills::doExportQifPayments() {
@@ -237,8 +246,9 @@ void SentBills::doExportQifPayments() {
 	QString qif("!Type:" + settings.value("qif/account_cash", "Cash").toString());
 	
 	QSqlQuery query(db);
-	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name FROM pps_invoice WHERE paid_date >= :date;");
-	query.bindValue(":date1", dateform.fromDate->date().toString("yyyy-MM-dd"));
+	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
+	query.bindValue(":date1", exportPaymentQifForm.fromDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(":date2", exportPaymentQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
 	
 	while (query.next()) {
@@ -266,22 +276,22 @@ void SentBills::doExportQifPayments() {
 			out << qif;
 		}
 	}
-	exportPaymentsDialog->close();
+	paymentQifDialog->close();
 }
 
 void SentBills::syncUserPaidDate() {
 	QDate now = QDate::currentDate();
-	form.paidDate->setDate(QDate(now.year(), 1, 1));
-	form.paidDueDate->setDate(QDate(now.year()+1, 1, 1));
-	adjustDialog->show();
+	adjustMembersDueDateForm.paidDate->setDate(QDate(now.year(), 1, 1));
+	adjustMembersDueDateForm.paidDueDate->setDate(QDate(now.year()+1, 1, 1));
+	adjustMemberdateDialog->show();
 }
 
 void SentBills::doAdjustDates() {
 	QSettings settings;
-	QDate from = form.paidDate->date();
-	QDate due = form.paidDueDate->date();
+	QDate from = adjustMembersDueDateForm.paidDate->date();
+	QDate due = adjustMembersDueDateForm.paidDueDate->date();
 	
-	if (form.checkDatabase->isChecked()) {
+	if (adjustMembersDueDateForm.checkDatabase->isChecked()) {
 		QSqlQuery query(db);
 		query.prepare("UPDATE ldap_persons SET paid_due=:paidDueDate WHERE uid IN (SELECT member_uid FROM pps_invoice "
 		              "WHERE amount_paid>=amount AND issue_date>=:issueDate AND paid_date>=:paidDate);");
@@ -297,7 +307,7 @@ void SentBills::doAdjustDates() {
 		}
 	}
 	
-	if (form.checkLdif->isChecked()) {
+	if (adjustMembersDueDateForm.checkLdif->isChecked()) {
 		QString ldif = "";
 		QString section, member;
 		QString duedate = due.toString("yyyy-MM-dd");
@@ -359,7 +369,7 @@ void SentBills::doAdjustDates() {
 			QMessageBox::warning(this, tr("Adjusting dates failed"), tr("An Error occured while getting Paid-Dues dates from Database:\n\n%1").arg(query.lastError().text()));
 		}
 	}
-	adjustDialog->hide();
+	adjustMemberdateDialog->hide();
 }
 
 void SentBills::showTableContextMenu(const QPoint &point) {

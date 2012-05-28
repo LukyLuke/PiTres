@@ -243,10 +243,12 @@ QList<Invoice *> Invoice::getInvoicesForMember(int member) {
 
 void Invoice::create(PPSPerson *person) {
 	QSettings settings;
+	clear();
 	setIsLoaded(false);
 	
 	setMemberUid(person->uid());
 	setReference(createReference(person->uid()));
+	qDebug() << reference();
 	setIssueDate(QDate::currentDate());
 	setPayableDue(QDate::currentDate().addMonths(1));
 	setPaidDate(QDate(1900, 1, 1));

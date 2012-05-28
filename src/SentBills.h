@@ -30,12 +30,12 @@ private:
 	QAction *actionSendReminder;
 	QAction *actionPrintReminder;
 	
-	QDialog *adjustDialog;
-	QDialog *fromtoDialog;
-	QDialog *exportPaymentsDialog;
-	Ui::adjustPaidDateForm form;
-	Ui::fromToDatesForm fromto;
-	Ui::DateForm dateform;
+	QDialog *adjustMemberdateDialog;
+	QDialog *invoiceQifDialog;
+	QDialog *paymentQifDialog;
+	Ui::adjustPaidDateForm adjustMembersDueDateForm;
+	Ui::fromToDatesForm exportInvoiceQifForm;
+	Ui::fromToDatesForm exportPaymentQifForm;
 	
 	QSqlQuery createQuery();
 	void createContextMenu();

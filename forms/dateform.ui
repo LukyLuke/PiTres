@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DateForm</class>
- <widget class="QWidget" name="DateForm">
+ <class>dateForm</class>
+ <widget class="QWidget" name="dateForm">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>77</height>
+    <height>97</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -53,6 +53,16 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="hintLabel">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
@@ -116,7 +126,7 @@
   <connection>
    <sender>btnCancel</sender>
    <signal>clicked()</signal>
-   <receiver>DateForm</receiver>
+   <receiver>dateForm</receiver>
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">

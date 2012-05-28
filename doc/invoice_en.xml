@@ -45,13 +45,13 @@ CH-1337 Valorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Members invoice for year {PRINT_YEAR}]]></text>
-			<text x="20" y="440" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="465" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[It's time: To fully enjoy your life as Pirate by the PirateParty Switzerland in {PRINT_YEAR}, you have to pay the members invoice of {INVOICE_AMOUNT}.00 CHF within below data.
-			Without paying, you are only a sympathizer and you don't have any rights to vote on Pirate-Meetings, you don't can vote or proclaim vour opinion by PiVote nor can you officially politicize as a Pirate. With the Membership, you can fill also regional politics or national ones too, which you can't as a sympathizer.
-			Because Politics isn't for free, we and your Section will welcome also a small donation, just adjust the amount below to your want. Please note, that all donations above 500.00 CHF will be noted with names on the Website of the Pirateparty Switzerland.
-			By the way, do we still have your correct Addressdata? If not, please send us your new data, inclusive your Membernumber {MEMBER_NUMBER} to info@piratenpartei.ch
-			The Pirateparty Switzerland and your Section will welcome your Membership fee and maybe a donation...]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="87" size="12"><![CDATA[Members invoice for year {PRINT_YEAR}]]></text>
+			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in {PRINT_YEAR}, you have to pay your membership fee of {INVOICE_AMOUNT}.00 CHF within below data.
+			Without paying you are only a sympathizer and you don't have any rights to vote on Pirate-Meetings, you'r not allowed to vote or proclaim vour opinion by PiVote nor can you officially politicize as a Pirate. With the Membership, you can fill also regional politics or national ones, which you can't as a sympathizer.
+			Because politics isn't for free, we and your regional section will welcome every small donation, just adjust the amount below to your wants. Please note, that all donations above 500.00 CHF will be printed with names on the Website of the Pirateparty Switzerland.
+			By the way, do we still have your correct data? If not, please send us your new ones, inclusive your Membernumber '{MEMBER_NUMBER}' to info@piratenpartei.ch
+			The Pirateparty Switzerland and your Section give thanks for your due, and specially for your donation...]]></text>
 		</g>
 
 		<g part="invoiceinfo">
@@ -90,12 +90,16 @@ CH-1337 Valorbe]]></text>
 	<email type="text">
 		<subject><![CDATA[Membership fee {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[Ahoi {MEMBER_NAME},
-To fully enjoy your life as Pirate in the the PirateParty Switzerland in {PRINT_YEAR}, you should pay the Membership fee as fast as possible. All Paying information are attached in the PDF.
+attached you'l find your personal Membership-Invoice for {PRINT_YEAR}. To fully enjoy your life as a Pirate by the PirateParty Switzerland, you shoud pay this Invoice as fast as possible. The PDF shows all Data you need for the payment.
 
 If you have any questions, just ask your regional board or the national one as well.
-Thanks for your contribution, financial and personnel-wise...
+Thanks for your contribution, financially and personally...
 
-The Board from Piratenpartei Schweiz]]></content>
+The Board from Piratenpartei Schweiz
+
+NB: Dont forget the Pirate Summercongress in Aarau on 9/10 of June!
+If you aren't registered yet: https://my.piratenpartei.ch/pvreg/index.php
+More information you will find on http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
 	</email>
 	
 	<email type="html">
@@ -170,10 +174,15 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 		<div class="content">
 			<div class="header">Membership fee for {PRINT_YEAR}, Piratenpartei Schweiz</div>
 			<p><strong>Ahoi {MEMBER_NAME},</strong></p>
-			<p>To fully enjoy your life as Pirate in the the PirateParty Switzerland in {PRINT_YEAR}, you should pay the Membership fee as fast as possible. All Paying information are attached in the PDF.</p>
+			<p>attached you'l find your personal Membership-Invoice for {PRINT_YEAR}. To fully enjoy your life as a Pirate by the PirateParty Switzerland, you shoud pay this Invoice as fast as possible. The PDF shows all Data you need for the payment.</p>
 			<p>If you have any questions, just ask your regional board or the national one as well.
-				<br/>Thanks for your contribution, financial and personnel-wise...</p>
+				<br/>Thanks for your contribution, financially and personally...
+			</p>
 			<p>The Board from Piratenpartei Schweiz</p>
+			<p>NB: Dont forget the Pirate Summercongress in Aarau on 9/10 of June!
+				<br/>If you aren't registered yet: <a href="https://my.piratenpartei.ch/pvreg/index.php">PV-Anmeldung</a>
+				<br/>More information you will find on <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
+			</p>
 		</div>
 	</div>
 </body></html>]]></content>

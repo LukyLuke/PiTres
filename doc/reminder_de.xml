@@ -45,44 +45,45 @@ CH-1337 Valorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="380" width="500" height="10" wordwrap="false" weight="75" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
-			<text x="20" y="410" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="435" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Es ist so weit: Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du den Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF mit untenstehendem Einzahlungsschein begleichen.
-			Wir hatten dir diese Rechnung bereits einmal an deine EMail-Adresse {MEMBER_EMAIL} gesendet und konnten bislang keinen Zahlungseingang registrieren. Kann es sein, dass wir eine falsche EMail-Adresse haben? Wenn das der Fall ist, sende uns doch schnell Deine neuen Daten inkl. der Mitgliedernummer {MEMBER_NUMBER} an die info@piratenpartei.ch.
-			Ohne den Mitgliederbeitrag, bist Du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst Du bei den PiVote Abstimmungen und Meinungsbildern teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst Du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was Dir als Sympathisant leider verwehrt bleibt.
-			Die Piratenpartei Schweiz und deine Sektion danken Dir für deinen Beitrag und die allfällige zusätzliche Spende...]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="75" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
+			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, musst Du deinen Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF anhand der untenstehenden Daten begleichen.
+			Ohne den Mitgliederbeitrag bist Du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst Du bei den PiVote Abstimmungen teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst Du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was Dir als Sympathisant leider verwehrt bleibt.
+			Da Politik nicht gratis zu machen ist, sind wir und die Sektionen dankbar für jeden noch so kleine Spende, Du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
+			Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell Deine neuen Daten inkl. der Mitgliedernummer '{MEMBER_NUMBER}' an die info@piratenpartei.ch
+			Die Piratenpartei Schweiz und deine Sektion danken Dir für deinen Beitrag, insbesondere für eine zusätzliche Spende...]]></text>
 		</g>
 
 		<g part="creditslip">
-			<text x="10" y="720" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="10" y="735" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="5" y="740" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="5" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
 
-			<text x="90" y="850" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="10" y="885" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
-			<text x="150" y="885" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
+			<text x="90" y="855" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
+			<text x="10" y="888" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="150" y="888" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
 
-			<text x="220" y="720" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="220" y="735" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="220" y="740" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="220" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
 
-			<text x="320" y="850" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="238" y="885" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
-			<text x="385" y="885" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
+			<text x="320" y="855" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
+			<text x="238" y="888" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="385" y="888" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
 
-			<text x="10" y="920" width="300" height="10" wordwrap="false" weight="50" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
+			<text x="5" y="923" width="300" height="10" wordwrap="false" weight="50" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
-			<text x="10" y="935" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="10" y="950" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="10" y="965" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="10" y="980" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="5" y="935" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
+			<text x="5" y="950" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
+			<text x="5" y="965" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
+			<text x="5" y="980" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
 
-			<text x="450" y="815" width="280" height="10" wordwrap="false" weight="50" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
+			<text x="460" y="825" width="280" height="10" wordwrap="false" weight="50" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
 			<text x="450" y="875" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
 			<text x="450" y="890" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
 			<text x="450" y="905" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
 			<text x="450" y="920" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
 
-			<text x="248" y="1018" width="480" height="10" wordwrap="false" weight="50" size="10" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="256" y="1013" width="480" height="10" wordwrap="false" weight="50" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 
