@@ -29,7 +29,7 @@ RESOURCES += PiTres.qrc
 QT = core gui network sql xml
 FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
         forms/adjustpaiddate.ui forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
-        forms/payment.ui
+        forms/payment.ui forms/invoiceedit.ui
 OUT_PWD = build
 
 # Add special Platform-Dependant libraries and sources

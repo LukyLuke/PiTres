@@ -67,17 +67,27 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	exportPaymentQifForm.hintLabel->setText(tr("Export all Payments, payed in this Daterange, as a QIF to import in GnuCash."));
 	connect(exportPaymentQifForm.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifPayments()));
 	
+	editDialog = new QDialog(this);
+	editInvoice.setupUi(editDialog);
+	connect(editInvoice.actionSave, SIGNAL(triggered()), this, SLOT(doEditInvoice()));
+	
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showTableContextMenu(const QPoint&)));
+	connect(tableView, SIGNAL(doubleClicked(QModelIndex)), actionShowEdit, SLOT(trigger()));
 }
 
 SentBills::~SentBills() {
 	delete actionSendReminder;
 	delete actionPrintReminder;
+	delete actionShowEdit;
 }
 
 void SentBills::createContextMenu() {
+	actionShowEdit = new QAction(tr("Edit Invoice"), this);
+	actionShowEdit->setStatusTip(tr("Edit the curretly selected Invoice"));
+	connect(actionShowEdit, SIGNAL(triggered()), this, SLOT(showEditInvoiceForm()));
+	
 	actionSendReminder = new QAction(tr("&Send Reminder"), this);
 	//actionPrintReminder->setShortcuts(QKeySequence(Qt::CTRL + Qt::Key_R));
 	actionSendReminder->setStatusTip(tr("Create a new Reminder and send it by EMail"));
@@ -374,6 +384,7 @@ void SentBills::doAdjustDates() {
 
 void SentBills::showTableContextMenu(const QPoint &point) {
 	QMenu menu(tableView);
+	menu.addAction(actionShowEdit);
 	menu.addAction(actionSendReminder);
 	menu.addAction(actionPrintReminder);
 	menu.exec(tableView->mapToGlobal(point));
@@ -386,6 +397,43 @@ QSet<int> SentBills::getSelectedRows() {
 		rows << selection.at(i).row();
 	}
 	return rows;
+}
+
+void SentBills::showEditInvoiceForm() {
+	QModelIndexList selection = tableView->selectionModel()->selectedIndexes();
+	if (selection.size() <= 0) return;
+	QSqlRecord record = tableModel->record(selection.at(0).row());
+	editInvoice.editReference->setText(record.value("reference").toString());
+	editInvoice.editAmount->setValue(record.value("amount").toDouble());
+	editInvoice.editPaid->setValue(record.value("amount_paid").toDouble());
+	editInvoice.editPaidDate->setDate(record.value("paid_date").toDate());
+	editInvoice.editInvoiceDate->setDate(record.value("issue_date").toDate());
+	editDialog->show();
+}
+
+void SentBills::doEditInvoice() {
+	QModelIndexList selection = tableView->selectionModel()->selectedIndexes();
+	if (selection.size() <= 0) return;
+	QSqlRecord record = tableModel->record(selection.at(0).row());
+	QString old_reference = record.value("reference").toString();
+	QSqlQuery query(db);
+	query.prepare("UPDATE pps_invoice SET reference=:reference, amount=:amount, amount_paid=:amount_paid, paid_date=:paid_date, issue_date=:issue_date WHERE reference=:old_reference;");
+	query.bindValue(":reference", editInvoice.editReference->text());
+	query.bindValue(":amount", editInvoice.editAmount->value());
+	query.bindValue(":amount_paid", editInvoice.editPaid->value());
+	query.bindValue(":paid_date", editInvoice.editPaidDate->date());
+	query.bindValue(":issue_date", editInvoice.editInvoiceDate->date());
+	query.bindValue(":old_reference", old_reference);
+	
+	if (!query.exec()) {
+		if (query.lastError().type() != QSqlError::NoError) {
+			qDebug() << query.lastQuery();
+			qDebug() << query.lastError();
+		}
+		QMessageBox::warning(this, tr("Editing Invoice failed"), tr("An Error occured while editing the selected Invoice:\n\n%1").arg(query.lastError().text()));
+	}
+	searchData();
+	editDialog->hide();
 }
 
 void SentBills::sendNewReminder() {

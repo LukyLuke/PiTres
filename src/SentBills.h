@@ -5,6 +5,7 @@
 #include "../ui_adjustpaiddate.h"
 #include "../ui_fromtodates.h"
 #include "../ui_dateform.h"
+#include "../ui_invoiceedit.h"
 #include "data/Reminder.h"
 
 #include <QWidget>
@@ -29,13 +30,16 @@ private:
 	int searchTimer;
 	QAction *actionSendReminder;
 	QAction *actionPrintReminder;
+	QAction *actionShowEdit;
 	
 	QDialog *adjustMemberdateDialog;
 	QDialog *invoiceQifDialog;
 	QDialog *paymentQifDialog;
+	QDialog *editDialog;
 	Ui::adjustPaidDateForm adjustMembersDueDateForm;
 	Ui::fromToDatesForm exportInvoiceQifForm;
 	Ui::fromToDatesForm exportPaymentQifForm;
+	Ui::editEditInvoice editInvoice;
 	
 	QSqlQuery createQuery();
 	void createContextMenu();
@@ -59,6 +63,8 @@ public slots:
 	void showTableContextMenu(const QPoint &point);
 	void sendNewReminder();
 	void printNewReminder();
+	void showEditInvoiceForm();
+	void doEditInvoice();
 
 protected:
 	void timerEvent(QTimerEvent *event);

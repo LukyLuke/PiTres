@@ -72,7 +72,7 @@ CH-1337 Valorbe]]></text>
 			<text x="60" y="815" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[IBAN:]]></text>
 			<text x="170" y="815" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[CH32 0900 0000 6030 7660 3]]></text>
 			
-			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[BIC:]]></text>
+			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[BIC/SWIFT:]]></text>
 			<text x="170" y="830" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[POFICHBEXXX]]></text>
 
 			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Ammonto:]]></text>

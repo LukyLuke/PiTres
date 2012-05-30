@@ -66,13 +66,13 @@ CH-1337 Valorbe]]></text>
 			<text x="60" y="785" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Financial Institution:]]></text>
 			<text x="170" y="785" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Schweizerische Post / Postfinance]]></text>
 			
-			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Banc account number:]]></text>
+			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Banc Account Number:]]></text>
 			<text x="170" y="800" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[60-307660-3]]></text>
 
 			<text x="60" y="815" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[IBAN:]]></text>
 			<text x="170" y="815" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[CH32 0900 0000 6030 7660 3]]></text>
 			
-			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[BIC:]]></text>
+			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[BIC/SWIFT:]]></text>
 			<text x="170" y="830" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[POFICHBEXXX]]></text>
 
 			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="63" size="9"><![CDATA[Amount:]]></text>
