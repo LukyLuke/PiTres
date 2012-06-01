@@ -59,14 +59,14 @@ CH-1337 Valorbe]]></text>
 			<text x="5" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Valorbe]]></text>
 
 			<text x="90" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="10" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="10" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
 			<text x="150" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
 
 			<text x="220" y="740" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
 			<text x="220" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Valorbe]]></text>
 
 			<text x="320" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="238" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="238" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
 			<text x="385" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
 
 			<text x="5" y="923" width="300" height="10" wordwrap="false" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>

@@ -185,7 +185,5 @@ bool XmlPdf::send(QString email) {
 	mail.setHtmlMessage(htmlMessage);
 	
 	// Send the Mail
-	// TODO: Debug
-	return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), "lukas.zurschmiede@piratenpartei.ch", subject);
-	//return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject);
+	return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject);
 }

@@ -408,6 +408,7 @@ void SentBills::showEditInvoiceForm() {
 	editInvoice.editPaid->setValue(record.value("amount_paid").toDouble());
 	editInvoice.editPaidDate->setDate(record.value("paid_date").toDate());
 	editInvoice.editInvoiceDate->setDate(record.value("issue_date").toDate());
+	editInvoice.selectState->setCurrentIndex(record.value("state").toInt());
 	editDialog->show();
 }
 
@@ -417,13 +418,14 @@ void SentBills::doEditInvoice() {
 	QSqlRecord record = tableModel->record(selection.at(0).row());
 	QString old_reference = record.value("reference").toString();
 	QSqlQuery query(db);
-	query.prepare("UPDATE pps_invoice SET reference=:reference, amount=:amount, amount_paid=:amount_paid, paid_date=:paid_date, issue_date=:issue_date WHERE reference=:old_reference;");
+	query.prepare("UPDATE pps_invoice SET reference=:reference, amount=:amount, amount_paid=:amount_paid, paid_date=:paid_date, issue_date=:issue_date, state=:state WHERE reference=:old_reference;");
 	query.bindValue(":reference", editInvoice.editReference->text());
 	query.bindValue(":amount", editInvoice.editAmount->value());
 	query.bindValue(":amount_paid", editInvoice.editPaid->value());
 	query.bindValue(":paid_date", editInvoice.editPaidDate->date());
 	query.bindValue(":issue_date", editInvoice.editInvoiceDate->date());
 	query.bindValue(":old_reference", old_reference);
+	query.bindValue(":state", editInvoice.selectState->currentIndex());
 	
 	if (!query.exec()) {
 		if (query.lastError().type() != QSqlError::NoError) {
