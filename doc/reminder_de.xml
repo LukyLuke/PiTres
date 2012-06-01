@@ -3,51 +3,51 @@
 	<template size="a4">
 		<g part="header">
 			<image x="5" y="5" width="220" height="50" file="logo_german.png" />
-			<text x="280" y="10" width="250" height="67" wordwrap="true" weight="50" size="10"><![CDATA[Piratenpartei Schweiz
+			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[Piratenpartei Schweiz
 CH-1337 Valorbe
 info@piratenpartei.ch]]></text>
 		</g>
 
 		<g part="sender">
 			<rect x="400" y="142" width="150" height="26" stroke="0.2"/>
-			<text x="404" y="144" width="10" height="10" wordwrap="false" weight="75" size="14"><![CDATA[P.P.]]></text>
-			<text x="535" y="147" width="10" height="10" wordwrap="false" weight="50" size="6" halign="right"><![CDATA[{PP_COUNTRY} - {PP_ZIP}
+			<text x="404" y="144" width="10" height="10" wordwrap="false" weight="bold" size="14"><![CDATA[P.P.]]></text>
+			<text x="535" y="147" width="10" height="10" wordwrap="false" size="6" halign="right"><![CDATA[{PP_COUNTRY} - {PP_ZIP}
 {PP_CITY}]]></text>
-			<text x="670" y="144" width="20" height="30" wordwrap="false" weight="50" size="6" halign="right"><![CDATA[{PRINT_DATE}
+			<text x="670" y="144" width="20" height="30" wordwrap="false" size="6" halign="right"><![CDATA[{PRINT_DATE}
 Piratenpartei Schweiz
 CH-1337 Valorbe]]></text>
 			<line x1="400" y1="174" x2="698" y2="174" stroke="0.2" />
 		</g>
 
 		<g part="address">
-			<text x="400" y="190" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="400" y="205" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="400" y="220" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="400" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
-			<text x="400" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_COUNTRY}]]></text>
-			<text x="400" y="300" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
+			<text x="400" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
+			<text x="400" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NAME}]]></text>
+			<text x="400" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_STREET}]]></text>
+			<text x="400" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="400" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_COUNTRY}]]></text>
+			<text x="400" y="300" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="memberinfo">
 			<line x1="5" y1="205" x2="5" y2="265" stroke="0.2" />
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Mitgliedernummer:]]></text>
-			<text x="130" y="205" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
+			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
+			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-			<text x="10" y="220" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Referenz:]]></text>
-			<text x="130" y="220" width="300" height="10" wordwrap="false" weight="50" size="8"><![CDATA[{INVOICE_NUMBER}]]></text>
+			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenz:]]></text>
+			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
 
-			<text x="10" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[E-Mail:]]></text>
-			<text x="130" y="235" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
+			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
+			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Nickname:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="75" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
-			<text x="20" y="400" width="500" height="10" wordwrap="false" weight="50" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" weight="50" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, musst Du deinen Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF anhand der untenstehenden Daten begleichen.
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
+			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, musst Du deinen Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF anhand der untenstehenden Daten begleichen.
 			Ohne den Mitgliederbeitrag bist Du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst Du bei den PiVote Abstimmungen teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst Du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was Dir als Sympathisant leider verwehrt bleibt.
 			Da Politik nicht gratis zu machen ist, sind wir und die Sektionen dankbar für jeden noch so kleine Spende, Du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
 			Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell Deine neuen Daten inkl. der Mitgliedernummer '{MEMBER_NUMBER}' an die info@piratenpartei.ch
@@ -55,47 +55,51 @@ CH-1337 Valorbe]]></text>
 		</g>
 
 		<g part="creditslip">
-			<text x="5" y="740" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="5" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="5" y="740" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="5" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Valorbe]]></text>
 
-			<text x="90" y="855" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="10" y="888" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
-			<text x="150" y="888" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
+			<text x="90" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
+			<text x="10" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="150" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
 
-			<text x="220" y="740" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="220" y="755" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="220" y="740" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="220" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Valorbe]]></text>
 
-			<text x="320" y="855" width="300" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="238" y="888" width="115" height="10" wordwrap="false" weight="50" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
-			<text x="385" y="888" width="60" height="10" wordwrap="false" weight="50" size="8" font="Monospace"><![CDATA[00]]></text>
+			<text x="320" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
+			<text x="238" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_AMOUNT}]]></text>
+			<text x="385" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
 
-			<text x="5" y="923" width="300" height="10" wordwrap="false" weight="50" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
+			<text x="5" y="923" width="300" height="10" wordwrap="false" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
-			<text x="5" y="935" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="5" y="950" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="5" y="965" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="5" y="980" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="5" y="935" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
+			<text x="5" y="950" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NAME}]]></text>
+			<text x="5" y="965" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_STREET}]]></text>
+			<text x="5" y="980" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_CITY}]]></text>
 
-			<text x="460" y="825" width="280" height="10" wordwrap="false" weight="50" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
+			<text x="460" y="825" width="280" height="10" wordwrap="false" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
-			<text x="450" y="875" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="450" y="890" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="450" y="905" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="450" y="920" width="300" height="10" wordwrap="false" weight="50" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="450" y="875" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
+			<text x="450" y="890" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NAME}]]></text>
+			<text x="450" y="905" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_STREET}]]></text>
+			<text x="450" y="920" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_CITY}]]></text>
 
-			<text x="256" y="1013" width="480" height="10" wordwrap="false" weight="50" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="256" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 
 	<email type="text">
 		<subject><![CDATA[Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[Ahoi {MEMBER_NAME},
-damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du den Mitgliederbeitrag mit den Daten im angehängten PDF schnellstmöglich begleichen. Die Zahlungsinformationen und alle anderen Daten findest Du ebenfals dort.
+im Anhang findest Du deine Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.
 
-Für Fragen stehen dir die Sektionsvorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
+Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
 Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
 
-Der Vorstand der Piratenpartei Schweiz]]></content>
+Der Vorstand der Piratenpartei Schweiz
+
+PS: Nicht vergessen, am 9/10 Juni ist der Piraten-Sommerkongress in Aarau!
+Wenn du dich noch nicht angemeldet hast: https://my.piratenpartei.ch/pvreg/index.php
+Mehr Informaitonen findest du unter http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
 	</email>
 	
 	<email type="html">
@@ -170,10 +174,15 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 		<div class="content">
 			<div class="header">Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz</div>
 			<p><strong>Ahoi {MEMBER_NAME},</strong></p>
-			<p>damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du den Mitgliederbeitrag mit den Daten im angehängten PDF schnellstmöglich begleichen. Die Zahlungsinformationen und alle anderen Daten findest Du ebenfals dort.</p>
-			<p>Für Fragen stehen dir die Sektionsvorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
-				<br/>Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...</p>
-			<p>Der Vorstand der Piratenpartei Schweiz</p>
+			<p>im Anhang findest Du die Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.</p>
+			<p>Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
+				<br/>Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
+			</p>
+			<p><strong>Der Vorstand der Piratenpartei Schweiz</strong></p>
+			<p>PS: Nicht vergessen, am 9/10 Juni ist der Piraten-Sommerkongress in Aarau!
+				<br/>Wenn du dich noch nicht angemeldet hast: <a href="https://my.piratenpartei.ch/pvreg/index.php">PV-Anmeldung</a>
+				<br/>Mehr Informaitonen findest du unter <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
+			</p>
 		</div>
 	</div>
 </body></html>]]></content>
