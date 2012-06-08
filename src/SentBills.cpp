@@ -28,6 +28,7 @@
 #include <QKeySequence>
 #include <QItemSelectionModel>
 #include <QModelIndexList>
+#include <QProgressDialog>
 #include <QDebug>
 
 
@@ -448,10 +449,16 @@ void SentBills::printNewReminder() {
 
 void SentBills::createPdfReminds(bool email) {
 	int uid;
+	QProgressDialog bar(this);
 	QString fileName;
 	Reminder reminder;
 	XmlPdf *pdf;
 	QSet<int> rows = getSelectedRows();
+	int max = rows.size();
+	bar.setRange(0, max);
+	bar.setCancelButtonText(tr("&Cancel"));
+	bar.setWindowTitle(tr("Create Invoices"));
+	bar.setWindowModality(Qt::WindowModal);
 	
 	if (!email) {
 		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
@@ -459,9 +466,15 @@ void SentBills::createPdfReminds(bool email) {
 			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
 		}
 	}
+	
+	bar.show();
 	foreach(const int &i, rows) {
 		uid = tableModel->record(i).value(0).toInt();
 		reminder.loadLast(uid);
+		
+		bar.setValue(i);
+		bar.setLabelText(tr("Create Invoice for %1 (%2 of %3)").arg(reminder.addressName()).arg(i).arg(max) );
+		
 		if (email) {
 			pdf = reminder.createPdf("invoice");
 			pdf->send(reminder.addressEmail());
@@ -470,6 +483,7 @@ void SentBills::createPdfReminds(bool email) {
 			pdf->print( QString(fileName).arg(reminder.memberUid()) );
 		}
 	}
+	bar.setValue(max);
 }
 
 

@@ -98,23 +98,26 @@ void InvoiceWizard::invoiceMembers() {
 
 void InvoiceWizard::invoiceNewMembers() {
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE joining>=?;");
+	query.prepare("SELECT uid FROM ldap_persons WHERE joining >= ? AND type = ?;");
 	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(1, PPSPerson::Pirate);
 	query.exec();
 	doCreateInvoices(&query);
 }
 
 void InvoiceWizard::invoiceUntilDate() {
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE paid_due<? OR paid_due IS NULL or paid_due='';");
+	query.prepare("SELECT uid FROM ldap_persons WHERE (paid_due < ? OR paid_due IS NULL or paid_due = '') AND type = ?;");
 	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(1, PPSPerson::Pirate);
 	query.exec();
 	doCreateInvoices(&query);
 }
 
 void InvoiceWizard::invoiceAllMembers() {
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons;");
+	query.prepare("SELECT uid FROM ldap_persons WHERE type = ?;");
+	query.bindValue(0, PPSPerson::Pirate);
 	query.exec();
 	doCreateInvoices(&query);
 }

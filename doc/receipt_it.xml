@@ -1,49 +1,56 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<template size="a6">
+<template size="a5" orientation="landscape">
 	<g part="header">
-		<image x="5" y="5" width="220" height="50" file="logo_german.png" />
-		<text x="5" y="75" width="245" height="15" wordwrap="false" weight="black" size="15" halign="center"><![CDATA[Quittung / Réception / Ricevuta]]></text>
-		<line x1="3" y1="100" x2="248" y2="100" stroke="2" />
+		<image x="0" y="5" width="330" height="75" file="logo_german.png" />
+		<text x="0" y="100" width="330" height="15" wordwrap="false" weight="black" size="15" halign="center"><![CDATA[Ricevuta quota iscrizione]]></text>
+		<line x1="0" y1="125" x2="330" y2="125" stroke="2" />
 	</g>
 
 	<g part="sender">
-		<text x="5" y="110" width="200" height="15" wordwrap="false" weight="bold" underline="true" size="10"><![CDATA[Ausgestellt von:]]></text>
-		<text x="25" y="125" width="200" height="30" wordwrap="false" weight="normal" size="9"><![CDATA[Piratenpartei Schweiz
+		<text x="5" y="140" width="200" height="15" wordwrap="false" weight="bold" underline="true" size="10"><![CDATA[Ausgestellt durch:]]></text>
+		<text x="25" y="160" width="200" height="30" wordwrap="false" weight="normal" size="9"><![CDATA[Piratenpartei Schweiz
 CH-1337 Valorbe]]></text>
 		
-		<text x="5" y="160" width="200" height="15" wordwrap="false" weight="bold" underline="true" size="10"><![CDATA[Ausgestellt für:]]></text>
-		<text x="25" y="175" width="200" height="60" wordwrap="false" weight="normal" size="9"><![CDATA[{MEMBER_PREFIX}
+		<text x="5" y="200" width="200" height="15" wordwrap="false" weight="bold" underline="true" size="10"><![CDATA[Ausgestellt für:]]></text>
+		<text x="25" y="220" width="200" height="60" wordwrap="false" weight="normal" size="9"><![CDATA[{MEMBER_PREFIX}
 {MEMBER_NAME}
 {MEMBER_STREET}
 {MEMBER_COUNTRY} {MEMBER_CITY}]]></text>
 		
-		<rect x="10" y="231" width="230" height="20" stroke="1" fillcolor="#eee" />
+		<rect x="10" y="290" width="320" height="20" stroke="1" fillcolor="#eee" />
 		
-		<text x="25" y="234" width="200" height="15" wordwrap="false" weight="black" size="12"><![CDATA[Betrag:]]></text>
-		<text x="100" y="234" width="120" height="15" wordwrap="false" weight="black" size="12" halign="right"><![CDATA[{INVOICE_AMOUNT}.00 sFr]]></text>
+		<text x="30" y="291" width="300" height="15" wordwrap="false" weight="black" size="12"><![CDATA[Betrag:]]></text>
+		<text x="30" y="291" width="270" height="15" wordwrap="false" weight="black" size="12" halign="right"><![CDATA[{INVOICE_AMOUNT}.00 sFr]]></text>
 		
-		<text x="10" y="260" width="220" height="10" height="15" wordwrap="false" weight="bold" size="9"><![CDATA[Ort:]]></text>
-		<text x="100" y="260" width="120" height="10" height="15" wordwrap="false" weight="normal" size="9"><![CDATA[{PRINT_CITY}]]></text>
+		<text x="10" y="320" width="220" height="10" height="15" wordwrap="false" weight="bold" size="9"><![CDATA[Daum, Ort:]]></text>
+		<text x="100" y="320" width="120" height="10" height="15" wordwrap="false" weight="normal" size="9"><![CDATA[{PRINT_DATE}, {PRINT_CITY}]]></text>
 		
-		<text x="10" y="275" width="220" height="10" height="15" wordwrap="false" weight="bold" size="9"><![CDATA[Datum:]]></text>
-		<text x="100" y="275" width="120" height="10" height="15" wordwrap="false" weight="normal" size="9"><![CDATA[{PRINT_DATE}]]></text>
+		<text x="10" y="350" width="220" height="10" height="15" wordwrap="false" weight="bold" size="9"><![CDATA[Unterschrift:]]></text>
+		<line x1="100" y1="360" x2="330" y2="360" stroke="0.2" />
 		
-		<text x="10" y="300" width="220" height="10" height="15" wordwrap="false" weight="bold" size="9"><![CDATA[Unterschrift:]]></text>
-		
-		<line x1="3" y1="315" x2="248" y2="315" stroke="0.2" />
-		
-		<text x="10" y="330" width="220" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Mitgliedernummer:]]></text>
-		<text x="10" y="330" width="230" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-		<text x="10" y="340" width="230" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Referenz:]]></text>
-		<text x="10" y="340" width="230" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{INVOICE_NUMBER}]]></text>
-
-		<text x="10" y="350" width="230" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[E-Mail:]]></text>
-		<text x="10" y="350" width="230" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_EMAIL}]]></text>
-
-		<text x="10" y="360" width="230" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Nickname:]]></text>
-		<text x="10" y="360" width="230" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_NICK}]]></text>
+		<rect x="0" y="375" width="330" height="120" stroke="0.2" strokecolor="#888" fillcolor="#fdfdfd" />
 		
-		<line x1="3" y1="370" x2="248" y2="370" stroke="0.2" />
+		<text x="10" y="385" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Mitgliedernummer:]]></text>
+		<text x="10" y="385" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_NUMBER}]]></text>
+
+		<text x="10" y="400" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Referenz:]]></text>
+		<text x="10" y="400" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{INVOICE_NUMBER}]]></text>
+
+		<text x="10" y="415" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[E-Mail:]]></text>
+		<text x="10" y="415" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_EMAIL}]]></text>
+
+		<text x="10" y="430" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Nickname:]]></text>
+		<text x="10" y="430" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_NICK}]]></text>
+		
+		<text x="10" y="445" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[EMail:]]></text>
+		<text x="10" y="445" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_EMAIL}]]></text>
+		
+		<text x="10" y="460" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Telefon:]]></text>
+		<text x="10" y="460" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_TELEPHONE}]]></text>
+		
+		<text x="10" y="475" width="310" height="10" height="15" wordwrap="false" weight="bold" size="8"><![CDATA[Mobil:]]></text>
+		<text x="10" y="475" width="310" height="10" wordwrap="false" weight="normal" size="8" halign="right"><![CDATA[{MEMBER_MOBILE}]]></text>
+		
 	</g>
 </template>

@@ -20,11 +20,11 @@ CH-1337 Valorbe]]></text>
 		</g>
 
 		<g part="address">
-			<text x="400" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="400" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="400" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="400" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_CITY}]]></text>
-			<text x="400" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_COUNTRY}]]></text>
+			<text x="400" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}
+{MEMBER_NAME}
+{MEMBER_STREET}
+{MEMBER_CITY}
+{MEMBER_COUNTRY}]]></text>
 			<text x="400" y="300" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
@@ -72,17 +72,17 @@ CH-1337 Valorbe]]></text>
 
 			<text x="5" y="923" width="300" height="10" wordwrap="false" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
-			<text x="5" y="935" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="5" y="950" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="5" y="965" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="5" y="980" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="5" y="935" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}
+{MEMBER_NAME}
+{MEMBER_STREET}
+{MEMBER_CITY}]]></text>
 
 			<text x="460" y="825" width="280" height="10" wordwrap="false" size="9" font="OCRB"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
-			<text x="450" y="875" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}]]></text>
-			<text x="450" y="890" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NAME}]]></text>
-			<text x="450" y="905" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_STREET}]]></text>
-			<text x="450" y="920" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_CITY}]]></text>
+			<text x="450" y="875" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_PREFIX}
+{MEMBER_NAME}
+{MEMBER_STREET}
+{MEMBER_CITY}]]></text>
 
 			<text x="256" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>

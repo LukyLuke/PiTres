@@ -326,5 +326,16 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 		else if (value == "it") { person->setLanguage(PPSPerson::IT); }
 		else if (value == "fr") { person->setLanguage(PPSPerson::FR); }
 		else { person->setLanguage(PPSPerson::EN); }
+		
+	} else if (field == "employeetype") {
+		switch (value.toInt()) {
+			case PPSPerson::LandLubber: person->setType(PPSPerson::LandLubber); break;
+			case PPSPerson::Sympathizer: person->setType(PPSPerson::Sympathizer); break;
+			case PPSPerson::Pirate: person->setType(PPSPerson::Pirate); break;
+			case PPSPerson::Veteran: person->setType(PPSPerson::Veteran); break;
+			case PPSPerson::PlankWalker: person->setType(PPSPerson::PlankWalker); break;
+			case PPSPerson::FleetPirate: person->setType(PPSPerson::FleetPirate); break;
+			default: person->setType(PPSPerson::UnknownType); break;
+		}
 	}
 }

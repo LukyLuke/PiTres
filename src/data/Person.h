@@ -53,7 +53,7 @@ public:
 	enum ContributionClass { ContributeFull=0 , ContributeStudent=1 };
 	enum Gender { GenderMale=0, GenderFemale=1, GenderBoth=2, GenderNone=3, GenderUnknown=-1 };
 	enum Language { DE=0, FR=1, IT=2, EN=3 };
-	enum PersonType { LandLubber=0, Sympathizer=1, Pirate=2, Veteran=3, PlankWalker=4, FleetPirate=5 };
+	enum PersonType { LandLubber=0, Sympathizer=1, Pirate=2, Veteran=3, PlankWalker=4, FleetPirate=5, UnknownType=99 };
 	
 	// Setter
 	void setUid(int uid);
