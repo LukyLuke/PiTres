@@ -9,7 +9,7 @@
 	<g part="sender">
 		<text x="5" y="140" width="200" height="15" wordwrap="false" weight="bold" underline="true" size="10"><![CDATA[Ausgestellt durch:]]></text>
 		<text x="25" y="160" width="200" height="30" wordwrap="false" weight="normal" size="9"><![CDATA[Piratenpartei Schweiz
-CH-1337 Valorbe]]></text>
+CH-1337 Vallorbe]]></text>
 		
 		<text x="5" y="200" width="200" height="15" wordwrap="false" weight="bold" underline="true" size="10"><![CDATA[Ausgestellt für:]]></text>
 		<text x="25" y="220" width="200" height="60" wordwrap="false" weight="normal" size="9"><![CDATA[{MEMBER_PREFIX}

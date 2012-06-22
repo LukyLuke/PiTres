@@ -3,7 +3,7 @@
 		<g part="header">
 			<image x="5" y="5" width="220" height="50" file="logo_german.png" />
 			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[Piratenpartei Schweiz
-CH-1337 Valorbe
+CH-1337 Vallorbe
 info@piratenpartei.ch]]></text>
 		</g>
 
@@ -14,7 +14,7 @@ info@piratenpartei.ch]]></text>
 {PP_CITY}]]></text>
 			<text x="670" y="144" width="20" height="30" wordwrap="false" size="6" halign="right"><![CDATA[{PRINT_DATE}
 Piratenpartei Schweiz
-CH-1337 Valorbe]]></text>
+CH-1337 Vallorbe]]></text>
 			<line x1="400" y1="174" x2="698" y2="174" stroke="0.2" />
 		</g>
 
@@ -55,14 +55,14 @@ CH-1337 Valorbe]]></text>
 
 		<g part="creditslip">
 			<text x="5" y="740" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="5" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="5" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
 			<text x="90" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
 			<text x="10" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
 			<text x="150" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
 
 			<text x="220" y="740" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
-			<text x="220" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Valorbe]]></text>
+			<text x="220" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
 			<text x="320" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
 			<text x="238" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
