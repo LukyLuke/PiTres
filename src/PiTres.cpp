@@ -133,6 +133,8 @@ void PiTres::showSettings() {
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_limited", 30.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_default", 60.0).toFloat());
+	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-12-31").toString());
+	
 	settingsForm.pdfInvoice->setText(settings.value("pdf/invoice_template", "data/invoice.xml").toString());
 	settingsForm.pdfReminder->setText(settings.value("pdf/reminder_template", "data/reminder.xml").toString());
 	settingsForm.pdfReceipt->setText(settings.value("pdf/receipt_template", "data/receipt.xml").toString());
@@ -172,6 +174,8 @@ void PiTres::doSaveSettings() {
 	settings.setValue("database/sqlite", settingsForm.sqliteFile->text());
 	settings.setValue("invoice/amount_limited", settingsForm.memberAmountFull->value());
 	settings.setValue("invoice/amount_default", settingsForm.memberAmountLimited->value());
+	settings.setValue("invoice/member_due_format", settingsForm.memberDueDate->text());
+	
 	settings.setValue("pdf/invoice_template", settingsForm.pdfInvoice->text());
 	settings.setValue("pdf/reminder_template", settingsForm.pdfReminder->text());
 	settings.setValue("pdf/receipt_template", settingsForm.pdfReceipt->text());

@@ -118,11 +118,12 @@ void Invoice::save() {
 	}
 	query.exec();
 	
-	setIsLoaded(true);
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
 		qDebug() << query.lastError();
 		setIsLoaded(false);
+	} else {
+		setIsLoaded(true);
 	}
 }
 
@@ -289,6 +290,7 @@ bool Invoice::pay(QDate *date) {
 }
 
 bool Invoice::pay(float amount, QDate *date) {
+	QSettings settings;
 	if (date == NULL) {
 		setPaidDate(QDate::currentDate());
 	} else {
@@ -299,6 +301,7 @@ bool Invoice::pay(float amount, QDate *date) {
 	if (f_amount <= amountPaid()) {
 		setState(StatePaid);
 	}
+	
 	save();
 	return _loaded;
 }

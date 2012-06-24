@@ -2,6 +2,7 @@
 #define Userlist_H
 
 #include "../ui_userlist.h"
+#include "../ui_dateform.h"
 
 #include <QWidget>
 #include <QSqlDatabase>
@@ -12,6 +13,7 @@
 #include <QSet>
 #include <QSqlQueryModel>
 #include <QModelIndex>
+#include <QDialog>
 #include <QTimerEvent>
 
 class Userlist : public QWidget, private Ui::UserlistForm {
@@ -21,6 +23,10 @@ private:
 	QSqlQueryModel *tableModel;
 	int searchTimer;
 	QAction *actionManualPayment;
+	QAction *actionEditDueDate;
+	
+	QDialog *editDateDialog;
+	Ui::dateForm dateForm;
 	
 	void loadSections();
 	QSqlQuery createQuery();
@@ -41,6 +47,8 @@ public slots:
 	void showTableContextMenu(const QPoint &point);
 	void exportData();
 	void payMemberfeeCash();
+	void showMemberDueAdjust();
+	void adjustMemberDueDate();
 
 protected:
 	void timerEvent(QTimerEvent *event);

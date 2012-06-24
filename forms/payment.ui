@@ -7,23 +7,53 @@
     <x>0</x>
     <y>0</y>
     <width>727</width>
-    <height>273</height>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>PaymentForm</string>
+   <string>Cash-Payment</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../PiTres.qrc">
-    <normaloff>:/resources/application_logo.svg</normaloff>:/resources/application_logo.svg</iconset>
+    <normaloff>:/icons/resources/icons/cashier.png</normaloff>:/icons/resources/icons/cashier.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Invoices from: %1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../PiTres.qrc">:/icons/resources/icons/cashier.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt; Pay Invoice in cash&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTableWidget" name="tableWidget">
@@ -78,6 +108,74 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Paying Date:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="paidDate">
+       <property name="displayFormat">
+        <string>yyyy-MM-dd</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Paid Due Date:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="paidDueDate">
+       <property name="displayFormat">
+        <string>yyyy-MM-dd</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <spacer name="horizontalSpacer_2">
@@ -109,23 +207,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Paid date:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDateEdit" name="paidDate">
-       <property name="displayFormat">
-        <string>yyyy-MM-dd</string>
-       </property>
-       <property name="calendarPopup">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -146,21 +227,47 @@
      <item>
       <widget class="QCheckBox" name="saveReceipt">
        <property name="text">
-        <string>Save Receipt</string>
+        <string>Save Receipt, don't print</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCreatePayment">
+      <widget class="QToolButton" name="btnCreatePayment">
        <property name="text">
-        <string>Create new Cash Payment</string>
+        <string>New Payment</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/contract.png</normaloff>:/icons/resources/icons/contract.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnPaySelected">
+      <widget class="QToolButton" name="btnPaySelected">
        <property name="text">
-        <string>Pay selected in Cash</string>
+        <string>Pay selected</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/money.png</normaloff>:/icons/resources/icons/money.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>

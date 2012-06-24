@@ -54,7 +54,6 @@ public:
 public slots:
 	void searchData();
 	void searchDataTimeout(QString data);
-	void syncUserPaidDate();
 	void doAdjustDates();
 	void exportQifAssets();
 	void doExportQifAssets();

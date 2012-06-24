@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>738</width>
-    <height>518</height>
+    <width>807</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -319,9 +319,22 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnExport">
+      <widget class="QToolButton" name="btnExport">
        <property name="text">
-        <string>Export current Selection</string>
+        <string>Save Tabledata</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/disk_blue.png</normaloff>:/icons/resources/icons/disk_blue.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
@@ -329,6 +342,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../PiTres.qrc"/>
+ </resources>
  <connections/>
 </ui>

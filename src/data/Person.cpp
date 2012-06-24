@@ -25,7 +25,7 @@ void PPSPerson::createTables() {
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons (uid INTEGER, contribution INTEGER, nickname TEXT, gender TEXT, familyname TEXT, "
 	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
-	              "paid_due TEXT, ldap_paid_due TEXT, type INTEGER);");
+	              "ldap_paid_due DATE, type INTEGER);");
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
@@ -47,6 +47,14 @@ void PPSPerson::createTables() {
 	}
 	
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_mobile (uid INTEGER, type TEXT, number TEXT);");
+	query.exec();
+	if (query.lastError().type() != QSqlError::NoError) {
+		qDebug() << query.lastQuery();
+		qDebug() << query.lastError();
+	}
+	
+	// Persistent matching table between PaidUntilDates and MemberUIDs
+	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_dates (uid INTEGER, paid_due DATE);");
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
@@ -92,78 +100,95 @@ void PPSPerson::emptyTables() {
 void PPSPerson::save() {
 	int i;
 	QSqlQuery query(db);
-	query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section, paid_due, ldap_paid_due, type) "
-	              "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section, :paiddue, :ldappaiddue, :type);");
-	query.bindValue(":uid", i_uid);
-	query.bindValue(":section", s_section);
-	query.bindValue(":contcls", (int)m_contributionClass);
-	query.bindValue(":nickname", s_nickname);
-	query.bindValue(":gender", (int)m_gender);
-	query.bindValue(":familyname", s_familyName);
-	query.bindValue(":givenname", s_givenName);
-	query.bindValue(":address", s_street);
-	query.bindValue(":plz", s_postalCode);
-	query.bindValue(":city", s_city);
-	query.bindValue(":country", s_country);
-	query.bindValue(":state", s_state);
-	query.bindValue(":birthday", d_birthdate);
-	query.bindValue(":joining", d_joining);
-	query.bindValue(":language", (int)m_language);
-	query.bindValue(":paiddue", d_paidDue);
-	query.bindValue(":ldappaiddue", d_ldapPaidDue);
-	query.bindValue(":type", (int)m_type);
-	query.exec();
 	
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
-	
-	// Insert all telephones, mobiles and email addresses
-	if (!l_telephone.empty()) {
-		query.prepare("INSERT INTO ldap_persons_telephone (uid, type, number) VALUES (:uid, :type, :value);");
+	// Persons are Readonly, expect when they are loaded from LDAP
+	if (!is_loaded) {
+		query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section, ldap_paid_due, type) "
+		              "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section, :ldappaiddue, :type);");
 		query.bindValue(":uid", i_uid);
-		query.bindValue(":type", "default");
-		for (i = 0; i < l_telephone.size(); i++) {
-			query.bindValue(":value", l_telephone.at(i));
-			query.exec();
-			if (query.lastError().type() != QSqlError::NoError) {
-				qDebug() << query.lastQuery();
-				qDebug() << query.lastError();
+		query.bindValue(":section", s_section);
+		query.bindValue(":contcls", (int)m_contributionClass);
+		query.bindValue(":nickname", s_nickname);
+		query.bindValue(":gender", (int)m_gender);
+		query.bindValue(":familyname", s_familyName);
+		query.bindValue(":givenname", s_givenName);
+		query.bindValue(":address", s_street);
+		query.bindValue(":plz", s_postalCode);
+		query.bindValue(":city", s_city);
+		query.bindValue(":country", s_country);
+		query.bindValue(":state", s_state);
+		query.bindValue(":birthday", d_birthdate);
+		query.bindValue(":joining", d_joining);
+		query.bindValue(":language", (int)m_language);
+		query.bindValue(":ldappaiddue", d_ldapPaidDue);
+		query.bindValue(":type", (int)m_type);
+		query.exec();
+		
+		if (query.lastError().type() != QSqlError::NoError) {
+			qDebug() << query.lastQuery();
+			qDebug() << query.lastError();
+		}
+		
+		// Insert all telephones, mobiles and email addresses
+		if (!l_telephone.empty()) {
+			query.prepare("INSERT INTO ldap_persons_telephone (uid, type, number) VALUES (:uid, :type, :value);");
+			query.bindValue(":uid", i_uid);
+			query.bindValue(":type", "default");
+			for (i = 0; i < l_telephone.size(); i++) {
+				query.bindValue(":value", l_telephone.at(i));
+				query.exec();
+				if (query.lastError().type() != QSqlError::NoError) {
+					qDebug() << query.lastQuery();
+					qDebug() << query.lastError();
+				}
 			}
 		}
-	}
-	
-	if (!l_mobile.empty()) {
-		query.prepare("INSERT INTO ldap_persons_mobile (uid, type, number) VALUES (:uid, :type, :value);");
-		query.bindValue(":uid", i_uid);
-		query.bindValue(":type", "default");
-		for (i = 0; i < l_mobile.size(); i++) {
-			query.bindValue(":value", l_mobile.at(i));
-			query.exec();
-			if (query.lastError().type() != QSqlError::NoError) {
-				qDebug() << query.lastQuery();
-				qDebug() << query.lastError();
+		
+		if (!l_mobile.empty()) {
+			query.prepare("INSERT INTO ldap_persons_mobile (uid, type, number) VALUES (:uid, :type, :value);");
+			query.bindValue(":uid", i_uid);
+			query.bindValue(":type", "default");
+			for (i = 0; i < l_mobile.size(); i++) {
+				query.bindValue(":value", l_mobile.at(i));
+				query.exec();
+				if (query.lastError().type() != QSqlError::NoError) {
+					qDebug() << query.lastQuery();
+					qDebug() << query.lastError();
+				}
 			}
 		}
-	}
-	
-	if (!l_email.empty()) {
-		query.prepare("INSERT INTO ldap_persons_email (uid, type, mail) VALUES (:uid, :type, :value);");
-		query.bindValue(":uid", i_uid);
-		query.bindValue(":type", "default");
-		for (i = 0; i < l_email.size(); i++) {
-			query.bindValue(":value", l_email.at(i));
-			query.exec();
-			if (query.lastError().type() != QSqlError::NoError) {
-				qDebug() << query.lastQuery();
-				qDebug() << query.lastError();
+		
+		if (!l_email.empty()) {
+			query.prepare("INSERT INTO ldap_persons_email (uid, type, mail) VALUES (:uid, :type, :value);");
+			query.bindValue(":uid", i_uid);
+			query.bindValue(":type", "default");
+			for (i = 0; i < l_email.size(); i++) {
+				query.bindValue(":value", l_email.at(i));
+				query.exec();
+				if (query.lastError().type() != QSqlError::NoError) {
+					qDebug() << query.lastQuery();
+					qDebug() << query.lastError();
+				}
 			}
 		}
+		
+		// Save the PaidDue matching Table
+		query.prepare("INSERT INTO ldap_persons_dates (uid,paid_due) VALUES (:uid,:due);");
+		query.bindValue(":uid", i_uid);
+		query.bindValue(":due", d_paidDue);
+		query.exec();
+		
+	} else {
+		// Update the PaidDue matching Table
+		query.prepare("UPDATE ldap_persons_dates SET paid_due=:due WHERE uid=:uid;");
+		query.bindValue(":uid", i_uid);
+		query.bindValue(":due", d_paidDue);
+		query.exec();
 	}
 }
 
 void PPSPerson::clear() {
+	is_loaded = FALSE;
 	i_uid = 0;
 	s_section = "";
 	m_contributionClass = ContributeFull;
@@ -211,7 +236,6 @@ bool PPSPerson::load(int uid) {
 		d_birthdate = query.value(record.indexOf("birthday")).toDate();
 		d_joining = query.value(record.indexOf("joining")).toDate();
 		m_language = (Language)query.value(record.indexOf("language")).toInt();
-		d_paidDue = query.value(record.indexOf("paid_due")).toDate();
 		m_type = (PersonType)query.value(record.indexOf("type")).toInt();
 		
 		// Load telephone, mobile and email
@@ -236,8 +260,16 @@ bool PPSPerson::load(int uid) {
 			l_email << query.value(0).toString();
 		}
 		
+		query.prepare("SELECT paid_due FROM ldap_persons_dates WHERE uid=?;");
+		query.bindValue(0, uid);
+		query.exec();
+		if (query.next()) {
+			d_paidDue = query.value(0).toDate();
+		}
+		
 		_invoice.loadLast(uid);
 	}
+	is_loaded = TRUE;
 	return isLoaded();
 }
 

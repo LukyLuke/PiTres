@@ -4,6 +4,8 @@
     <file>resources/ocrb.ttf</file>
   </qresource>
   <qresource prefix="icons">
+    <file>resources/icons/disk_blue.png</file>
+    <file>resources/icons/contract.png</file>
     <file>resources/icons/chest.png</file>
     <file>resources/icons/chest_into.png</file>
     <file>resources/icons/chest_out.png</file>

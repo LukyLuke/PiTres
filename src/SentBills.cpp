@@ -43,7 +43,6 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
-	connect(btnSyncUsers, SIGNAL(clicked()), this, SLOT(syncUserPaidDate()));
 	connect(pendingOnly, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
@@ -288,13 +287,6 @@ void SentBills::doExportQifPayments() {
 		}
 	}
 	paymentQifDialog->close();
-}
-
-void SentBills::syncUserPaidDate() {
-	QDate now = QDate::currentDate();
-	adjustMembersDueDateForm.paidDate->setDate(QDate(now.year(), 1, 1));
-	adjustMembersDueDateForm.paidDueDate->setDate(QDate(now.year()+1, 1, 1));
-	adjustMemberdateDialog->show();
 }
 
 void SentBills::doAdjustDates() {

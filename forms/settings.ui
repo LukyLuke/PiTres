@@ -77,7 +77,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_5">
              <property name="title">
-              <string>Member Types</string>
+              <string>Member Settings</string>
              </property>
              <layout class="QFormLayout" name="formLayout_6">
               <item row="0" column="0">
@@ -111,6 +111,36 @@
                 </property>
                 <property name="value">
                  <double>30.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_29">
+                <property name="text">
+                 <string>Member due Date Format</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="memberDueDate">
+                <property name="text">
+                 <string>yyyy-12-13</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="label_30">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>The Format must be in form of &quot;yyyy-MM-dd&quot; but can have static values to terminat to the end of the Year for example</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -216,6 +246,19 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>

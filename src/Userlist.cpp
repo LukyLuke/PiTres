@@ -44,17 +44,28 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showTableContextMenu(const QPoint&)));
+	
+	editDateDialog = new QDialog(this);
+	dateForm.setupUi(editDateDialog);
+	dateForm.hintLabel->setText(tr("Select the new 'Member Due'-Date for the selected member."));
+	connect(dateForm.actionChoose, SIGNAL(triggered()), this, SLOT(adjustMemberDueDate()));
 }
 
 Userlist::~Userlist() {
 	delete actionManualPayment;
+	delete actionEditDueDate;
 }
 
 void Userlist::createContextMenu() {
 	actionManualPayment = new QAction(tr("&Pay Memberfee"), this);
-	actionManualPayment->setShortcuts(QKeySequence::Print);
+	actionManualPayment->setShortcut(QKeySequence::Print);
 	actionManualPayment->setStatusTip(tr("User pays current Memberfee cash"));
 	connect(actionManualPayment, SIGNAL(triggered()), this, SLOT(payMemberfeeCash()));
+	
+	actionEditDueDate = new QAction(tr("&Change Member due Date"), this);
+	actionEditDueDate->setShortcut(QKeySequence("CTRL + D"));
+	actionEditDueDate->setStatusTip(tr("Change the 'Member due' Date from the current User"));
+	connect(actionEditDueDate, SIGNAL(triggered()), this, SLOT(showMemberDueAdjust()));
 }
 
 void Userlist::loadData() {
@@ -260,6 +271,7 @@ void Userlist::exportData() {
 void Userlist::showTableContextMenu(const QPoint &point) {
 	QMenu menu(tableView);
 	menu.addAction(actionManualPayment);
+	menu.addAction(actionEditDueDate);
 	menu.exec(tableView->mapToGlobal(point));
 }
 
@@ -280,3 +292,31 @@ void Userlist::payMemberfeeCash() {
 		wizard->show();
 	}
 }
+
+void Userlist::showMemberDueAdjust() {
+	QSettings settings;
+	int uid = getFirstSelectedUid();
+	if (uid > 0) {
+		PPSPerson person;
+		person.load(uid);
+		if (person.paidDue() > QDate(1970, 1, 2)) {
+			dateForm.fromDate->setDate(person.paidDue());
+		} else {
+			dateForm.fromDate->setDate( QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd") );
+		}
+		editDateDialog->show();
+	}
+}
+
+void Userlist::adjustMemberDueDate() {
+	QSettings settings;
+	int uid = getFirstSelectedUid();
+	if (uid > 0) {
+		PPSPerson person;
+		person.load(uid);
+		person.setPaidDue(dateForm.fromDate->date());
+		person.save();
+	}
+	editDateDialog->hide();
+}
+

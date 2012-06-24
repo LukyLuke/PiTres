@@ -34,6 +34,7 @@
 #include <QDebug>
 
 PaymentWizard::PaymentWizard(QWidget * parent) : QDialog(parent) {
+	QSettings settings;
 	setupUi(this);
 	amountBox->setValue(0);
 	btnPaySelected->setEnabled(false);
@@ -52,10 +53,10 @@ void PaymentWizard::setPerson(int uid) {
 	person.clear();
 	person.load(uid);
 	
-	label->setText(tr("Unpaid invoices from %1 %2 (%3)").arg(person.familyName(), person.givenName(), person.nickname()));
 	setWindowTitle(tr("Unpaid invoices from %1 %2 (%3)").arg(person.familyName(), person.givenName(), person.nickname()));
 	amountBox->setValue(person.contributionClass() == PPSPerson::ContributeStudent ? settings.value("invoice/amount_limited", 30).toFloat() : settings.value("invoice/amount_default", 60).toFloat());
 	paidDate->setDate(QDate::currentDate());
+	paidDueDate->setDate( QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd") );
 	
 	QList<Invoice *> list = person.getInvoices();
 	for (int i = 0; i < list.size(); i++) {
@@ -97,6 +98,9 @@ void PaymentWizard::paySelectedInCash() {
 
 void PaymentWizard::doPayInvoice() {
 	invoice.pay(amountBox->value(), new QDate(paidDate->date()));
+	
+	person.setPaidDue(paidDueDate->date());
+	person.save();
 	
 	XmlPdf *pdf;
 	QString fileName = "";

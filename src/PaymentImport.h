@@ -2,6 +2,7 @@
 #define PaymentImport_H
 
 #include "../ui_paymentimport.h"
+#include "data/Person.h"
 
 #include <QWidget>
 #include <QSqlDatabase>
@@ -17,6 +18,8 @@ Q_OBJECT
 private:
 	QSqlDatabase db;
 	int searchTimer;
+	QString listString;
+	QString reString;
 
 public:
 	PaymentImport(QWidget *parent = 0);
@@ -27,6 +30,7 @@ public slots:
 	void searchDataTimeout(QString data);
 	void continueImport();
 	void paySelectedInvoice();
+	void invoiceSelected(QListWidgetItem *item);
 	
 protected:
 	void timerEvent(QTimerEvent *event);
