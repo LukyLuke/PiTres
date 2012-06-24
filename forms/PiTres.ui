@@ -54,6 +54,8 @@
     </property>
     <addaction name="actionFrom_LDAP"/>
     <addaction name="actionInvoiceWizard"/>
+    <addaction name="actionAdjustDates"/>
+    <addaction name="actionDonation"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -86,7 +88,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionFrom_LDAP"/>
+   <addaction name="actionImport_Payments"/>
+   <addaction name="actionAdjustDates"/>
    <addaction name="actionInvoiceWizard"/>
+   <addaction name="actionDonation"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="sizePolicy">
@@ -125,7 +130,7 @@
        </property>
        <property name="icon">
         <iconset resource="../PiTres.qrc">
-         <normaloff>:/buttons/resources/buttons/user-identity.png</normaloff>:/buttons/resources/buttons/user-identity.png</iconset>
+         <normaloff>:/icons/resources/icons/businessman.png</normaloff>:/icons/resources/icons/businessman.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -157,7 +162,7 @@
        </property>
        <property name="icon">
         <iconset resource="../PiTres.qrc">
-         <normaloff>:/buttons/resources/buttons/mail-folder-outbox.png</normaloff>:/buttons/resources/buttons/mail-folder-outbox.png</iconset>
+         <normaloff>:/icons/resources/icons/money.png</normaloff>:/icons/resources/icons/money.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -182,11 +187,11 @@
         <string>Create new Bills and send they as EMails or print out the PDFs and Letters</string>
        </property>
        <property name="text">
-        <string>Import Payments</string>
+        <string>Donations and Dues</string>
        </property>
        <property name="icon">
         <iconset resource="../PiTres.qrc">
-         <normaloff>:/buttons/resources/buttons/mail-folder-inbox.png</normaloff>:/buttons/resources/buttons/mail-folder-inbox.png</iconset>
+         <normaloff>:/icons/resources/icons/chest.png</normaloff>:/icons/resources/icons/chest.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -230,7 +235,7 @@
   <action name="actionFrom_LDAP">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/repository.png</normaloff>:/icons/resources/icons/repository.png</iconset>
+     <normaloff>:/icons/resources/icons/data_refresh.png</normaloff>:/icons/resources/icons/data_refresh.png</iconset>
    </property>
    <property name="text">
     <string>Import from &amp;LDAP</string>
@@ -245,7 +250,7 @@
   <action name="actionInvoiceWizard">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/text-x-ldif.png</normaloff>:/icons/resources/icons/text-x-ldif.png</iconset>
+     <normaloff>:/icons/resources/icons/cashier.png</normaloff>:/icons/resources/icons/cashier.png</iconset>
    </property>
    <property name="text">
     <string>Invoice Wizard</string>
@@ -274,7 +279,7 @@
   </action>
   <action name="actionShow_Users">
    <property name="icon">
-    <iconset resource="../PiTres.qrc">
+    <iconset>
      <normaloff>:/buttons/resources/buttons/user-identity.png</normaloff>:/buttons/resources/buttons/user-identity.png</iconset>
    </property>
    <property name="text">
@@ -289,7 +294,7 @@
   </action>
   <action name="actionShow_Bills">
    <property name="icon">
-    <iconset resource="../PiTres.qrc">
+    <iconset>
      <normaloff>:/buttons/resources/buttons/mail-folder-outbox.png</normaloff>:/buttons/resources/buttons/mail-folder-outbox.png</iconset>
    </property>
    <property name="text">
@@ -305,7 +310,7 @@
   <action name="actionImport_Payments">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/buttons/resources/buttons/mail-folder-inbox.png</normaloff>:/buttons/resources/buttons/mail-folder-inbox.png</iconset>
+     <normaloff>:/icons/resources/icons/payment_in.png</normaloff>:/icons/resources/icons/payment_in.png</iconset>
    </property>
    <property name="text">
     <string>Import Payments</string>
@@ -327,6 +332,30 @@
    </property>
    <property name="toolTip">
     <string>Configure PiTres</string>
+   </property>
+  </action>
+  <action name="actionAdjustDates">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/adjust_members.png</normaloff>:/icons/resources/icons/adjust_members.png</iconset>
+   </property>
+   <property name="text">
+    <string>Adjust Member Dates</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust Member Dates</string>
+   </property>
+  </action>
+  <action name="actionDonation">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/chest.png</normaloff>:/icons/resources/icons/chest.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Donation</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Donaitons and Section Dues</string>
    </property>
   </action>
  </widget>
