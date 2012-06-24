@@ -109,30 +109,6 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnSyncUsers">
-       <property name="text">
-        <string>Adjust &quot;Member-Due&quot; Dates</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <spacer name="horizontalSpacer_2">
@@ -148,16 +124,42 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnPaymentsExport">
+      <widget class="QToolButton" name="btnPaymentsExport">
        <property name="text">
-        <string>Export Payments QIF</string>
+        <string>Export Payments</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/payment_out.png</normaloff>:/icons/resources/icons/payment_out.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnInvoiceQif">
+      <widget class="QToolButton" name="btnInvoiceQif">
        <property name="text">
-        <string>Export Invoices QIF</string>
+        <string>Export Invoices</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/payment_in.png</normaloff>:/icons/resources/icons/payment_in.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
@@ -165,6 +167,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../PiTres.qrc"/>
+ </resources>
  <connections/>
 </ui>

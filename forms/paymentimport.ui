@@ -178,9 +178,22 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnContinue">
+      <widget class="QToolButton" name="btnContinue">
        <property name="text">
         <string>Book Payments</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/payment_in.png</normaloff>:/icons/resources/icons/payment_in.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
@@ -188,6 +201,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../PiTres.qrc"/>
+ </resources>
  <connections/>
 </ui>
