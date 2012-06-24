@@ -73,7 +73,7 @@ void Userlist::loadData() {
 	PPSPerson::createTables();
 	Invoice::createTables();
 	
-	QSqlQuery query("SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons;", db);
+	QSqlQuery query("SELECT ldap_persons.uid, ldap_persons_dates.paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON ldap_persons.uid = ldap_persons_dates.uid;", db);
 	tableModel->setQuery(query);
 	
 	// InvoiceState: o_pen, c_anceled, p_aid, u_nknown
@@ -127,20 +127,20 @@ QSqlQuery Userlist::createQuery() {
 		if (i > 0) {
 			search.append(" AND ");
 		}
-		search.append(QString("(uid=:uid").append(QString::number(i)).append(" OR nickname LIKE :nick").append(QString::number(i)).append(" OR familyname LIKE :family").append(QString::number(i)).append(" OR givenname LIKE :given").append(QString::number(i)).append(")"));
+		search.append(QString("(ldap_persons.uid=:uid").append(QString::number(i)).append(" OR ldap_persons.nickname LIKE :nick").append(QString::number(i)).append(" OR ldap_persons.familyname LIKE :family").append(QString::number(i)).append(" OR ldap_persons.givenname LIKE :given").append(QString::number(i)).append(")"));
 	}
 	
 	QSqlQuery query(db);
 	QString qs;
 	bool bindSection = FALSE;
 	if (section == "All") {
-		qs = "SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons";
+		qs = "SELECT ldap_persons.uid, ldap_persons_dates.paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON ldap_persons.uid = ldap_persons_dates.uid";
 		if (sl.size() > 0) {
 			qs.append(" WHERE ").append(search);
 		}
 	} else {
 		bindSection = TRUE;
-		qs = "SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons WHERE section=:section";
+		qs = "SELECT ldap_persons.uid, ldap_persons_dates.paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON ldap_persons.uid = ldap_persons_dates.uid WHERE ldap_persons.section=:section";
 		if (sl.size() > 0) {
 			qs.append(" AND (").append(search).append(")");
 		}
@@ -247,7 +247,7 @@ void Userlist::exportData() {
 	QRegExp re("[\"',\r\n]+");
 	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Paid\n");
 	while (query.next()) {
-		// "SELECT uid,paid_due,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
+		// "SELECT uid,paid_due_date,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
 		csv.append( query.value(0).toString().remove(re) ).append(",");
 		csv.append( query.value(2).toString().remove(re) ).append(",");
 		csv.append( query.value(3).toString().remove(re) ).append(",");

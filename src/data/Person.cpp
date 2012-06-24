@@ -171,19 +171,28 @@ void PPSPerson::save() {
 				}
 			}
 		}
-		
+	}
+	
+	if (paidDue().year() <= 1970) {
 		// Save the PaidDue matching Table
 		query.prepare("INSERT INTO ldap_persons_dates (uid,paid_due) VALUES (:uid,:due);");
 		query.bindValue(":uid", i_uid);
 		query.bindValue(":due", d_paidDue);
 		query.exec();
-		
+		if (query.lastError().type() != QSqlError::NoError) {
+			qDebug() << query.lastQuery();
+			qDebug() << query.lastError();
+		}
 	} else {
 		// Update the PaidDue matching Table
 		query.prepare("UPDATE ldap_persons_dates SET paid_due=:due WHERE uid=:uid;");
 		query.bindValue(":uid", i_uid);
 		query.bindValue(":due", d_paidDue);
 		query.exec();
+		if (query.lastError().type() != QSqlError::NoError) {
+			qDebug() << query.lastQuery();
+			qDebug() << query.lastError();
+		}
 	}
 }
 
