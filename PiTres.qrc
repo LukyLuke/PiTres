@@ -3,12 +3,20 @@
     <file>resources/application_logo.svg</file>
     <file>resources/ocrb.ttf</file>
   </qresource>
-  <qresource prefix="buttons">
-    <file>resources/buttons/mail-folder-inbox.png</file>
-    <file>resources/buttons/mail-folder-outbox.png</file>
-    <file>resources/buttons/user-identity.png</file>
-  </qresource>
   <qresource prefix="icons">
+    <file>resources/icons/chest.png</file>
+    <file>resources/icons/chest_into.png</file>
+    <file>resources/icons/chest_out.png</file>
+    <file>resources/icons/cashier.png</file>
+    <file>resources/icons/adjust_members.png</file>
+    <file>resources/icons/calendar_preferences.png</file>
+    <file>resources/icons/businessman.png</file>
+    <file>resources/icons/payment_in.png</file>
+    <file>resources/icons/payment_out.png</file>
+    <file>resources/icons/money.png</file>
+    <file>resources/icons/email.png</file>
+    <file>resources/icons/snailmail.png</file>
+    <file>resources/icons/data_refresh.png</file>
     <file>resources/icons/application-exit.png</file>
     <file>resources/icons/edit-paste.png</file>
     <file>resources/icons/folder-documents.png</file>
