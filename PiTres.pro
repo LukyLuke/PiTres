@@ -12,8 +12,8 @@ HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/L
 SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp src/InvoiceWizard.cpp src/PaymentWizard.cpp
 
 # Data Objects
-HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h
-SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp
+HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Section.h
+SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp src/data/Section.cpp
 
 # Delegates
 #HEADERS += src/delegate/.h
