@@ -1,4 +1,3 @@
-
 #include "Invoice.h"
 #include "Person.h"
 
@@ -19,18 +18,6 @@
 Invoice::Invoice(QObject *parent) : QObject(parent) {
 	srand(time(NULL));
 	clear();
-
-	// Staticly defined values for ESR-Modulo-10 Checksum
-	esrChecksumList.append("09468271350");
-	esrChecksumList.append("94682713509");
-	esrChecksumList.append("46827135098");
-	esrChecksumList.append("68271350947");
-	esrChecksumList.append("82713509466");
-	esrChecksumList.append("27135094685");
-	esrChecksumList.append("71350946824");
-	esrChecksumList.append("13509468273");
-	esrChecksumList.append("35094682712");
-	esrChecksumList.append("50946827131");
 }
 
 Invoice::~Invoice() {}
@@ -393,13 +380,13 @@ QString Invoice::getEsr() {
 }
 
 QString Invoice::esrChecksum(QString num) {
-	QString sum("0");
-	QString::const_iterator it = num.constBegin();
+  int[] checkSum = {0, 9, 4, 6, 8, 2, 7, 1, 3, 5};
+	int pos, sum = 0;
 	for (int i = 0; i < num.length(); i++) {
-		sum = esrChecksumList.at(sum.toInt()).at(num.at(i).digitValue());
-		it++;
+		pos = (sum += num.at(i).digitValue()) % 10;
+		sum = checkSum[pos];
 	}
-	return esrChecksumList.at(sum.toInt()).at(10);
+	return checkSum[10 - sum];
 }
 
 void Invoice::setMemberUid(int memberUid) {
