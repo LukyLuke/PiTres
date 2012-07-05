@@ -11,11 +11,11 @@
 #include <QSqlError>
 #include <QDebug>
 
-Section::Section(QObject parent) : QObject(parent) {
+Section::Section(QObject *parent) : QObject(parent) {
 	clear();
 }
 
-Section::Section(const QString name, QObject parent) : QObject(parent) {
+Section::Section(const QString name, QObject *parent) : QObject(parent) {
 	clear();
 	load(name);
 }
@@ -80,7 +80,7 @@ Section *Section::parent() {
 QList<Section *> Section::children() {
 	QList<Section *> list;
 	if (loaded()) {
-		QDatabaseConnection db;
+		QSqlDatabase db;
 		QSqlQuery query(db);
 		query.prepare("SELECT name FROM pps_section WHERE parent=?;");
 		query.bindValue(0, s_name);
