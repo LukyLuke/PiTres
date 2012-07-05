@@ -1,7 +1,13 @@
 ﻿
 #include "Contributions.h"
-#include "Invoice.h"
-#include "../helper/Smtp.h"
+
+#include "data/Invoice.h"
+#include "data/Section.h"
+#include "data/Person.h"
+#include "helper/Smtp.h"
+
+#include <cstdlib>
+#include <cstdio>
 
 Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -124,6 +130,10 @@ void Contributions::exportData() {
 }
 
 void Contributions::sendEmail() {
+	Section sec;
+	PPSPerson pers;
+	QString subject, message, email;
+	
 	createQif();
 	
 	// TODO: Check if this is working with current implementation or do we have to clean the attachments and other settings before we send the next mail?
@@ -152,13 +162,35 @@ void Contributions::sendEmail() {
 		}
 		mail.attach(fileName, attachment);
 		
-		// TODO: Load the treasurer of the current Section
+		// Load the treasurer of the current Section
+		sec.load(*section);
+		pers.load(sec.treasurer());
+		
+		// TODO: Load Subject and Texts
+		subject = "Contributions...";
+		message = "Attatched the Contributions:\n...blubberl blah\n\nGreetings your Treasurer";
 		
 		// Set the Mailtext and send the mail
-		mail.setTextMessage("Attatched the Contributions:\n...");
-		mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), "postmaster@ranta.ch", "Contributions...");
+		mail.setTextMessage(message);
+		email = "";
+		if (pers.email().length() > 0) {
+			email = pers.email().get(0);
+		}
+		// TODO: Remove if working
+		email = "postmaster@ranta.ch";
 		
-		// TODO: If sending was not successfull (or no treasurer was found), let the user save the QIF
+		// If sending was not successfull (or no treasurer was found), let the user save the QIF
+		if (!mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject)) {
+			QString fileName = QFileDialog::getSaveFileName(this, tr("Save Contribution for the section"), "", tr("Quicken Interchange Format (*.qif)"));
+			if (!fileName.isEmpty()) {
+				if (QFile::exists(fileName)) {
+					QFile::remove(fileName);
+				}
+				if (!QFile::copy(fname, fileName)) {
+					qDebug() << "Error while copying the QIF: " << fname << " to " << fileName;
+				}
+			}
+		}
 		
 		// remove the tmp file
 		remove(fname);
