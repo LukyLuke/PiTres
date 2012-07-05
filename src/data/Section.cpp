@@ -90,7 +90,7 @@ QList<Section *> Section::children() {
 		int n = record.indexOf("name");
 		while(query.next()) {
 			Section *section = new Section;
-			section->load(query.valueOf(n).toString());
+			section->load(query.value(n).toString());
 			list.append(section);
 		}
 	}
