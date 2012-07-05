@@ -42,6 +42,7 @@ public slots:
 	void showInvoiceFileDialog();
 	void showReminderFileDialog();
 	void showReceiptFileDialog();
+	void showContributions();
 };
 
 #endif // PiTres_H
