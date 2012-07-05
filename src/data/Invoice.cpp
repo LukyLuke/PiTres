@@ -380,7 +380,7 @@ QString Invoice::getEsr() {
 }
 
 QString Invoice::esrChecksum(QString num) {
-  int[10] checkSum = {0, 9, 4, 6, 8, 2, 7, 1, 3, 5};
+	int checkSum[10] = {0, 9, 4, 6, 8, 2, 7, 1, 3, 5};
 	int pos, sum = 0;
 	for (int i = 0; i < num.length(); i++) {
 		pos = (sum += num.at(i).digitValue()) % 10;
