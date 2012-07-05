@@ -15,7 +15,7 @@ Q_PROPERTY(QString address READ address WRITE setAddress NOTIFY addressChanged)
 Q_PROPERTY(QString account READ account WRITE setAccount NOTIFY accountChanged)
 Q_PROPERTY(int treasurer READ treasurer WRITE setTreasurer NOTIFY treasurerChanged)
 
-Q_ENUM(AmountType)
+Q_ENUMS(AmountType)
 
 public:
 	Section(QObject* parent = 0);
