@@ -143,7 +143,7 @@ private:
 	QString s_forSection;
 	Language m_language;
 	
-	QString esrChecksum(QString num);
+	int esrChecksum(QString num);
 	QString createReference(int memberUid);
 	QString getLanguageString(Language lang);
 };

@@ -355,7 +355,7 @@ QString Invoice::getEsr() {
 	} else {
 		esr.append("01"); // ESR in CHF: values must not match the boxes exactly
 	}
-	esr.append(esrChecksum(esr));
+	esr.append( QString::number(esrChecksum(esr)) );
 	esr.append(">"); // Checksum and seperator
 	
 	// Add the reference
@@ -373,13 +373,13 @@ QString Invoice::getEsr() {
 		account.append("000000000"); // No Account-Number
 	}
 	esr.append(account);
-	//esr.append(esrChecksum(account)); // The last Char on the AccountNumber is the Checksum either
+	//esr.append(QString::number( esrChecksum(account) )); // The last Char on the AccountNumber is the Checksum either
 	esr.append(">"); // Seperator
 	
 	return esr;
 }
 
-QString Invoice::esrChecksum(QString num) {
+int Invoice::esrChecksum(QString num) {
 	int checkSum[10] = {0, 9, 4, 6, 8, 2, 7, 1, 3, 5};
 	int pos, sum = 0;
 	for (int i = 0; i < num.length(); i++) {
@@ -416,8 +416,7 @@ QString Invoice::reference() {
 	QString ref = s_reference;
 	ref.prepend( QString("").fill( QChar('0'), 26 - ref.length()) );
 	
-	QString sum = esrChecksum(ref);
-	ref.append(sum); // Append the Checksum
+	ref.append(QString::number( esrChecksum(ref) )); // Append the Checksum
 	
 	ref.insert(2, " ");
 	ref.insert(8, " ");
