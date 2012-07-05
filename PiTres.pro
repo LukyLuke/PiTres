@@ -8,8 +8,10 @@ DEPENDPATH += .
 INCLUDEPATH += . src
 
 # Main sources
-HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h src/InvoiceWizard.h src/PaymentWizard.h
-SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp src/InvoiceWizard.cpp src/PaymentWizard.cpp
+HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h src/InvoiceWizard.h \
+           src/PaymentWizard.h src/Contributions.h
+SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp src/InvoiceWizard.cpp \
+           src/PaymentWizard.cpp src/Contributions.cpp
 
 # Data Objects
 HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Section.h

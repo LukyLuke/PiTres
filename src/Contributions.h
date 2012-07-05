@@ -1,4 +1,4 @@
-﻿#ifndef Contributions_H
+#ifndef Contributions_H
 #define Contributions_H
 
 #include "../ui_contributions.h"
@@ -32,6 +32,6 @@ public slots:
 	void exportData();
 	void sendEmail();
 
-}
+};
 
 #endif // Contributions_H

@@ -1,4 +1,4 @@
-﻿
+
 #include "Contributions.h"
 
 #include "data/Invoice.h"
@@ -8,6 +8,9 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <QFileDialog>
+#include <QFile>
+#include <QSettings>
 
 Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -25,6 +28,10 @@ Contributions::~Contributions() {}
 
 void Contributions::loadData() {
 	Invoice::createTables();
+	
+	dateFrom->setDate(QDate::currentDate().addMonths(-4));
+	dateUntil->setDate(QDate::currentDate());
+	
 	QSqlQuery query = createQuery();
 	query.exec();
 	tableModel->setQuery(query);
@@ -44,8 +51,8 @@ void Contributions::loadData() {
 QSqlQuery Contributions::createQuery() {
 	QSqlQuery query(db);
 	query.prepare("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end ORDER BY for_section ASC;");
-	query.bindParam(0, dateFrom->date().toString("yyyy-MM-dd"));
-	query.bindParam(1, dateUntil->date().toString("yyyy-MM-dd"));
+	query.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
 	return query;
 }
 
@@ -56,7 +63,8 @@ void Contributions::searchData() {
 }
 
 void Contributions::createQif() {
-	QString valuta = QDate::currentDate.toString("yyyy-MM-dd");
+	QSettings settings;
+	QString valuta = QDate::currentDate().toString("yyyy-MM-dd");
 	QString section;
 	QSqlQuery query2(db);
 	QSqlQuery query(db);
@@ -69,10 +77,11 @@ void Contributions::createQif() {
 	while (query.next()) {
 		section = query.value(0).toString();
 		query2.prepare("SELECT SUM(amount/2) AS amount FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND for_section=?;");
-		query2.bindParam(0, dateFrom->date().toString("yyyy-MM-dd"));
-		query2.bindParam(1, dateUntil->date().toString("yyyy-MM-dd"));
-		query2.bindParam(2, section);
+		query2.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
+		query2.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
+		query2.bindValue(2, section);
 		query2.exec();
+		query2.first();
 		
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
@@ -118,7 +127,7 @@ void Contributions::exportData() {
 		QList<QString>::const_iterator section;
 		QList<QString> keys = sectionQif.keys();
 		for (section = keys.constBegin(); section != keys.constEnd(); section++) {
-			QFile f(fileName.replace(".qif", "_" + (*section) + ".qif"));
+			QFile f(QString(fileName).replace(".qif", "_" + (*section) + ".qif"));
 			if (f.open(QFile::WriteOnly | QFile::Truncate)) {
 				QTextStream out(&f);
 				out << sectionQif.value(*section);
@@ -130,6 +139,7 @@ void Contributions::exportData() {
 }
 
 void Contributions::sendEmail() {
+	QSettings settings;
 	Section sec;
 	PPSPerson pers;
 	QString subject, message, email;
@@ -174,7 +184,7 @@ void Contributions::sendEmail() {
 		mail.setTextMessage(message);
 		email = "";
 		if (pers.email().length() > 0) {
-			email = pers.email().get(0);
+			email = pers.email().at(0);
 		}
 		// TODO: Remove if working
 		email = "postmaster@ranta.ch";

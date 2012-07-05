@@ -55,7 +55,7 @@
     <addaction name="actionFrom_LDAP"/>
     <addaction name="actionInvoiceWizard"/>
     <addaction name="actionAdjustDates"/>
-    <addaction name="actionDonation"/>
+    <addaction name="actionContribution"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -91,7 +91,7 @@
    <addaction name="actionImport_Payments"/>
    <addaction name="actionAdjustDates"/>
    <addaction name="actionInvoiceWizard"/>
-   <addaction name="actionDonation"/>
+   <addaction name="actionContribution"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="sizePolicy">
@@ -176,7 +176,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="importPaymentsButton">
+      <widget class="QToolButton" name="contributionsButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -346,16 +346,16 @@
     <string>Adjust Member Dates</string>
    </property>
   </action>
-  <action name="actionDonation">
+  <action name="actionContribution">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
      <normaloff>:/icons/resources/icons/chest.png</normaloff>:/icons/resources/icons/chest.png</iconset>
    </property>
    <property name="text">
-    <string>Show Donation</string>
+    <string>Show Contributions</string>
    </property>
    <property name="toolTip">
-    <string>Show Donaitons and Section Dues</string>
+    <string>Show Donaitons and Section Contributions</string>
    </property>
   </action>
  </widget>
@@ -380,9 +380,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>importPaymentsButton</sender>
+   <sender>contributionsButton</sender>
    <signal>clicked()</signal>
-   <receiver>actionImport_Payments</receiver>
+   <receiver>actionContribution</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">

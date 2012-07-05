@@ -5,6 +5,7 @@
 #include "PaymentImport.h"
 #include "LDAPImport.h"
 #include "InvoiceWizard.h"
+#include "Contributions.h"
 
 #include "data/Person.h"
 #include "helper/XmlPdf.h"
@@ -79,7 +80,7 @@ void PiTres::connectActions() {
 	connect(actionImport_Payments, SIGNAL(triggered()), this, SLOT(showImportPayments()));
 	connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(showSettings()));
 	connect(actionInvoiceWizard, SIGNAL(triggered()), this, SLOT(showInvoiceWizard()));
-	connect(actionContributions, SIGNAL(triggered()), this, SLOT(showContributions()));
+	connect(actionContribution, SIGNAL(triggered()), this, SLOT(showContributions()));
 }
 
 void PiTres::debugAction(QString sender) {
