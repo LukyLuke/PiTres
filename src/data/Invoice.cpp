@@ -148,6 +148,10 @@ void Invoice::loadLast(int member) {
 	}
 }
 
+void Invoice::load(QString reference) {
+	loadByReference(reference.append("0")); // Add a Pseudo-Checksum
+}
+
 void Invoice::loadByReference(QString reference) {
 	clear();
 	QString ref = QString(reference);
@@ -163,7 +167,6 @@ void Invoice::loadByReference(QString reference) {
 		ref.insert(9, " ");
 		ref.insert(14, " ");
 	}
-	
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM pps_invoice WHERE reference=?;");
 	query.bindValue(0, ref);
@@ -288,7 +291,6 @@ bool Invoice::pay(float amount, QDate *date) {
 	if (f_amount <= amountPaid()) {
 		setState(StatePaid);
 	}
-	
 	save();
 	return _loaded;
 }

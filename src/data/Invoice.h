@@ -47,6 +47,7 @@ public:
 	XmlPdf *createPdf(QString tpl = 0);
 	QString getEsr();
 	void create(PPSPerson *person);
+	void load(QString reference);
 	void loadByReference(QString reference);
 	bool pay(QDate *date = 0);
 	bool pay(float amount, QDate *date = 0);
@@ -87,6 +88,7 @@ public:
 	float amount() const { return f_amount; };
 	float amountPaid() const { return f_amountPaid; };
 	State state() const { return m_state; };
+	bool isPaid() const { return m_state == StatePaid; };
 	int reminded() const { return i_reminded; };
 	QString addressPrefix() const { return s_addressPrefix; };
 	QString addressCompany() const { return s_addressCompany; };

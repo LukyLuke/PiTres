@@ -168,6 +168,7 @@ private:
 	QDate d_ldapPaidDue;
 	PersonType m_type;
 	bool is_loaded;
+	bool b_paidDueLoaded;
 };
 
 #endif // Data_Person_H

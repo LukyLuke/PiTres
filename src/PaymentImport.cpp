@@ -20,7 +20,7 @@
 
 PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	QSettings settings;
-	reString = "^([\\d ]+) \\(([\\d-]+)\\): ([^(]+)\\((\\d+)\\) / Section ([^\\s/]+) / (\\d+) of (\\d+)paid$";
+	reString = "^([\\d ]+) \\(([\\d-]+)\\): ([^(]+)\\((\\d+)\\) \\/ Section ([^\\s\\/]+) \\/ (\\d+) of (\\d+) paid$";
 	listString = "%1 (%2): %3 (%4) / Section %5 / %6 of %7 paid";
 	setupUi(this);
 	dateEdit->setDate(QDate::currentDate());
@@ -28,8 +28,8 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
-	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continueImport()));
-	connect(btnAdd, SIGNAL(clicked()), this, SLOT(paySelectedInvoice()));
+	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continuePayment()));
+	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addSelectedInvoice()));
 	connect(listAvailable, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(invoiceSelected(QListWidgetItem*)));
 }
 
@@ -111,7 +111,7 @@ void PaymentImport::invoiceSelected(QListWidgetItem *item) {
 	 }
 }
 
-void PaymentImport::paySelectedInvoice() {
+void PaymentImport::addSelectedInvoice() {
 	if ((listAvailable->currentRow() > -1) && !editAmount->text().isEmpty()) {
 		QString text = listAvailable->currentItem()->text();
 		QRegExp re(reString);
@@ -132,15 +132,15 @@ void PaymentImport::paySelectedInvoice() {
 	}
 }
 
-void PaymentImport::continueImport() {
+void PaymentImport::continuePayment() {
 	QSettings settings;
 	QString fileName;
 	PPSPerson person;
+	Invoice invoice;
+	QDate valuta_date;
 	//float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
 	//float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
 	QString qif("!Type:" + settings.value("qif/account_bank", "Bank").toString());
-	QSqlQuery query(db);
-	query.prepare("UPDATE pps_invoice SET paid_date=:date,amount_paid=amount_paid+:amount WHERE reference=:ref AND member_uid=:member;");
 	
 	for (int i = 0; i < tablePay->rowCount(); i++) {
 		QString ref = tablePay->item(i, 0)->text();
@@ -159,27 +159,14 @@ void PaymentImport::continueImport() {
 		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
 		qif.append("\n^\n");
 		
-		// Update the Database
-		query.bindValue(":date", valuta);
-		query.bindValue(":amount", amount.toFloat());
-		query.bindValue(":ref", ref);
-		query.bindValue(":member", member);
-		query.exec();
-		
-		if (query.lastError().type() != QSqlError::NoError) {
-			qDebug() << query.lastQuery();
-			qDebug() << query.lastError();
-			
-		} else {
+		valuta_date = QDate::fromString(valuta, "yyyy-MM-dd");
+		invoice.load(ref);
+		if (invoice.pay(invoice.amountPaid() + amount.toFloat(), &valuta_date) && invoice.isPaid()) {
 			person.load(member.toInt());
 			person.setPaidDue(QDate::fromString(tablePay->item(i, 7)->text(), "yyyy-MM-dd"));
 			person.save();
 		}
 	}
-	
-	// Set Invoices as paid
-	query.prepare("UPDATE pps_invoice SET state=" + QString::number(Invoice::StatePaid) + " WHERE amount<=amount_paid;");
-	query.exec();
 	
 	// Safe the QIF
 	fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));

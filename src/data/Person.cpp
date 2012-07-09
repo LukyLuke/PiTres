@@ -54,6 +54,7 @@ void PPSPerson::createTables() {
 	}
 	
 	// Persistent matching table between PaidUntilDates and MemberUIDs
+	// insert into ldap_persons_dates select member_uid,"2012-12-31" from pps_invoice where state = 2 and paid_date > "2012-01-01"
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_dates (uid INTEGER, paid_due DATE);");
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
@@ -173,7 +174,7 @@ void PPSPerson::save() {
 		}
 	}
 	
-	if (paidDue().year() <= 1970) {
+	if (!b_paidDueLoaded) {
 		// Save the PaidDue matching Table
 		query.prepare("INSERT INTO ldap_persons_dates (uid,paid_due) VALUES (:uid,:due);");
 		query.bindValue(":uid", i_uid);
@@ -183,6 +184,8 @@ void PPSPerson::save() {
 			qDebug() << query.lastQuery();
 			qDebug() << query.lastError();
 		}
+		b_paidDueLoaded = TRUE;
+	
 	} else {
 		// Update the PaidDue matching Table
 		query.prepare("UPDATE ldap_persons_dates SET paid_due=:due WHERE uid=:uid;");
@@ -198,6 +201,7 @@ void PPSPerson::save() {
 
 void PPSPerson::clear() {
 	is_loaded = FALSE;
+	b_paidDueLoaded = FALSE;
 	i_uid = 0;
 	s_section = "";
 	m_contributionClass = ContributeFull;
@@ -274,6 +278,7 @@ bool PPSPerson::load(int uid) {
 		query.exec();
 		if (query.next()) {
 			d_paidDue = query.value(0).toDate();
+			b_paidDueLoaded = TRUE;
 		}
 		
 		_invoice.loadLast(uid);

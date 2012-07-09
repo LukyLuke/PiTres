@@ -28,8 +28,8 @@ public:
 public slots:
 	void searchData();
 	void searchDataTimeout(QString data);
-	void continueImport();
-	void paySelectedInvoice();
+	void continuePayment();
+	void addSelectedInvoice();
 	void invoiceSelected(QListWidgetItem *item);
 	
 protected:
