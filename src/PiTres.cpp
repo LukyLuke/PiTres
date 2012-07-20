@@ -49,6 +49,10 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	db.setDatabaseName(dbfile.absoluteFilePath());
 	db.open();
 	
+	// Create Persons Database Tables if needed
+	PPSPerson::createTables();
+	Invoice::createTables();
+	
 	// Set some default values we need later
 	settings.setValue("sentbills/sincedate", QDate::currentDate().addMonths(-3));
 	settings.setValue("sentbills/maxdate", QDate::currentDate().addDays(1));
