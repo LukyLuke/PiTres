@@ -77,15 +77,15 @@ void Invoice::save() {
 	}
 	
 	// This is for all old References
-	QString ref(s_reference);
+	/*QString ref(s_reference);
 	if (ref.length() == 16) {
 		ref.insert(4, " ");
 		ref.insert(9, " ");
 		ref.insert(14, " ");
-	}
+	}*/
 	
 	query.bindValue(":member", i_memberUid);
-	query.bindValue(":reference", ref);
+	query.bindValue(":reference", s_reference);
 	query.bindValue(":issued", d_issueDate);
 	query.bindValue(":payable", d_payableDue);
 	query.bindValue(":paid", d_paidDate);
@@ -101,7 +101,7 @@ void Invoice::save() {
 	query.bindValue(":email", s_addressEmail);
 	query.bindValue(":section", s_forSection);
 	if (_loaded) {
-		query.bindValue(":reference_where", ref);
+		query.bindValue(":reference_where", s_reference);
 	}
 	query.exec();
 	
