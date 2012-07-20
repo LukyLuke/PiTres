@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = PiTres
 DEPENDPATH += .
 INCLUDEPATH += . src
+DEBUG = 1
 
 # Main sources
 HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h src/InvoiceWizard.h \
