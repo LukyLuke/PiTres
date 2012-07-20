@@ -100,10 +100,6 @@ void SentBills::createContextMenu() {
 }
 
 void SentBills::loadData() {
-	// Create Persons Database Tables if needed
-	PPSPerson::createTables();
-	Invoice::createTables();
-	
 	tableModel->setQuery(createQuery());
 	
 	tableModel->setHeaderData(0,  Qt::Horizontal, tr("UID"));

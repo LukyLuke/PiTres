@@ -69,10 +69,6 @@ void Userlist::createContextMenu() {
 }
 
 void Userlist::loadData() {
-	// Create Persons Database Tables if needed
-	PPSPerson::createTables();
-	Invoice::createTables();
-	
 	QSqlQuery query("SELECT ldap_persons.uid, ldap_persons_dates.paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON ldap_persons.uid = ldap_persons_dates.uid;", db);
 	tableModel->setQuery(query);
 	
