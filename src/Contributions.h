@@ -21,6 +21,7 @@ private:
 	
 	QSqlQuery createQuery();
 	void loadData();
+	void showOverview();
 	void createQif();
 
 public:

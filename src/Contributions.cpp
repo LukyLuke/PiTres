@@ -60,15 +60,44 @@ void Contributions::searchData() {
 	QSqlQuery query = createQuery();
 	query.exec();
 	tableModel->setQuery(query);
+	showOverview();
+}
+
+void Contributions::showOverview() {
+	QSqlQuery query(db);
+	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end GROUP BY for_section;");
+	query.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
+	
+	// Clean the GridContainer
+	QLayoutItem *child;
+	while ((child = overviewLayout->takeAt(0)) != 0) {
+		delete ((QLabel *)child->widget());
+		delete child;
+	}
+	
+	// Refill with Data
+	query.exec();
+	int row = 0;
+	while (query.next()) {
+		QLabel *s = new QLabel( tr("Section: %1").arg(query.value(1).toString()) );
+		QLabel *a = new QLabel( tr("%1 sFr.").arg(query.value(0).toDouble(), 0, 'f', 2) );
+		a->setAlignment(Qt::AlignRight);
+		overviewLayout->addWidget(s, row, 0);
+		overviewLayout->addWidget(a, row, 1);
+		row++;
+	}
 }
 
 void Contributions::createQif() {
 	QSettings settings;
 	QString valuta = QDate::currentDate().toString("yyyy-MM-dd");
-	QString section;
+	QString section, amount;
 	QSqlQuery query2(db);
 	QSqlQuery query(db);
-	query.prepare("SELECT for_section FROM pps_invoice GROUP BY for_section;");
+	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end GROUP BY for_section;");
+	query.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
 	query.exec();
 	
 	sectionQif.clear();
@@ -76,16 +105,11 @@ void Contributions::createQif() {
 	
 	while (query.next()) {
 		section = query.value(0).toString();
-		query2.prepare("SELECT SUM(amount/2) AS amount FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND for_section=?;");
-		query2.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
-		query2.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
-		query2.bindValue(2, section);
-		query2.exec();
-		query2.first();
+		amount = query.value(0).toString();
 		
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
-		qif_national.append("\nT" + query2.value(0).toString());
+		qif_national.append("\nT" + amount);
 		qif_national.append("\nP"+ settings.value("qif/payee_label", "Contribution: ").toString() + section);
 		qif_national.append("\nN");
 		qif_national.append("\nM" + tr("Contribution for ") + section);
@@ -95,7 +119,7 @@ void Contributions::createQif() {
 		// Section Income QIF
 		QString qif_section("!Type:" + settings.value("qif/account_bank", "Bank").toString());
 		qif_section.append("\nD" + valuta);
-		qif_section.append("\nT" + query2.value(0).toString());
+		qif_section.append("\nT" + amount);
 		qif_section.append("\nP"+ settings.value("qif/payee_label", "Contribution: ").toString() + section);
 		qif_section.append("\nN");
 		qif_section.append("\nM" + tr("Contribution for ") + section);
