@@ -181,12 +181,12 @@ void Smtp::stateChanged(QAbstractSocket::SocketState socketState) {
 }
 
 void Smtp::errorReceived(QAbstractSocket::SocketError socketError) {
-	qDebug() << "Smtp: Socket-Error:" << socketError;
+	qWarning() << "Smtp: Socket-Error:" << socketError;
 }
 
 void Smtp::disconnected() {
-	qDebug() << "Smtp: Disconnected";
-	qDebug() << "Smtp: Error: "  << socket->errorString();
+	qWarning() << "Smtp: Disconnected";
+	qWarning() << "Smtp: Error: "  << socket->errorString();
 }
 
 void Smtp::connected() {
