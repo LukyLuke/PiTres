@@ -360,6 +360,6 @@ QString Smtp::getMimeType(const QString &fileName) {
 		}
 		magic_close(magicMimePredictor);
 	}
-	qDebug() << "Smtp: LibMagic found Mimetype '" + result + "' for file " + fileName;
+	qDebug() << "Smtp: LibMagic found Mimetype '" << result << "' for file " << fileName;
 	return result;
 }
