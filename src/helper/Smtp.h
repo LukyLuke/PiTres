@@ -40,6 +40,7 @@ public:
 	void authLogin(const QString &username, const QString &password);
 	void authPlain(const QString &username, const QString &password);
 	void attach(const QString &file, const QString &name);
+	void clearAttachments();
 	void setTextMessage(const QString &body);
 	void setHtmlMessage(const QString &body);
 	bool send(const QString &from, const QString &to, const QString &subject);
@@ -81,7 +82,7 @@ private:
 	int state;
 	QList<attachment_t> attachments;
 	
-	QString DateHeader();
+	QString dateHeader();
 	QString generateBoundary();
 	QString getMimeType(const QString &fileName);
 	QString chuckSplit(const QString &data, bool wordwise = false, bool isHtml = false);

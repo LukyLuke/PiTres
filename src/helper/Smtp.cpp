@@ -64,7 +64,7 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	msgHtmlBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
 	//msgHtmlBody = chuckSplit(msgHtmlBody, false, true);
 	
-	message = DateHeader() + "\r\n";
+	message = dateHeader() + "\r\n";
 	message.append("MIME-Version: 1.0\r\n");
 	message.append("To: " + to + "\r\n");
 	message.append("From: " + from + "\r\n");
@@ -136,7 +136,7 @@ QString Smtp::chuckSplit(const QString &data, bool wordwise, bool isHtml) {
 	return list.join(QString(isHtml ? "=" : "").append("\r\n"));
 }
 
-QString Smtp::DateHeader() {
+QString Smtp::dateHeader() {
 	// mail rfc; Date format! http://www.faqs.org/rfcs/rfc788.html
 	QDateTime currentTime = QDateTime::currentDateTime();
 	QStringList RfcDays = QStringList() << "Mon" << "Tue" << "Wed" << "Thu" << "Fri" << "Sat" << "Sun";
@@ -323,6 +323,10 @@ void Smtp::attach(const QString &file, const QString &name) {
 	a.data = f.readAll().toBase64();
 	attachments.append(a);
 	f.close();
+}
+
+void Smtp::clearAttachments() {
+	attachments.clear();
 }
 
 QString Smtp::generateBoundary() {
