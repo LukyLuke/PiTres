@@ -156,7 +156,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_2">
              <property name="title">
-              <string>SMTP-Server</string>
+              <string>EMail-Settings</string>
              </property>
              <layout class="QFormLayout" name="formLayout_11">
               <item row="0" column="0">
@@ -243,6 +243,16 @@
                 </item>
                </widget>
               </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_54">
+                <property name="text">
+                 <string>Sender</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="smtpFrom"/>
+              </item>
              </layout>
             </widget>
            </item>
@@ -283,8 +293,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>468</height>
+            <width>711</width>
+            <height>414</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -551,8 +561,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>463</height>
+            <width>540</width>
+            <height>401</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -791,8 +801,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>463</height>
+            <width>400</width>
+            <height>390</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">

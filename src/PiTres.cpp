@@ -193,6 +193,7 @@ void PiTres::showSettings() {
 	settingsForm.smtpPort->setValue(settings.value("smtp/port", "587").toInt());
 	settingsForm.smtpUsername->setText(settings.value("smtp/username", "none@dom.tld").toString());
 	settingsForm.smtpPassword->setText(settings.value("smtp/password", "").toString());
+	settingsForm.smtpFrom->setText(settings.value("smtp/from", "none@dom.tld").toString());
 	settingsForm.smtpAuthentication->setCurrentIndex(
 		settings.value("smtp/authentication", "plain").toString() == "plain" ? 1 :
 		settings.value("smtp/authentication", "plain").toString() == "login" ? 2 :
@@ -264,6 +265,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("smtp/port", settingsForm.smtpPort->value());
 	settings.setValue("smtp/username", settingsForm.smtpUsername->text());
 	settings.setValue("smtp/password", settingsForm.smtpPassword->text());
+	settings.setValue("smtp/from", settingsForm.smtpFrom->text());
 	settings.setValue("smtp/authentication", settingsForm.smtpAuthentication->currentText());
 	
 	settings.setValue("pdf/var_pp_country", settingsForm.pdfPPCounty->text());
