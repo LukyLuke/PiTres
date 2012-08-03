@@ -135,7 +135,7 @@ bool XmlPdf::send(QString email) {
 	Smtp mail(settings.value("smtp/host", "localhost").toString(), settings.value("smtp/port", 587).toInt());
 	if (settings.value("smtp/authentication", "login").toString() == "login") {
 		mail.authLogin(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
-	} else {
+	} else if (settings.value("smtp/authentication", "login").toString() == "plain") {
 		mail.authPlain(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
 	}
 	

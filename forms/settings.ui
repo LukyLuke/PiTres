@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>790</width>
-    <height>511</height>
+    <width>793</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>613</width>
-    <height>350</height>
+    <width>793</width>
+    <height>542</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -46,8 +52,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>437</height>
+            <width>769</width>
+            <height>468</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -137,7 +143,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>The Format must be in form of &quot;yyyy-MM-dd&quot; but can have static values to terminat to the end of the Year for example</string>
+                 <string>The Format must be in form of &quot;yyyy-MM-dd&quot; but can have static values for example to terminate to the end of the Year by giving a value like &quot;yyyy-12-31&quot;.</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -148,9 +154,144 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string>SMTP-Server</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_11">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_42">
+                <property name="text">
+                 <string>SMTP-Server</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_43">
+                <property name="text">
+                 <string>Authentication</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_44">
+                <property name="text">
+                 <string>Username</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string>Password</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_46">
+                <property name="text">
+                 <string>Port</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="smtpHost">
+                <property name="text">
+                 <string>localhost</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="smtpUsername"/>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="smtpPassword">
+                <property name="echoMode">
+                 <enum>QLineEdit::PasswordEchoOnEdit</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="smtpPort">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>65534</number>
+                </property>
+                <property name="value">
+                 <number>587</number>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="smtpAuthentication">
+                <item>
+                 <property name="text">
+                  <string>none</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string notr="true">plain</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string notr="true">login</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>1</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>PDF Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QScrollArea" name="scrollArea_4">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_3">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>769</width>
+            <height>468</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
             <widget class="QGroupBox" name="groupBox_7">
              <property name="title">
-              <string>PDF-Settings</string>
+              <string>Templates</string>
              </property>
              <layout class="QFormLayout" name="formLayout_7">
               <property name="fieldGrowthPolicy">
@@ -248,14 +389,137 @@
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer">
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Variables and Placeholders</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_10">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_41">
+                <property name="text">
+                 <string>PP Countrycode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_47">
+                <property name="text">
+                 <string>PP Postalcode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>Print City</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_49">
+                <property name="text">
+                 <string>PP City</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_50">
+                <property name="text">
+                 <string>Bank Account Number</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_51">
+                <property name="text">
+                 <string>ESR-Currency (CHF or EUR)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_52">
+                <property name="text">
+                 <string>Date format</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="pdfPPCounty">
+                <property name="text">
+                 <string>CH</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="pdfPPZip">
+                <property name="text">
+                 <string>1337</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="pdfPPCity">
+                <property name="text">
+                 <string>Vallorbe</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="pdfPrintCity">
+                <property name="text">
+                 <string>Vallorbe</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="pdfAccountNumber">
+                <property name="text">
+                 <string>01-84038-2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="pdfCurrency">
+                <property name="text">
+                 <string>CHF</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QLineEdit" name="pdfDateFormat">
+                <property name="text">
+                 <string>dd.MM.yyyy</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="1">
+               <widget class="QLabel" name="label_53">
+                <property name="minimumSize">
+                 <size>
+                  <width>518</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>The Date-Format uses &quot;y&quot; for the Year, &quot;M&quot; for the Month and &quot;d&quot; for the Day. Use a repeated value to show a single char to the full written Day/Month.</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>40</height>
+               <height>1</height>
               </size>
              </property>
             </spacer>
@@ -287,8 +551,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>437</height>
+            <width>769</width>
+            <height>463</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -487,6 +751,19 @@
              </layout>
             </widget>
            </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>1</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -514,13 +791,78 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>437</height>
+            <width>769</width>
+            <height>463</height>
            </rect>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QGroupBox" name="groupBox_2">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="1">
+            <widget class="QGroupBox" name="groupImports">
+             <property name="title">
+              <string>Payment Import</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Type</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="paymentType">
+                <property name="text">
+                 <string>Bank</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Payee Label</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Memo String</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Acount Name</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="paymentLabel">
+                <property name="text">
+                 <string>Payment: </string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="paymentMemo">
+                <property name="text">
+                 <string>Member UID: </string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="paymentAccount">
+                <property name="text">
+                 <string>Membership Fee</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="groupAssets">
              <property name="title">
               <string>Assets / Invoice</string>
              </property>
@@ -598,65 +940,158 @@
              </layout>
             </widget>
            </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox">
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="groupContributions">
              <property name="title">
-              <string>Payment Import</string>
+              <string>Contributions</string>
              </property>
-             <layout class="QFormLayout" name="formLayout_2">
+             <layout class="QFormLayout" name="formLayout_8">
               <item row="0" column="0">
-               <widget class="QLabel" name="label_2">
+               <widget class="QLabel" name="label_31">
                 <property name="text">
-                 <string>Type</string>
+                 <string>Payer</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="paymentType">
+               <widget class="QLineEdit" name="contributionPayer">
                 <property name="text">
-                 <string>Bank</string>
+                 <string>Pirateparty Switzerland</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_7">
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_33">
                 <property name="text">
-                 <string>Payee Label</string>
+                 <string>Don't pay these</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_8">
+               <widget class="QLabel" name="label_34">
                 <property name="text">
-                 <string>Memo String</string>
+                 <string>Liability Account</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QLabel" name="label_9">
+               <widget class="QLabel" name="label_35">
                 <property name="text">
-                 <string>Acount Name</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="paymentLabel">
-                <property name="text">
-                 <string>Payment: </string>
+                 <string>Asset Account</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="paymentMemo">
+               <widget class="QLineEdit" name="contributionAccount">
                 <property name="text">
-                 <string>Member UID: </string>
+                 <string>Contribution_%1</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLineEdit" name="paymentAccount">
+               <widget class="QLineEdit" name="contributionIncome">
                 <property name="text">
-                 <string>Membership Fee</string>
+                 <string>Membership fee</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QPlainTextEdit" name="contributionDontpay">
+                <property name="plainText">
+                 <string>members</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_39">
+                <property name="text">
+                 <string>Memo Text</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="contributionMemo">
+                <property name="text">
+                 <string>Contribution: %1</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QGroupBox" name="groupDonations">
+             <property name="title">
+              <string>Donations</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_9">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_32">
+                <property name="text">
+                 <string>Payer</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="donationPayer">
+                <property name="text">
+                 <string>Pirateparty Switzerland</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_36">
+                <property name="text">
+                 <string>Liability Account</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="donationAccount">
+                <property name="text">
+                 <string>Donation_%1</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_37">
+                <property name="text">
+                 <string>Asset Account</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="donationIncome">
+                <property name="text">
+                 <string>Donation</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_38">
+                <property name="text">
+                 <string>Don't pay these</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QPlainTextEdit" name="donationDontpay">
+                <property name="plainText">
+                 <string>members</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_40">
+                <property name="text">
+                 <string>Memo Text</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="donationMemo">
+                <property name="text">
+                 <string>Donation: %1</string>
                 </property>
                </widget>
               </item>

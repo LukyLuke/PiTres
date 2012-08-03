@@ -177,6 +177,36 @@ void PiTres::showSettings() {
 	settingsForm.ldifPaidDueAttribute->setText(settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString());
 	settingsForm.ldifPaidDueReplace->setChecked(settings.value("ldif/replace_attribute", false).toBool());
 	
+	settingsForm.contributionPayer->setText(settings.value("contribution/payer", "Pirateparty Switzerland").toString());
+	settingsForm.contributionMemo->setText(settings.value("contribution/memo", "Contribution: %1").toString());
+	settingsForm.contributionAccount->setText(settings.value("contribution/account", "contribution_%1").toString());
+	settingsForm.contributionIncome->setText(settings.value("contribution/income", "Membership fee").toString());
+	settingsForm.contributionDontpay->setPlainText(settings.value("contribution/dontpay", "members").toStringList().join("\n"));
+	
+	settingsForm.donationPayer->setText(settings.value("donation/payer", "Pirateparty Switzerland").toString());
+	settingsForm.donationMemo->setText(settings.value("donation/memo", "Donation: %1").toString());
+	settingsForm.donationAccount->setText(settings.value("donation/account", "donation_%1").toString());
+	settingsForm.donationIncome->setText(settings.value("donation/income", "Donation").toString());
+	settingsForm.donationDontpay->setPlainText(settings.value("donation/dontpay", "members").toStringList().join("\n"));
+	
+	settingsForm.smtpHost->setText(settings.value("smtp/host", "localhost").toString());
+	settingsForm.smtpPort->setValue(settings.value("smtp/port", "587").toInt());
+	settingsForm.smtpUsername->setText(settings.value("smtp/username", "none@dom.tld").toString());
+	settingsForm.smtpPassword->setText(settings.value("smtp/password", "").toString());
+	settingsForm.smtpAuthentication->setCurrentIndex(
+		settings.value("smtp/authentication", "plain").toString() == "plain" ? 1 :
+		settings.value("smtp/authentication", "plain").toString() == "login" ? 2 :
+		0
+	);
+	
+	settingsForm.pdfPPCounty->setText(settings.value("pdf/var_pp_country", "CH").toString());
+	settingsForm.pdfPPZip->setText(settings.value("pdf/var_pp_zip", "1337").toString());
+	settingsForm.pdfPPCity->setText(settings.value("pdf/var_pp_city", "Vallorbe").toString());
+	settingsForm.pdfPrintCity->setText(settings.value("pdf/var_print_city", "Vallorbe").toString());
+	settingsForm.pdfAccountNumber->setText(settings.value("pdf/bank_account_number", "01-84038-2").toString());
+	settingsForm.pdfCurrency->setText(settings.value("pdf/esr_currency", "CHF").toString());
+	settingsForm.pdfDateFormat->setText(settings.value("pdf/date_format", "dd.MM.yyyy").toString());
+	
 	settingsDialog->show();
 }
 
@@ -217,6 +247,32 @@ void PiTres::doSaveSettings() {
 	settings.setValue("ldif/main_dn", settingsForm.ldifSectionMembers->text());
 	settings.setValue("ldif/memberstate_attribute", settingsForm.ldifPaidDueAttribute->text());
 	settings.setValue("ldif/replace_attribute", settingsForm.ldifPaidDueReplace->isChecked());
+	
+	settings.setValue("contribution/payer", settingsForm.contributionPayer->text());
+	settings.setValue("contribution/memo", settingsForm.contributionMemo->text());
+	settings.setValue("contribution/account", settingsForm.contributionAccount->text());
+	settings.setValue("contribution/income", settingsForm.contributionIncome->text());
+	settings.setValue("contribution/dontpay", QStringList(settingsForm.contributionDontpay->toPlainText().split("\n")));
+	
+	settings.setValue("donation/payer", settingsForm.donationPayer->text());
+	settings.setValue("donation/memo", settingsForm.donationMemo->text());
+	settings.setValue("donation/account", settingsForm.donationAccount->text());
+	settings.setValue("donation/income", settingsForm.donationIncome->text());
+	settings.setValue("donation/dontpay", QStringList(settingsForm.donationDontpay->toPlainText().split("\n")));
+	
+	settings.setValue("smtp/host", settingsForm.smtpHost->text());
+	settings.setValue("smtp/port", settingsForm.smtpPort->value());
+	settings.setValue("smtp/username", settingsForm.smtpUsername->text());
+	settings.setValue("smtp/password", settingsForm.smtpPassword->text());
+	settings.setValue("smtp/authentication", settingsForm.smtpAuthentication->currentText());
+	
+	settings.setValue("pdf/var_pp_country", settingsForm.pdfPPCounty->text());
+	settings.setValue("pdf/var_pp_zip", settingsForm.pdfPPZip->text());
+	settings.setValue("pdf/var_pp_city", settingsForm.pdfPPCity->text());
+	settings.setValue("pdf/var_print_city", settingsForm.pdfPrintCity->text());
+	settings.setValue("pdf/bank_account_number", settingsForm.pdfAccountNumber->text());
+	settings.setValue("pdf/esr_currency", settingsForm.pdfCurrency->text());
+	settings.setValue("pdf/date_format", settingsForm.pdfDateFormat->text());
 }
 
 void PiTres::showInvoiceFileDialog() {

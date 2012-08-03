@@ -308,12 +308,12 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->loadTemplate(templateFile);
 	
 	pdf->setVar("pp_country", settings.value("pdf/var_pp_country", "CH").toString());
-	pdf->setVar("pp_zip", settings.value("pdf/var_pp_zip", "8500").toString());
-	pdf->setVar("pp_city", settings.value("pdf/var_pp_city", "Frauenfeld").toString());
-	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Frauenfeld").toString());
+	pdf->setVar("pp_zip", settings.value("pdf/var_pp_zip", "1337").toString());
+	pdf->setVar("pp_city", settings.value("pdf/var_pp_city", "Vallorbe").toString());
+	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Vallorbe").toString());
 	pdf->setVar("print_date", QDate::currentDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("print_year", QDate::currentDate().toString("yyyy"));
-	pdf->setVar("account_number", settings.value("pdf/invoice_account_number", "0-0-0").toString());
+	pdf->setVar("account_number", settings.value("pdf/bank_account_number", "01-84038-2").toString());
 	
 	pdf->setVar("invoice_reference", reference());
 	pdf->setVar("invoice_number", reference());
@@ -366,7 +366,7 @@ QString Invoice::getEsr() {
 	
 	// Add the Account-Number
 	QString account;
-	QStringList accountNumber = settings.value("pdf/invoice_account_number", "0-0-0").toString().split("-", QString::SkipEmptyParts); 
+	QStringList accountNumber = settings.value("pdf/bank_account_number", "0-0-0").toString().split("-", QString::SkipEmptyParts); 
 	if (accountNumber.size() == 3) {
 		account.append(accountNumber.at(0));
 		account.append(QString(accountNumber.at(1)).prepend( QString("").fill(QChar('0'), 8 - accountNumber.at(1).length()) ));
