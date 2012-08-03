@@ -61,6 +61,15 @@ void Invoice::createTables() {
 	}
 }
 
+void Invoice::setContributed(QString reference) {
+	QSqlDatabase db;
+	QSqlQuery query(db);
+	query.prepare("UPDATE pps_invoice SET state=:state WHERE reference=:reference;");
+	query.bindValue(":state", StateContributed);
+	query.bindValue(":reference", reference);
+	query.exec();
+}
+
 void Invoice::save() {
 	if (i_memberUid <= 0) return;
 	QSqlQuery query(db);

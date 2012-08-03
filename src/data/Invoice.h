@@ -53,9 +53,10 @@ public:
 	bool pay(float amount, QDate *date = 0);
 	static QList<Invoice *> getInvoicesForMember(int member);
 	static void createTables();
+	static void setContributed(QString reference);
 
 	// InvoiceState in old DB: o_pen, c_anceled, p_aid, u_nknown
-	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3 };
+	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3, StateContributed=4 };
 	enum Language { DE=0, FR=1, IT=2, EN=3 };
 	
 	// Setter
