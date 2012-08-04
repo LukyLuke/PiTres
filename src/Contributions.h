@@ -17,12 +17,16 @@ Q_OBJECT
 private:
 	QSqlDatabase db;
 	QSqlQueryModel *tableModel;
+	QSqlQueryModel *contributionsModel;
 	QHash<QString, QString> sectionQif;
 	
 	QSqlQuery createQuery();
 	void loadData();
 	void showOverview();
 	void createQif();
+	void loadSectionContributions();
+	QSqlQuery createContributionsQuery();
+	void showContributionsDetails();
 
 public:
 	Contributions(QWidget *parent = 0);
@@ -32,6 +36,9 @@ public slots:
 	void searchData();
 	void exportData();
 	void sendEmail();
+	void selectSection();
+	void selectYear();
+	void searchContributions();
 
 };
 

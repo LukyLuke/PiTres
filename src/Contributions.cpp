@@ -21,15 +21,19 @@ Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	connect(btnEmail, SIGNAL(clicked()), this, SLOT(sendEmail()));
 	
+	connect(sectionList, SIGNAL(currentIndexChanged(int)), this, SLOT(selectSection()));
+	connect(yearList, SIGNAL(itemSelectionChanged()), this, SLOT(selectYear()));
+	
 	tableModel = new QSqlQueryModel(tableView);
+	contributionsModel = new QSqlQueryModel(contributionTable);
+	
 	loadData();
+	loadSectionContributions();
 }
 
 Contributions::~Contributions() {}
 
 void Contributions::loadData() {
-	Invoice::createTables();
-	
 	dateFrom->setDate(QDate::currentDate().addMonths(-4));
 	dateUntil->setDate(QDate::currentDate());
 	
@@ -49,11 +53,62 @@ void Contributions::loadData() {
 	tableView->setModel(tableModel);
 }
 
+void Contributions::loadSectionContributions() {
+	QSqlQuery query = createContributionsQuery();
+	query.exec();
+	contributionsModel->setQuery(query);
+	
+	contributionsModel->setHeaderData(0, Qt::Horizontal, tr("Paid Date"));
+	contributionsModel->setHeaderData(1, Qt::Horizontal, tr("Amount"));
+	contributionsModel->setHeaderData(2, Qt::Horizontal, tr("Person"));
+	contributionsModel->setHeaderData(3, Qt::Horizontal, tr("City"));
+	contributionsModel->setHeaderData(4, Qt::Horizontal, tr("Section"));
+	contributionsModel->setHeaderData(5, Qt::Horizontal, tr("Member UID"));
+	contributionsModel->setHeaderData(6, Qt::Horizontal, tr("Reference-Number"));
+	
+	contributionTable->setSortingEnabled(false);
+	contributionTable->setModel(contributionsModel);
+	
+	QSqlQuery sections(db);
+	sections.prepare("SELECT for_section FROM pps_invoice GROUP BY for_section ORDER BY for_section ASC;");
+	sections.exec();
+	sectionList->addItem(tr("all"));
+	while (sections.next()) {
+		sectionList->addItem(sections.value(0).toString());
+	}
+}
+
 QSqlQuery Contributions::createQuery() {
 	QSqlQuery query(db);
-	query.prepare("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end ORDER BY for_section ASC;");
-	query.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
-	query.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
+	query.prepare("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
+	              " paid_date>=:start AND paid_date<=:end AND state=:state ORDER BY for_section ASC;");
+	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
+	query.bindValue(":state", Invoice::StatePaid);
+	return query;
+}
+
+QSqlQuery Contributions::createContributionsQuery() {
+	QDate from, to;
+	QSqlQuery query(db);
+	
+	if (yearList->selectedItems().count() > 0 && yearList->currentRow() > 0) {
+		from.setDate(yearList->selectedItems().at(0)->text().toInt(), 01, 01);
+		to.setDate(yearList->selectedItems().at(0)->text().toInt(), 12, 31);
+	} else {
+		from.setDate(1900, 01, 01);
+		to = QDate::currentDate();
+	}
+	
+	query.prepare(QString("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
+	                      " for_section%1:section AND paid_date>=:start"
+	                      " AND paid_date<=:end AND state=:state ORDER BY for_section ASC;").arg(
+	                         (sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "=")
+	                      ));
+	query.bindValue(":start", from.toString("yyyy-MM-dd"));
+	query.bindValue(":end", to.toString("yyyy-MM-dd"));
+	query.bindValue(":state", Invoice::StateContributed);
+	query.bindValue(":section", sectionList->currentText());
 	return query;
 }
 
@@ -62,6 +117,13 @@ void Contributions::searchData() {
 	query.exec();
 	tableModel->setQuery(query);
 	showOverview();
+}
+
+void Contributions::searchContributions() {
+	QSqlQuery query = createContributionsQuery();
+	query.exec();
+	contributionsModel->setQuery(query);
+	showContributionsDetails();
 }
 
 void Contributions::showOverview() {
@@ -76,12 +138,13 @@ void Contributions::showOverview() {
 	}
 	
 	// Load "do not contribute this sections" list
-	QList<QString> dontContribute = settings.value("contributions/dontpay", "members").toStringList();
+	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
 	
 	// Refill with Data
-	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end GROUP BY for_section;");
-	query.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
-	query.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
+	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state GROUP BY for_section;");
+	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
+	query.bindValue(":state", Invoice::StatePaid);
 	query.exec();
 	double sum = 0.0;
 	int row = 0;
@@ -106,6 +169,56 @@ void Contributions::showOverview() {
 	overviewLayout->addWidget(a, row, 1);
 }
 
+void Contributions::showContributionsDetails() {
+	QSettings settings;
+	QSqlQuery query = createContributionsQuery();
+	query.exec();
+	
+	// Clean the GridContainer
+	QLayoutItem *child;
+	while ((child = detailsLayout->takeAt(0)) != 0) {
+		delete ((QLabel *)child->widget());
+		delete child;
+	}
+	
+	// Refill with Data
+	QHash<QString, double> sum;
+	QHash<QString, double> num;
+	QString section;
+	while (query.next()) {
+		section = query.value(4).toString();
+		if (!sum.contains(section)) {
+			sum.insert(section, 0);
+			num.insert(section, 0);
+		}
+		num.find(section).value()++;
+		sum.find(section).value() += query.value(1).toDouble();
+	}
+	
+	int row = 0;
+	QHash<QString, double>::const_iterator iter = sum.constBegin();
+	while (iter != sum.constEnd()) {
+		QLabel *t = new QLabel( tr("<b>Section %1</b>").arg(iter.key()) );
+		detailsLayout->addWidget(t, row++, 0);
+		
+		QLabel *kp = new QLabel( tr("Payments:") );
+		QLabel *vp = new QLabel( QString("%1").arg(num.find(iter.key()).value(), 0, 'f', 0) );
+		kp->setAlignment(Qt::AlignRight);
+		vp->setAlignment(Qt::AlignRight);
+		detailsLayout->addWidget(kp, row, 0);
+		detailsLayout->addWidget(vp, row++, 1);
+		
+		QLabel *kt = new QLabel( tr("Total:") );
+		QLabel *vt = new QLabel( QString("%1").arg(iter.value(), 0, 'f', 2) );
+		kt->setAlignment(Qt::AlignRight);
+		vt->setAlignment(Qt::AlignRight);
+		detailsLayout->addWidget(kt, row, 0);
+		detailsLayout->addWidget(vt, row++, 1);
+		iter++;
+	}
+	
+}
+
 void Contributions::createQif() {
 	QSettings settings;
 	QString valuta = QDate::currentDate().toString("yyyy-MM-dd");
@@ -116,7 +229,7 @@ void Contributions::createQif() {
 	QSqlQuery query(db);
 	
 	// Load "do not contribute this sections" list
-	QList<QString> dontContribute = settings.value("contributions/dontpay", "members").toStringList();
+	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
 	
 	// Initialize the QIF and the list with all Section-QIFs
 	sectionQif.clear();
@@ -126,9 +239,10 @@ void Contributions::createQif() {
 	}
 	
 	// Get all Data
-	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end GROUP BY for_section;");
-	query.bindValue(0, dateFrom->date().toString("yyyy-MM-dd"));
-	query.bindValue(1, dateUntil->date().toString("yyyy-MM-dd"));
+	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state GROUP BY for_section;");
+	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
+	query.bindValue(":state", Invoice::StatePaid);
 	query.exec();
 	while (query.next()) {
 		amount = query.value(0).toString();
@@ -172,6 +286,14 @@ void Contributions::createQif() {
 			f.close();
 		}
 	}
+	
+	// Mark all Invoices as Contributed - Don't use the Invoice-Class here in case of one vs. lot of queries
+	query.prepare("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end AND state=:state;");
+	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
+	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
+	query.bindValue(":state", Invoice::StatePaid);
+	query.bindValue(":newstate", Invoice::StateContributed);
+	query.exec();
 }
 
 void Contributions::exportData() {
@@ -199,10 +321,8 @@ void Contributions::sendEmail() {
 	Section sec;
 	PPSPerson pers;
 	QString subject, message, email;
+	QString attachment = tr("Contribution_%1.qif").arg(QDate::currentDate().toString("yyyy-MM-dd"));
 	
-	createQif();
-	
-	// TODO: Check if this is working with current implementation or do we have to clean the attachments and other settings before we send the next mail?
 	Smtp mail(settings.value("smtp/host", "localhost").toString(), settings.value("smtp/port", 587).toInt());
 	if (settings.value("smtp/authentication", "login").toString() == "login") {
 		mail.authLogin(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
@@ -211,7 +331,7 @@ void Contributions::sendEmail() {
 	}
 	
 	// Send the Contributions by EMail
-	QString attachment = "Contribution_" + QDate::currentDate().toString("yyyy-MM-dd") + ".qif";
+	createQif();
 	QList<QString>::const_iterator section;
 	QList<QString> keys = sectionQif.keys();
 	for (section = keys.constBegin(); section != keys.constEnd(); section++) {
@@ -264,3 +384,28 @@ void Contributions::sendEmail() {
 		remove(fname);
 	}
 }
+
+void Contributions::selectSection() {
+	searchContributions();
+	QSqlQuery query(db);
+	query.prepare(QString("SELECT strftime('%Y',paid_date) AS year FROM pps_invoice WHERE"
+	                      " for_section%1:section AND state=:state GROUP BY year;").arg(
+	                         (sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "=")
+	                      ));
+	
+	query.bindValue(":state", Invoice::StateContributed);
+	query.bindValue(":section", sectionList->currentText());
+	query.exec();
+	
+	yearList->clear();
+	while (query.next()) {
+		yearList->addItem(query.value(0).toString());
+	}
+}
+
+void Contributions::selectYear() {
+	searchContributions();
+}
+
+
+
