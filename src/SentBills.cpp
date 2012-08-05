@@ -423,6 +423,7 @@ void SentBills::doEditInvoice() {
 		}
 		QMessageBox::warning(this, tr("Editing Invoice failed"), tr("An Error occured while editing the selected Invoice:\n\n%1").arg(query.lastError().text()));
 	}
+	// TODO: Get the current Selected position and select this after searching data again
 	searchData();
 	editDialog->hide();
 }
