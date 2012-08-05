@@ -183,7 +183,7 @@ void Contributions::showContributionsDetails() {
 	
 	// Refill with Data
 	QHash<QString, double> sum;
-	QHash<QString, double> num;
+	QHash<QString, int> num;
 	QString section;
 	while (query.next()) {
 		section = query.value(4).toString();
@@ -192,17 +192,22 @@ void Contributions::showContributionsDetails() {
 			num.insert(section, 0);
 		}
 		num.find(section).value()++;
-		sum.find(section).value() += query.value(1).toDouble();
+		sum.find(section).value() += query.value(1).toDouble() / 2;
 	}
 	
 	int row = 0;
+	int ctotal = 0;
+	double stotal = 0.0;
 	QHash<QString, double>::const_iterator iter = sum.constBegin();
 	while (iter != sum.constEnd()) {
 		QLabel *t = new QLabel( tr("<b>Section %1</b>").arg(iter.key()) );
 		detailsLayout->addWidget(t, row++, 0);
 		
+		stotal += iter.value();
+		ctotal += num.find(iter.key()).value();
+		
 		QLabel *kp = new QLabel( tr("Payments:") );
-		QLabel *vp = new QLabel( QString("%1").arg(num.find(iter.key()).value(), 0, 'f', 0) );
+		QLabel *vp = new QLabel( QString("%1").arg(num.find(iter.key()).value()) );
 		kp->setAlignment(Qt::AlignRight);
 		vp->setAlignment(Qt::AlignRight);
 		detailsLayout->addWidget(kp, row, 0);
@@ -217,6 +222,20 @@ void Contributions::showContributionsDetails() {
 		iter++;
 	}
 	
+	// Totals
+	QLabel *kp = new QLabel( tr("<b>Payments:</b>") );
+	QLabel *vp = new QLabel( QString("<b>%1</b>").arg(ctotal) );
+	kp->setAlignment(Qt::AlignLeft);
+	vp->setAlignment(Qt::AlignRight);
+	detailsLayout->addWidget(kp, row, 0);
+	detailsLayout->addWidget(vp, row++, 1);
+	
+	QLabel *kt = new QLabel( tr("<b>Total:</b>") );
+	QLabel *vt = new QLabel( QString("<b>%1</b>").arg(stotal, 0, 'f', 2) );
+	kt->setAlignment(Qt::AlignLeft);
+	vt->setAlignment(Qt::AlignRight);
+	detailsLayout->addWidget(kt, row, 0);
+	detailsLayout->addWidget(vt, row++, 1);
 }
 
 void Contributions::createQif() {
@@ -354,21 +373,23 @@ void Contributions::sendEmail() {
 		pers.load(sec.treasurer());
 		
 		// TODO: Load Subject and Texts
-		subject = QString("Contributions for %1").arg(*section);
-		message = "Attatched the Contributions:\n...blubberl blah\n\nGreetings your Treasurer";
+		subject = QString("Membership fee contributions for %1").arg(*section);
+		message = "Ahoi Treasurer,\n"
+		          "This first time in a not verry beautifull Mailing.\n"
+		          "Next time you will also receive an additional PDF-Evidence with all information included. This time, the evidence from your Bank has to be be enough.\n\n"
+		          "Attatched you'l find the contribution of the membership fee of the Pirate Party Switzerland for your section as a Quicken-Interchange File. This you can easily import with GnuCash in your accounting through 'File' -> 'Import' -> 'Import QIF...'.\n"
+		          "You will receive the settlement during next days, change the valuta after in the imported booking.\n\n"
+		          "Greetings,\nLukas Zurschmiede\nTreasurer Pirate Party Switzerland\n";
 		
 		// Set the Mailtext and send the mail
 		mail.setTextMessage(message);
-		email = "";
+		email = settings.value("smtp/from", "").toString();
 		if (pers.email().length() > 0) {
 			email = pers.email().at(0);
 		}
-		qDebug() << "Sending contributions to: " << email;
-		// TODO: Remove if working
-		email = "postmaster@ranta.ch";
 		
 		// If sending was not successfull (or no treasurer was found), let the user save the QIF
-		if (!mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject)) {
+		if (email.isEmpty() || !mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject)) {
 			QString fileName = QFileDialog::getSaveFileName(this, tr("Save Contribution for the section"), "", tr("Quicken Interchange Format (*.qif)"));
 			if (!fileName.isEmpty()) {
 				if (QFile::exists(fileName)) {
