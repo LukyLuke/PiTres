@@ -68,7 +68,7 @@ CH-1337 Vallorbe]]></text>
 			<text x="170" y="785" width="300" height="10" wordwrap="false" size="9"><![CDATA[Schweizerische Post / Postfinance]]></text>
 			
 			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Numero di conto:]]></text>
-			<text x="170" y="800" width="300" height="10" wordwrap="false" size="9"><![CDATA[60-307660-3]]></text>
+			<text x="170" y="800" width="300" height="10" wordwrap="false" size="9"><![CDATA[{ACCOUNT_NUMBER}]]></text>
 
 			<text x="60" y="815" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[IBAN:]]></text>
 			<text x="170" y="815" width="300" height="10" wordwrap="false" size="9"><![CDATA[CH32 0900 0000 6030 7660 3]]></text>
@@ -81,7 +81,7 @@ CH-1337 Vallorbe]]></text>
 
 			<text x="60" y="860" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Referenza:]]></text>
 			<text x="170" y="860" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[Importante!]]></text>
+			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[Utilizzare la ricevuta di pagamento con IBAN rossa e la casella di commento.]]></text>
 
 			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Commento:]]></text>
 			<text x="170" y="890" width="400" height="10" wordwrap="true" size="9"><![CDATA[Il tuo numero di membro, il numero di referenza o qualsiasi altra cosa tu voglia comunicare al nostro tesoriere ;-)]]></text>

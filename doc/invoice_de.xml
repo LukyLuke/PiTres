@@ -67,7 +67,7 @@ CH-1337 Vallorbe]]></text>
 			<text x="170" y="785" width="300" height="10" wordwrap="false" size="9"><![CDATA[Schweizerische Post / Postfinance]]></text>
 			
 			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Kontonummer:]]></text>
-			<text x="170" y="800" width="300" height="10" wordwrap="false" size="9"><![CDATA[60-307660-3]]></text>
+			<text x="170" y="800" width="300" height="10" wordwrap="false" size="9"><![CDATA[{ACCOUNT_NUMBER}]]></text>
 
 			<text x="60" y="815" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[IBAN:]]></text>
 			<text x="170" y="815" width="300" height="10" wordwrap="false" size="9"><![CDATA[CH32 0900 0000 6030 7660 3]]></text>
@@ -80,7 +80,7 @@ CH-1337 Vallorbe]]></text>
 
 			<text x="60" y="860" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Referenz:]]></text>
 			<text x="170" y="860" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[Unbedingt angeben, sonst können wir die Zahlung nicht Dir zuordnen]]></text>
+			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[Bei IBAN und rotem Einzahlungsschein als Kommentar]]></text>
 
 			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Kommentar:]]></text>
 			<text x="170" y="890" width="400" height="10" wordwrap="true" size="9"><![CDATA[Deine Mitgliedernummer, die Referenznummer oder was immer du unserem Schatzmeister sonst noch mitteilen willst ;-)]]></text>
