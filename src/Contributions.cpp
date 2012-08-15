@@ -139,6 +139,7 @@ void Contributions::showOverview() {
 	
 	// Load "do not contribute this sections" list
 	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
+	dontContribute.removeAll("");
 	
 	// Refill with Data
 	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state GROUP BY for_section;");
@@ -146,19 +147,22 @@ void Contributions::showOverview() {
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
 	query.exec();
+	
 	double sum = 0.0;
 	int row = 0;
 	while (query.next()) {
-		if (!dontContribute.contains(query.value(1).toString())) {
-			QLabel *s = new QLabel( tr("Section: %1").arg(query.value(1).toString()) );
-			QLabel *a = new QLabel( tr("%1 sFr.").arg(query.value(0).toDouble(), 0, 'f', 2) );
-			a->setAlignment(Qt::AlignRight);
-			overviewLayout->addWidget(s, row, 0);
-			overviewLayout->addWidget(a, row, 1);
-			
+		QLabel *s = new QLabel( tr("Section: %1").arg(query.value(1).toString()) );
+		QLabel *a = new QLabel( tr("%1 sFr.").arg(query.value(0).toDouble(), 0, 'f', 2) );
+		a->setAlignment(Qt::AlignRight);
+		if (dontContribute.contains(query.value(1).toString())) {
+			s->setStyleSheet("QLabel { color: darkRed }");
+			a->setStyleSheet("QLabel { color: darkRed }");
+		} else {
 			sum += query.value(0).toDouble();
-			row++;
 		}
+		overviewLayout->addWidget(s, row, 0);
+		overviewLayout->addWidget(a, row, 1);
+		row++;
 	}
 	
 	// Total
@@ -249,6 +253,11 @@ void Contributions::createQif() {
 	
 	// Load "do not contribute this sections" list
 	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
+	dontContribute.removeAll("");
+	QString notIn = QString(",?").repeated(dontContribute.size());
+	if (!dontContribute.empty()) {
+		notIn.remove(0, 1).append(")").prepend("AND for_section NOT IN (");
+	}
 	
 	// Initialize the QIF and the list with all Section-QIFs
 	sectionQif.clear();
@@ -258,19 +267,21 @@ void Contributions::createQif() {
 	}
 	
 	// Get all Data
-	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state GROUP BY for_section;");
+	query.prepare(QString("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state %1 GROUP BY for_section;").arg(notIn));
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
+	for (int i = 0; i < dontContribute.size(); i++) {
+		query.bindValue(i+3, dontContribute.at(i));
+	}
 	query.exec();
+	if (query.lastError().type() != QSqlError::NoError) {
+		qDebug() << query.lastQuery();
+		qDebug() << query.lastError();
+	}
 	while (query.next()) {
 		amount = query.value(0).toString();
 		section = query.value(1).toString();
-		
-		// Don't generate a QIF if the section is not getting paid...
-		if (dontContribute.contains(section)) {
-			continue;
-		}
 		
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
@@ -307,11 +318,14 @@ void Contributions::createQif() {
 	}
 	
 	// Mark all Invoices as Contributed - Don't use the Invoice-Class here in case of one vs. lot of queries
-	query.prepare("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end AND state=:state;");
+	query.prepare(QString("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end AND state=:state %1;").arg(notIn));
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
 	query.bindValue(":newstate", Invoice::StateContributed);
+	for (int i = 0; i < dontContribute.size(); i++) {
+		query.bindValue(i+4, dontContribute.at(i));
+	}
 	query.exec();
 }
 
