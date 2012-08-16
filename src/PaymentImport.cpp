@@ -106,8 +106,6 @@ void PaymentImport::invoiceSelected(QListWidgetItem *item) {
 	QRegExp re(reString);
 	
 	if (re.indexIn(item->text()) > -1) {
-		qDebug() << re.cap(6).toFloat();
-		qDebug() << re.cap(7).toFloat();
 		editAmount->setValue(re.cap(7).toFloat() - re.cap(6).toFloat());
 		datePaidDue->setDate(QDate::fromString(re.cap(2), "yyyy-MM-dd"));
 		datePaidDue->setDate( QDate::fromString(datePaidDue->date().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd") );
