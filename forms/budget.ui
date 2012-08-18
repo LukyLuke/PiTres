@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BudgetForm</class>
+ <widget class="QWidget" name="BudgetForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>860</width>
+    <height>521</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Budget</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../PiTres.qrc">
+    <normaloff>:/icons/resources/icons/chart.png</normaloff>:/icons/resources/icons/chart.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="margin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QToolBar" name="horizontalWidget">
+         <addaction name="actionCreateFolder"/>
+         <addaction name="actionChangeFolder"/>
+         <addaction name="actionRemoveFolder"/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTreeView" name="treeView"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widget_2" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>4</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="margin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QToolBar" name="horizontalWidget_2">
+         <addaction name="actionCreateEntry"/>
+         <addaction name="actionChangeEntry"/>
+         <addaction name="actionRemoveEntry"/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="tableView"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Details</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QScrollArea" name="detailArea">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>72</width>
+            <height>477</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionCreateFolder">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/folder_new.png</normaloff>:/icons/resources/icons/folder_new.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Folder</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionRemoveFolder">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/folder_delete.png</normaloff>:/icons/resources/icons/folder_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Folder</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove the Selected Folder and all Entries and Subfolders</string>
+   </property>
+  </action>
+  <action name="actionCreateEntry">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/notebook.png</normaloff>:/icons/resources/icons/notebook.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Entry</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Entry</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionRemoveEntry">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/delete.png</normaloff>:/icons/resources/icons/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Entry</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove the Entry</string>
+   </property>
+  </action>
+  <action name="actionChangeEntry">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/edit.png</normaloff>:/icons/resources/icons/edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Change Entry</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the Entry and it's values</string>
+   </property>
+  </action>
+  <action name="actionChangeFolder">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/folder_edit.png</normaloff>:/icons/resources/icons/folder_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Change Folder</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the Folder's attributes</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../PiTres.qrc"/>
+ </resources>
+ <connections/>
+</ui>
