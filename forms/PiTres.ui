@@ -45,6 +45,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionConfiguration"/>
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
@@ -53,16 +54,20 @@
      <string>Functions</string>
     </property>
     <addaction name="actionFrom_LDAP"/>
-    <addaction name="actionInvoiceWizard"/>
+    <addaction name="actionShow_Users"/>
     <addaction name="actionAdjustDates"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Bills"/>
+    <addaction name="actionInvoiceWizard"/>
+    <addaction name="actionImport_Payments"/>
+    <addaction name="separator"/>
     <addaction name="actionContribution"/>
+    <addaction name="actionBudget"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionConfiguration"/>
-    <addaction name="separator"/>
     <addaction name="actionHelp"/>
     <addaction name="action_About_PiTres"/>
    </widget>
@@ -91,7 +96,6 @@
    <addaction name="actionImport_Payments"/>
    <addaction name="actionAdjustDates"/>
    <addaction name="actionInvoiceWizard"/>
-   <addaction name="actionContribution"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="sizePolicy">
@@ -134,8 +138,8 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>64</width>
-         <height>64</height>
+         <width>48</width>
+         <height>48</height>
         </size>
        </property>
        <property name="toolButtonStyle">
@@ -166,8 +170,8 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>64</width>
-         <height>64</height>
+         <width>48</width>
+         <height>48</height>
         </size>
        </property>
        <property name="toolButtonStyle">
@@ -187,7 +191,7 @@
         <string>Create new Bills and send they as EMails or print out the PDFs and Letters</string>
        </property>
        <property name="text">
-        <string>Donations and Dues</string>
+        <string>Contributions</string>
        </property>
        <property name="icon">
         <iconset resource="../PiTres.qrc">
@@ -195,8 +199,37 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>64</width>
-         <height>64</height>
+         <width>48</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="budgetButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>View and manage the Budget</string>
+       </property>
+       <property name="text">
+        <string>Budget</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/chart.png</normaloff>:/icons/resources/icons/chart.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>48</width>
+         <height>48</height>
         </size>
        </property>
        <property name="toolButtonStyle">
@@ -253,7 +286,7 @@
      <normaloff>:/icons/resources/icons/cashier.png</normaloff>:/icons/resources/icons/cashier.png</iconset>
    </property>
    <property name="text">
-    <string>Invoice Wizard</string>
+    <string>New Invoice Wizard</string>
    </property>
    <property name="toolTip">
     <string>Create new Invoices based on different Selections and Settings</string>
@@ -279,8 +312,8 @@
   </action>
   <action name="actionShow_Users">
    <property name="icon">
-    <iconset>
-     <normaloff>:/buttons/resources/buttons/user-identity.png</normaloff>:/buttons/resources/buttons/user-identity.png</iconset>
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/businessman.png</normaloff>:/icons/resources/icons/businessman.png</iconset>
    </property>
    <property name="text">
     <string>Show &amp;Users</string>
@@ -294,11 +327,11 @@
   </action>
   <action name="actionShow_Bills">
    <property name="icon">
-    <iconset>
-     <normaloff>:/buttons/resources/buttons/mail-folder-outbox.png</normaloff>:/buttons/resources/buttons/mail-folder-outbox.png</iconset>
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/money.png</normaloff>:/icons/resources/icons/money.png</iconset>
    </property>
    <property name="text">
-    <string>Show Bills</string>
+    <string>Show Invoices</string>
    </property>
    <property name="toolTip">
     <string>Show all sent Bills and Reminds and send new Reminds</string>
@@ -352,10 +385,22 @@
      <normaloff>:/icons/resources/icons/chest.png</normaloff>:/icons/resources/icons/chest.png</iconset>
    </property>
    <property name="text">
-    <string>Show Contributions</string>
+    <string>Contributions</string>
    </property>
    <property name="toolTip">
     <string>Show Donaitons and Section Contributions</string>
+   </property>
+  </action>
+  <action name="actionBudget">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/chart.png</normaloff>:/icons/resources/icons/chart.png</iconset>
+   </property>
+   <property name="text">
+    <string>Budget</string>
+   </property>
+   <property name="toolTip">
+    <string>Show and manage the Budget</string>
    </property>
   </action>
  </widget>
@@ -420,6 +465,22 @@
     <hint type="sourcelabel">
      <x>66</x>
      <y>130</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>budgetButton</sender>
+   <signal>clicked()</signal>
+   <receiver>actionBudget</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>342</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
