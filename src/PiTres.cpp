@@ -6,6 +6,7 @@
 #include "LDAPImport.h"
 #include "InvoiceWizard.h"
 #include "Contributions.h"
+#include "BudgetView.h"
 
 #include "data/Person.h"
 #include "data/Invoice.h"
@@ -88,6 +89,7 @@ void PiTres::connectActions() {
 	connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(showSettings()));
 	connect(actionInvoiceWizard, SIGNAL(triggered()), this, SLOT(showInvoiceWizard()));
 	connect(actionContribution, SIGNAL(triggered()), this, SLOT(showContributions()));
+	connect(actionBudget, SIGNAL(triggered()), this, SLOT(showBudget()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -138,6 +140,11 @@ void PiTres::showInvoiceWizard() {
 
 void PiTres::showContributions() {
 	Contributions *widget = new Contributions;
+	setContent(widget);
+}
+
+void PiTres::showBudget() {
+	BudgetView *widget = new BudgetView;
 	setContent(widget);
 }
 
