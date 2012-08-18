@@ -1,5 +1,5 @@
 /*
-	<one line to give the program's name and a brief idea of what it does.>
+	Create new Invoices, based on Dates or on UIDs
 	Copyright (C) 2012  Lukas Zurschmiede <l.zurschmiede@delightsoftware.com>
 
 	This program is free software: you can redistribute it and/or modify
