@@ -4,6 +4,12 @@
     <file>resources/ocrb.ttf</file>
   </qresource>
   <qresource prefix="icons">
+    <file>resources/icons/delete.png</file>
+    <file>resources/icons/edit.png</file>
+    <file>resources/icons/folder_edit.png</file>
+    <file>resources/icons/folder_delete.png</file>
+    <file>resources/icons/folder_new.png</file>
+    <file>resources/icons/notebook.png</file>
     <file>resources/icons/chart.png</file>
     <file>resources/icons/disk_blue.png</file>
     <file>resources/icons/contract.png</file>
