@@ -20,14 +20,50 @@
 #define BUDGETENTITY_H
 
 #include <QObject>
-
+#include <QDate>
+#include <QString>
+#include <QSqlDatabase>
 
 class BudgetEntity : public QObject {
+Q_OBJECT
+Q_PROPERTY(int id READ id WRITE setId)
+Q_PROPERTY(QDate date READ date WRITE setDate)
+Q_PROPERTY(QString description READ description WRITE setDescription)
+Q_PROPERTY(float amount READ amount WRITE setAmount)
+Q_PROPERTY(int section READ section WRITE setSection)
 
 public:
-	BudgetEntity(QObject *parent);
-	BudgetEntity(const BudgetEntity &other, QObject *parent);
-	virtual ~ BudgetEntity();
+	BudgetEntity(QObject *parent = 0);
+	BudgetEntity(int id, QObject *parent = 0);
+	virtual ~BudgetEntity();
+	static void createTables();
+	void load(int id);
+	void save();
+	
+	// Setter
+	void setId(int id);
+	void setDate(QDate date);
+	void setDescription(QString description);
+	void setAmount(float amount);
+	void setSection(int section);
+	
+	// Getter
+	int id() { return i_id; };
+	QDate date() { return d_date; };
+	QString description() { return s_descr; };
+	float amount() { return f_amount; };
+	int section() { return i_section; };
+	
+private:
+	QSqlDatabase db;
+	bool _loaded;
+	int i_id;
+	QDate d_date;
+	QString s_descr;
+	float f_amount;
+	int i_section;
+	
+	void clear();
 };
 
 #endif // BUDGETENTITY_H

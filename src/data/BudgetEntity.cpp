@@ -17,15 +17,91 @@
 */
 
 #include "BudgetEntity.h"
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QVariant>
 
 BudgetEntity::BudgetEntity(QObject *parent) : QObject(parent) {
-
+	clear();
 }
 
-BudgetEntity::BudgetEntity(const BudgetEntity &other, QObject *parent) : QObject(parent) {
-
+BudgetEntity::BudgetEntity(int id, QObject *parent) : QObject(parent) {
+	load(id);
 }
 
-BudgetEntity::~BudgetEntity() {
+BudgetEntity::~BudgetEntity() {}
 
+void BudgetEntity::clear() {
+	_loaded = false;
+	i_id = 0;
+	i_section = 0;
+	d_date = QDate(1900, 0, 0);
+	s_descr = "";
+	f_amount = 0.0;
+}
+
+void BudgetEntity::save() {
+	QSqlQuery query(db);
+	if (_loaded) {
+		query.prepare("UPDATE budget_entities SET section=:section,valuta=:date,description=:desc,amount=:amount WHERE entity_id=:id;");
+		query.bindValue(":id", i_id);
+	} else {
+		query.prepare("INSERT INTO budget_entities (section,valuta,description,amount) VALUES (:section,:date,:descr,:amount);");
+	}
+	query.bindValue(":section", i_section);
+	query.bindValue(":date", d_date.toString("yyyy-MM-dd"));
+	query.bindValue(":descr", s_descr);
+	query.bindValue(":amount", f_amount);
+	query.exec();
+	
+	// Get the EntityId
+	if (!_loaded) {
+		setId(query.lastInsertId().toInt());
+		_loaded = true;
+	}
+}
+
+void BudgetEntity::createTables() {
+	QSqlDatabase db;
+	QSqlQuery query(db);
+	query.prepare("CREATE TABLE IF NOT EXISTS budget_entities (entity_id INTEGER PRIMARY KEY AUTOINCREMENT, section INTEGER, valuta DATE, description TEXT, amount FLOAT);");
+	query.exec();
+}
+
+void BudgetEntity::load(int id) {
+	clear();
+	QSqlQuery query(db);
+	query.prepare("SELECT * FROM budget_entities WHERE entity_id=?;");
+	query.bindValue(0, id);
+	query.exec();
+	_loaded = query.first();
+	
+	if (_loaded) {
+		QSqlRecord record = query.record();
+		setId(query.value(record.indexOf("entity_id")).toInt());
+		setSection(query.value(record.indexOf("section")).toInt());
+		setDate(query.value(record.indexOf("valuta")).toDate());
+		setDescription(query.value(record.indexOf("description")).toString());
+		setAmount(query.value(record.indexOf("amount")).toFloat());
+	}
+}
+
+void BudgetEntity::setId(int id) {
+	i_id = id;
+}
+
+void BudgetEntity::setDate(QDate date) {
+	d_date = date;
+}
+
+void BudgetEntity::setDescription(QString description) {
+	s_descr = description;
+}
+
+void BudgetEntity::setAmount(float amount) {
+	f_amount = amount;
+}
+
+void BudgetEntity::setSection(int section) {
+	i_section = section;
 }
