@@ -28,6 +28,7 @@
 #include "data/Person.h"
 #include "data/Invoice.h"
 #include "data/Section.h"
+#include "data/BudgetEntity.h"
 #include "helper/XmlPdf.h"
 
 #include <QtGui>
@@ -73,6 +74,8 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	PPSPerson::createTables();
 	Invoice::createTables();
 	Section::createTables();
+	BudgetView::createTables();
+	BudgetEntity::createTables();
 	
 	// Set some default values we need later
 	settings.setValue("sentbills/sincedate", QDate::currentDate().addMonths(-3));
