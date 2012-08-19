@@ -96,6 +96,7 @@ void Invoice::save() {
 		              "amount=:amount,amount_paid=:amount_paid,state=:state,address_prefix=:prefix,address_company=:company,address_name=:name,"
 		              "address_street1=:street1,address_street2=:street2,address_city=:city,address_email=:email,for_section=:section"
 		              " WHERE reference=:reference_where;");
+		query.bindValue(":reference_where", s_reference);
 	} else {
 		query.prepare("INSERT INTO pps_invoice (member_uid,reference,issue_date,payable_date,paid_date,amount,amount_paid,state,"
 		              "address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section) VALUES ("
@@ -127,9 +128,6 @@ void Invoice::save() {
 	query.bindValue(":city", s_addressCity);
 	query.bindValue(":email", s_addressEmail);
 	query.bindValue(":section", s_forSection);
-	if (_loaded) {
-		query.bindValue(":reference_where", s_reference);
-	}
 	query.exec();
 	
 	if (query.lastError().type() != QSqlError::NoError) {
