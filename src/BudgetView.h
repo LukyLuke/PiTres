@@ -33,10 +33,15 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QSqlQueryModel>
+#include <QList>
+#include <QPainter>
+#include <QStyledItemDelegate>
 
 namespace budget {
 	class TreeItem;
 	class TreeModel;
+	class BudgetEntityModel;
+	class BudgetEntityDelegate;
 };
 
 class BudgetView : public QWidget, private Ui::BudgetForm {
@@ -44,16 +49,18 @@ Q_OBJECT
 
 private:
 	QSqlDatabase db;
-	QSqlQueryModel *tableModel;
+	QLocale locale;
 	budget::TreeModel *treeModel;
+	budget::BudgetEntityModel *listModel;
 	
-	void loadDetails(int id);
-	void showSummary(int id);
+	void showSummary(QList<BudgetEntity *> *list);
 
 public:
 	BudgetView(QWidget *parent = 0);
 	virtual ~BudgetView();
 	static void createTables();
+	static QList<qint32> getChildSections(qint32 section);
+	static QList<qint32> getChildSections(qint32 section, bool childs);
 
 public slots:
 	void createFolder();
@@ -68,30 +75,34 @@ public slots:
 
 
 namespace budget {
-	/* Items for the TreeView */
+	/**
+	 * Items for the TreeView
+	 */
 	class TreeItem {
 	public:
-		TreeItem(const QVariant &data, const int id, TreeItem *parent = 0);
+		TreeItem(const QVariant &data, const qint32 id, TreeItem *parent = 0);
 		virtual ~TreeItem();
 		
 		void appendChild(TreeItem *child);
-		TreeItem *child(int row);
-		int childCount() const;
-		int columnCount() const;
-		QVariant data(int column) const;
-		int row() const;
-		int id() const;
+		TreeItem *child(qint32 row);
+		qint32 childCount() const;
+		qint32 columnCount() const;
+		QVariant data(qint32 column) const;
+		qint32 row() const;
+		qint32 id() const;
 		TreeItem *parent();
 		void setComment(const QVariant &data);
 		
 	private:
 		QList<TreeItem *> childItems;
 		QList<QVariant> itemData;
-		int entityId;
+		qint32 entityId;
 		TreeItem *parentItem;
 	};
 
-	/* The TreeModel for the BudgetView */
+	/**
+	 * The TreeModel for the BudgetView
+	 */
 	class TreeModel : public QAbstractItemModel {
 	Q_OBJECT
 
@@ -99,13 +110,13 @@ namespace budget {
 		TreeModel(const QString category, const QString comment, QObject *parent = 0);
 		virtual ~TreeModel();
 		
-		QVariant data(const QModelIndex &index, int role) const;
+		QVariant data(const QModelIndex &index, qint32 role) const;
 		Qt::ItemFlags flags(const QModelIndex &index) const;
-		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-		QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+		QVariant headerData(qint32 section, Qt::Orientation orientation, qint32 role = Qt::DisplayRole) const;
+		QModelIndex index(qint32 row, qint32 column, const QModelIndex &parent = QModelIndex()) const;
 		QModelIndex parent(const QModelIndex &index) const;
-		int rowCount(const QModelIndex &parent = QModelIndex()) const;
-		int columnCount(const QModelIndex &parent = QModelIndex()) const;
+		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
+		qint32 columnCount(const QModelIndex &parent = QModelIndex()) const;
 		
 	private:
 		void setupModelData(TreeItem *parent);
@@ -113,6 +124,34 @@ namespace budget {
 		QSqlDatabase db;
 		TreeItem *rootItem;
 	};
+	
+	/**
+	 * The Model and ItemDelegate for the listView to show all entities
+	 */
+	class BudgetEntityModel : public QAbstractListModel {
+	Q_OBJECT
+		
+	public:
+		BudgetEntityModel(QObject *parent = 0);
+		BudgetEntityModel(QList<BudgetEntity *> *entities, QObject *parent = 0);
+		virtual ~BudgetEntityModel();
+		
+		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
+		QVariant data(const QModelIndex &index, qint32 role) const;
+		void setData(QList<BudgetEntity *> *entities);
+		
+	private:
+		QList<BudgetEntity *> *entities;
+	};
+	
+	class BudgetEntityDelegate : public QStyledItemDelegate {
+	Q_OBJECT
+	
+	public:
+		BudgetEntityDelegate(QObject * parent = 0);
+		void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	};
+	
 };
 
 #endif // BudgetView_H

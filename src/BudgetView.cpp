@@ -19,6 +19,7 @@
 #include "BudgetView.h"
 
 #include <QDebug>
+#include <QSettings>
 
 BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -36,34 +37,59 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	treeModel = new budget::TreeModel(tr("Category"), tr("Description"));
 	treeView->setModel(treeModel);
 	
-	tableModel = new QSqlQueryModel(tableView);
-	tableModel->setHeaderData(0, Qt::Horizontal, tr("Date"));
-	tableModel->setHeaderData(1, Qt::Horizontal, tr("Description"));
-	tableModel->setHeaderData(2, Qt::Horizontal, tr("Amount"));
-	tableModel->setHeaderData(3, Qt::Horizontal, tr("Balance"));
+	listModel = new budget::BudgetEntityModel;
+	listView->setModel(listModel);
+	listView->setItemDelegate( new budget::BudgetEntityDelegate );
 }
 
-BudgetView::~BudgetView() { }
+BudgetView::~BudgetView() {
+	delete listModel;
+	delete treeModel;
+}
 
 void BudgetView::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.prepare("CREATE TABLE IF NOT EXISTS budget_tree (entity_id INTEGER, parent_id INTEGER, name TEXT, description TEXT);");
+	query.exec("CREATE TABLE IF NOT EXISTS budget_tree (entity_id INTEGER, parent_id INTEGER, name TEXT, description TEXT);");
+}
+
+QList <qint32>BudgetView::getChildSections(qint32 section) {
+	return getChildSections(section, FALSE);
+}
+
+QList <qint32>BudgetView::getChildSections(qint32 section, bool childs) {
+	QList<qint32> list;
+	qint32 id;
+	QSqlDatabase db;
+	QSqlQuery query(db);
+	query.prepare("SELECT entity_id FROM budget_tree WHERE parent_id=:section;");
+	query.bindValue(":section", section);
 	query.exec();
+	while (query.next()) {
+		id = query.value(0).toInt();
+		list << id;
+		if (childs) {
+			list.append(getChildSections(id, TRUE));
+		}
+	}
+	return list;
 }
 
 void BudgetView::treeClicked(const QModelIndex index) {
 	budget::TreeItem *item = static_cast<budget::TreeItem *>(index.internalPointer());
-	loadDetails(item->id());
-	showSummary(item->id());
+	QList<BudgetEntity *> *list = BudgetEntity::getEntities(item->id(), TRUE);
+	
+	showSummary(list);
+	listModel->setData(list);
 }
 
-void BudgetView::loadDetails(int id) {
-	
-}
-
-void BudgetView::showSummary(int id) {
-	
+void BudgetView::showSummary(QList<BudgetEntity *> *list) {
+	qreal amount = 0;
+	for (qint32 i = 0; i < list->size(); i++) {
+		BudgetEntity *entity = list->at(i);
+		amount += entity->amount();
+	}
+	labelTotal->setText("<b>" + locale.toCurrencyString(amount, locale.currencySymbol(QLocale::CurrencySymbol)) + "</b>");
 }
 
 void BudgetView::createFolder() {
@@ -91,11 +117,15 @@ void BudgetView::editEntry() {
 }
 
 
-/* Internal Classes in a separate namespace */
+/**
+ * Internal Classes in a separate namespace
+ */
 namespace budget {
 	
-	/* TreeView Itemts */
-	TreeItem::TreeItem(const QVariant &data, const int id, TreeItem *parent) {
+	/**
+	 * TreeView Itemts
+	 */
+	TreeItem::TreeItem(const QVariant &data, const qint32 id, TreeItem *parent) {
 		parentItem = parent;
 		itemData << data;
 		entityId = id;
@@ -109,7 +139,7 @@ namespace budget {
 		itemData << data;
 	}
 
-	int TreeItem::id() const {
+	qint32 TreeItem::id() const {
 		return entityId;
 	}
 
@@ -117,23 +147,23 @@ namespace budget {
 		childItems.append(child);
 	}
 
-	TreeItem *TreeItem::child(int row) {
+	TreeItem *TreeItem::child(qint32 row) {
 		return childItems.value(row);
 	}
 
-	int TreeItem::childCount() const {
+	qint32 TreeItem::childCount() const {
 		return childItems.count();
 	}
 
-	int TreeItem::columnCount() const {
+	qint32 TreeItem::columnCount() const {
 		return itemData.count();
 	}
 
-	QVariant TreeItem::data(int column) const {
+	QVariant TreeItem::data(qint32 column) const {
 		return itemData.value(column);
 	}
 
-	int TreeItem::row() const {
+	qint32 TreeItem::row() const {
 		if (parentItem) {
 			return parentItem->childItems.indexOf(const_cast<TreeItem*>(this));
 		}
@@ -144,7 +174,9 @@ namespace budget {
 		return parentItem;
 	}
 
-	/* The Model-Class implementation */
+	/**
+	 * The Model implementation for the TreeView
+	 */
 	TreeModel::TreeModel(const QString category, const QString comment, QObject *parent) : QAbstractItemModel(parent) {
 		rootItem = new TreeItem(QString(category), 0);
 		rootItem->setComment(comment);
@@ -155,7 +187,7 @@ namespace budget {
 		delete rootItem;
 	}
 	
-	QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const {
+	QModelIndex TreeModel::index(qint32 row, qint32 column, const QModelIndex &parent) const {
 		if (!hasIndex(row, column, parent)) {
 			return QModelIndex();
 		}
@@ -188,7 +220,7 @@ namespace budget {
 		return createIndex(parentItem->row(), 0, parentItem);
 	}
 	
-	int TreeModel::rowCount(const QModelIndex &parent) const {
+	qint32 TreeModel::rowCount(const QModelIndex &parent) const {
 		TreeItem *parentItem;
 		if (parent.column() > 0) {
 			return 0;
@@ -202,14 +234,14 @@ namespace budget {
 		return parentItem->childCount();
 	}
 	
-	int TreeModel::columnCount(const QModelIndex &parent) const {
+	qint32 TreeModel::columnCount(const QModelIndex &parent) const {
 		if (parent.isValid()) {
 			return static_cast<TreeItem *>(parent.internalPointer())->columnCount();
 		}
 		return rootItem->columnCount();
 	}
 
-	QVariant TreeModel::data(const QModelIndex &index, int role) const {
+	QVariant TreeModel::data(const QModelIndex &index, qint32 role) const {
 		if (!index.isValid() || role != Qt::DisplayRole) {
 			return QVariant();
 		}
@@ -225,7 +257,7 @@ namespace budget {
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	}
 	
-	QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int role) const {
+	QVariant TreeModel::headerData(qint32 section, Qt::Orientation orientation, qint32 role) const {
 		if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
 			return rootItem->data(section);
 		}
@@ -233,6 +265,7 @@ namespace budget {
 	}
 	
 	void TreeModel::setupModelData(TreeItem *parent) {
+		beginResetModel();
 		QSqlQuery query(db);
 		query.prepare("SELECT name,entity_id,description FROM budget_tree WHERE parent_id=? ORDER BY entity_id;");
 		query.bindValue(0, parent->id());
@@ -243,6 +276,84 @@ namespace budget {
 			setupModelData(child);
 			parent->appendChild(child);
 		}
+		endResetModel();
+	}
+	
+	/**
+	 * The Model implementation for the ListView
+	 */
+	BudgetEntityModel::BudgetEntityModel(QObject * parent) : QAbstractListModel(parent) {
+		entities = new QList<BudgetEntity *>();
+	}
+	BudgetEntityModel::BudgetEntityModel(QList<BudgetEntity *> *items, QObject * parent) : QAbstractListModel(parent) {
+		entities = new QList<BudgetEntity *>();
+		setData(entities);
+	}
+	
+	BudgetEntityModel::~BudgetEntityModel() {
+		int c = 0;
+		while (entities && !entities->isEmpty()) {
+			BudgetEntity *ent = entities->takeFirst();
+			delete ent;
+		}
+		delete entities;
+	}
+	
+	void BudgetEntityModel::setData(QList<BudgetEntity *> *items) {
+		beginResetModel();
+		int c = 0;
+		while (entities && !entities->isEmpty()) {
+			BudgetEntity *ent = entities->takeFirst();
+			delete ent;
+		}
+		entities = items;
+		endResetModel();
+	}
+	
+	qint32 BudgetEntityModel::rowCount(const QModelIndex &parent) const {
+		if (entities) {
+			return entities->size();
+		}
+		return 0;
 	}
 
+	QVariant BudgetEntityModel::data(const QModelIndex &index, qint32 role) const {
+		if (!index.isValid() || role != Qt::DisplayRole) {
+			return QVariant();
+		}
+		if (!entities || entities->size() <= index.row()) {
+			return QVariant();
+		}
+		
+		BudgetEntity *entity = entities->at(index.row());
+		QVariant ret;
+		ret.setValue<BudgetEntity>(*entity);
+		return ret;
+	}
+	
+	
+	BudgetEntityDelegate::BudgetEntityDelegate(QObject * parent) : QStyledItemDelegate(parent) {
+	}
+	
+	void BudgetEntityDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+		if (index.column() != 0 || !index.data().canConvert<BudgetEntity>()) {
+			QStyledItemDelegate::paint(painter, option, index);
+			return;
+		}
+		
+		BudgetEntity entity = qvariant_cast<BudgetEntity>(index.data());
+		
+		painter->save();
+		painter->setRenderHint(QPainter::Antialiasing);
+		
+		QStyleOptionViewItemV4 opt = option;
+		QStyledItemDelegate::initStyleOption(&opt, index);
+		QRect rect = opt.rect;
+		
+		painter->drawText(rect.adjusted(1,1,-1,-1), entity.description() + ": " + QString::number(entity.amount()));
+		
+		painter->restore();
+	}
+
+	
 }
