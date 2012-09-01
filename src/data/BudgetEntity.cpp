@@ -17,6 +17,7 @@
 */
 
 #include "BudgetEntity.h"
+#include <BudgetView.h>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
@@ -25,11 +26,30 @@ BudgetEntity::BudgetEntity(QObject *parent) : QObject(parent) {
 	clear();
 }
 
-BudgetEntity::BudgetEntity(int id, QObject *parent) : QObject(parent) {
+BudgetEntity::BudgetEntity(qint32 id, QObject *parent) : QObject(parent) {
 	load(id);
 }
 
+BudgetEntity::BudgetEntity(const BudgetEntity &entity) : QObject(0) {
+	i_section = entity.section();
+	d_date = entity.date();
+	s_descr = entity.description();
+	f_amount = entity.amount();
+}
+
 BudgetEntity::~BudgetEntity() {}
+
+QDebug operator<<(QDebug dbg, const BudgetEntity &entity) {
+	dbg.nospace() << "BudgetEntity(" << entity.id() << "; " << entity.description() << ")";
+	dbg.maybeSpace();
+	return dbg;
+}
+
+QDebug operator<<(QDebug dbg, const BudgetEntity *entity) {
+	dbg.nospace() << "BudgetEntity(" << entity->id() << "; " << entity->description() << ")";
+	dbg.maybeSpace();
+	return dbg;
+}
 
 void BudgetEntity::clear() {
 	_loaded = false;
@@ -64,11 +84,45 @@ void BudgetEntity::save() {
 void BudgetEntity::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.prepare("CREATE TABLE IF NOT EXISTS budget_entities (entity_id INTEGER PRIMARY KEY AUTOINCREMENT, section INTEGER, valuta DATE, description TEXT, amount FLOAT);");
-	query.exec();
+	query.exec("CREATE TABLE IF NOT EXISTS budget_entities (entity_id INTEGER PRIMARY KEY AUTOINCREMENT, section INTEGER, valuta DATE, description TEXT, amount FLOAT);");
 }
 
-void BudgetEntity::load(int id) {
+QList<BudgetEntity *> *BudgetEntity::getEntities(qint32 section) {
+	return getEntities(section, FALSE);
+}
+
+QList<BudgetEntity *> *BudgetEntity::getEntities(qint32 section, bool childs) {
+	QList<BudgetEntity *> *list = new QList<BudgetEntity *>();
+	QSqlDatabase db;
+	QSqlQuery query(db);
+	query.prepare("SELECT entity_id FROM budget_entities WHERE section=:section;");
+	query.bindValue(":section", section);
+	query.exec();
+	
+	while (query.next()) {
+		list->append( new BudgetEntity( query.value(0).toInt() ) );
+	}
+	
+	if (childs) {
+		list->append( getChildEntities(section) );
+	}
+	return list;
+}
+
+QList<BudgetEntity *> BudgetEntity::getChildEntities(qint32 section) {
+	QList<BudgetEntity *> list;
+	QList<BudgetEntity *> *_list;
+	QList<qint32> ids = BudgetView::getChildSections(section);
+	for (qint32 i = 0; i < ids.size(); i++) {
+		_list = getEntities(ids.at(i), TRUE);
+		for (qint32 j = 0; j < _list->size(); j++) {
+			list.append( _list->at(j) );
+		}
+	}
+	return list;
+}
+
+void BudgetEntity::load(qint32 id) {
 	clear();
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM budget_entities WHERE entity_id=?;");
@@ -86,7 +140,7 @@ void BudgetEntity::load(int id) {
 	}
 }
 
-void BudgetEntity::setId(int id) {
+void BudgetEntity::setId(qint32 id) {
 	i_id = id;
 }
 
@@ -102,6 +156,6 @@ void BudgetEntity::setAmount(float amount) {
 	f_amount = amount;
 }
 
-void BudgetEntity::setSection(int section) {
+void BudgetEntity::setSection(qint32 section) {
 	i_section = section;
 }

@@ -23,47 +23,58 @@
 #include <QDate>
 #include <QString>
 #include <QSqlDatabase>
+#include <QList>
+#include <QMetaType>
+#include <QDebug>
 
 class BudgetEntity : public QObject {
 Q_OBJECT
-Q_PROPERTY(int id READ id WRITE setId)
+Q_PROPERTY(qint32 id READ id WRITE setId)
 Q_PROPERTY(QDate date READ date WRITE setDate)
 Q_PROPERTY(QString description READ description WRITE setDescription)
-Q_PROPERTY(float amount READ amount WRITE setAmount)
-Q_PROPERTY(int section READ section WRITE setSection)
+Q_PROPERTY(qreal amount READ amount WRITE setAmount)
+Q_PROPERTY(qint32 section READ section WRITE setSection)
 
 public:
 	BudgetEntity(QObject *parent = 0);
-	BudgetEntity(int id, QObject *parent = 0);
+	BudgetEntity(qint32 id, QObject *parent = 0);
+	BudgetEntity(const BudgetEntity &entity);
 	virtual ~BudgetEntity();
 	static void createTables();
-	void load(int id);
+	static QList<BudgetEntity *> *getEntities(qint32 section);
+	static QList<BudgetEntity *> *getEntities(qint32 section, bool childs);
+	void load(qint32 id);
 	void save();
 	
 	// Setter
-	void setId(int id);
+	void setId(qint32 id);
 	void setDate(QDate date);
 	void setDescription(QString description);
 	void setAmount(float amount);
-	void setSection(int section);
+	void setSection(qint32 section);
 	
 	// Getter
-	int id() { return i_id; };
-	QDate date() { return d_date; };
-	QString description() { return s_descr; };
-	float amount() { return f_amount; };
-	int section() { return i_section; };
+	qint32 id() const { return i_id; };
+	QDate date() const { return d_date; };
+	QString description() const { return s_descr; };
+	qreal amount() const { return f_amount; };
+	qint32 section() const { return i_section; };
 	
 private:
 	QSqlDatabase db;
 	bool _loaded;
-	int i_id;
+	qint32 i_id;
 	QDate d_date;
 	QString s_descr;
-	float f_amount;
-	int i_section;
+	qreal f_amount;
+	qint32 i_section;
 	
 	void clear();
+	static QList<BudgetEntity *> getChildEntities(qint32 section);
 };
+
+Q_DECLARE_METATYPE(BudgetEntity);
+QDebug operator<<(QDebug dbg, const BudgetEntity &entity);
+QDebug operator<<(QDebug dbg, const BudgetEntity *entity);
 
 #endif // BUDGETENTITY_H
