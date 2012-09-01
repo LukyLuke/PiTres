@@ -38,10 +38,13 @@
 #include <QSettings>
 
 PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
+	QSettings settings;
 	setupUi(this);
 	
+	QLocale locale(settings.value("core/locale", "de_CH").toString());
+	QLocale::setDefault(locale);
+	
 	// Resize
-	QSettings settings;
 	resize(settings.value("core/size", QSize(800, 600)).toSize());
 	if (settings.value("core/maximized", false).toBool()) {
 		showMaximized();
