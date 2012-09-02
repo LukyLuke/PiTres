@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <QSettings>
+#include <QPushButton>
 
 BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -346,14 +347,34 @@ namespace budget {
 		painter->save();
 		painter->setRenderHint(QPainter::Antialiasing);
 		
+		QLocale locale;
 		QStyleOptionViewItemV4 opt = option;
 		QStyledItemDelegate::initStyleOption(&opt, index);
 		QRect rect = opt.rect;
 		
-		painter->drawText(rect.adjusted(1,1,-1,-1), entity.description() + ": " + QString::number(entity.amount()));
+		opt.text = "";
+		QStyle *style = opt.widget ? opt.widget->style() : QApplication::style();
+		style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, opt.widget);
+		
+		QPalette::ColorGroup cg = opt.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+		
+		if (opt.state & QStyle::State_Selected) {
+			painter->setPen(opt.palette.color(cg, QPalette::HighlightedText));
+		} else {
+			painter->setPen(opt.palette.color(cg, QPalette::Text));
+		}
+		
+		QRect adj = rect.adjusted(3, rect.height()/3, -3, rect.height()/3);
+		painter->drawText(adj, entity.description());
+		painter->drawText(adj, Qt::AlignRight, locale.toCurrencyString(entity.amount(), locale.currencySymbol(QLocale::CurrencySymbol)));
 		
 		painter->restore();
 	}
-
+	
+	QSize BudgetEntityDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
+		QSize size = QStyledItemDelegate::sizeHint(option, index);
+		size.setHeight(size.height() * 3);
+		return size;
+	}
 	
 }
