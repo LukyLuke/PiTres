@@ -364,9 +364,12 @@ namespace budget {
 			painter->setPen(opt.palette.color(cg, QPalette::Text));
 		}
 		
+		QString amount = locale.toCurrencyString(entity.amount(), locale.currencySymbol(QLocale::CurrencySymbol));
+		int amountWidth = painter->fontMetrics().width(amount);
 		QRect adj = rect.adjusted(3, rect.height()/3, -3, rect.height()/3);
-		painter->drawText(adj, entity.description());
-		painter->drawText(adj, Qt::AlignRight, locale.toCurrencyString(entity.amount(), locale.currencySymbol(QLocale::CurrencySymbol)));
+		
+		painter->drawText(adj.adjusted(0, 0, -amountWidth, 0), Qt::TextSingleLine, entity.description());
+		painter->drawText(adj.adjusted(adj.left() + amountWidth, 0, 0, 0), Qt::AlignRight | Qt::TextSingleLine, amount);
 		
 		painter->restore();
 	}
