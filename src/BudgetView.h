@@ -107,7 +107,7 @@ namespace budget {
 	Q_OBJECT
 
 	public:
-		TreeModel(const QString category, const QString comment, QObject *parent = 0);
+		TreeModel(const QString number, const QString category, const QString comment, const QString amount, QObject *parent = 0);
 		virtual ~TreeModel();
 		
 		QVariant data(const QModelIndex &index, qint32 role) const;
@@ -117,6 +117,7 @@ namespace budget {
 		QModelIndex parent(const QModelIndex &index) const;
 		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
 		qint32 columnCount(const QModelIndex &parent = QModelIndex()) const;
+		bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 		
 	private:
 		void setupModelData(TreeItem *parent);
@@ -151,6 +152,9 @@ namespace budget {
 		BudgetEntityDelegate(QObject * parent = 0);
 		void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 		QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+		
+	private:
+		qint32 dateWidth;
 	};
 	
 };

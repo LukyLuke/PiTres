@@ -35,7 +35,7 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	
 	connect(treeView, SIGNAL(clicked(QModelIndex)), this, SLOT(treeClicked(QModelIndex)));
 	
-	treeModel = new budget::TreeModel(tr("Category"), tr("Description"));
+	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"));
 	treeView->setModel(treeModel);
 	
 	listModel = new budget::BudgetEntityModel;
@@ -51,7 +51,7 @@ BudgetView::~BudgetView() {
 void BudgetView::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.exec("CREATE TABLE IF NOT EXISTS budget_tree (entity_id INTEGER, parent_id INTEGER, name TEXT, description TEXT);");
+	query.exec("CREATE TABLE IF NOT EXISTS budget_tree (entity_id INTEGER, parent_id INTEGER, name TEXT, description TEXT, amount FLOAT);");
 }
 
 QList <qint32>BudgetView::getChildSections(qint32 section) {
@@ -94,11 +94,28 @@ void BudgetView::showSummary(QList<BudgetEntity *> *list) {
 }
 
 void BudgetView::createFolder() {
-	qDebug() << "Create Folder...";
+	/*QSqlQuery query(db);
+	QModelIndexList sel = treeView->selectedIndexes();
+	if (!sel.isEmpty()) {
+		QModelIndex idx = sel.at(0);
+		budget::TreeItem *item = static_cast<budget::TreeItem *>(idx.internalPointer());
+		
+		query.prepare("INSERT INTO budget_tree (entity_id,parent_id,name,description) VALUES (:id,:parent,:name,:descr);");
+		query.bindValue(":id", QString::number(item->id()) + "0");
+		query.bindValue(":parent", item->id());
+		query.bindValue(":name", "New Name");
+		query.bindValue(":descr", "Description");
+		query.exec();
+		
+		treeModel->insertRow(sel.at(0).row(), sel.at(0).parent());
+	}*/
 }
 
 void BudgetView::removeFolder() {
-	qDebug() << "Remove Folder...";
+	/*QModelIndexList sel = treeView->selectedIndexes();
+	if (!sel.isEmpty()) {
+		treeModel->removeRow(sel.at(0).row(), sel.at(0).parent());
+	}*/
 }
 
 void BudgetView::editFolder() {
@@ -178,9 +195,11 @@ namespace budget {
 	/**
 	 * The Model implementation for the TreeView
 	 */
-	TreeModel::TreeModel(const QString category, const QString comment, QObject *parent) : QAbstractItemModel(parent) {
-		rootItem = new TreeItem(QString(category), 0);
+	TreeModel::TreeModel(const QString number, const QString category, const QString comment, const QString amount, QObject *parent) : QAbstractItemModel(parent) {
+		rootItem = new TreeItem(number, 0);
+		rootItem->setComment(category);
 		rootItem->setComment(comment);
+		rootItem->setComment(amount);
 		setupModelData(rootItem);
 	}
 	
@@ -265,15 +284,25 @@ namespace budget {
 		return QVariant();
 	}
 	
-	void TreeModel::setupModelData(TreeItem *parent) {
-		beginResetModel();
+	bool TreeModel::removeRows(int row, int count, const QModelIndex &parent) {
 		QSqlQuery query(db);
-		query.prepare("SELECT name,entity_id,description FROM budget_tree WHERE parent_id=? ORDER BY entity_id;");
+		query.prepare("");
+		return QAbstractItemModel::removeRows(row, count, parent);
+	}
+	
+	void TreeModel::setupModelData(TreeItem *parent) {
+		QLocale locale;
+		QSqlQuery query(db);
+		query.prepare("SELECT entity_id,name,description,amount FROM budget_tree WHERE parent_id=? ORDER BY entity_id;");
 		query.bindValue(0, parent->id());
 		query.exec();
+		
+		beginResetModel();
 		while (query.next()) {
-			TreeItem *child = new TreeItem( query.value(0).toString(), query.value(1).toInt(), parent);
-			child->setComment(query.value(2).toString());
+			TreeItem *child = new TreeItem( query.value(0).toString(), query.value(0).toInt(), parent);
+			child->setComment(query.value(1));
+			child->setComment(query.value(2));
+			child->setComment(locale.toCurrencyString(query.value(3).toFloat(), locale.currencySymbol(QLocale::CurrencySymbol)));
 			setupModelData(child);
 			parent->appendChild(child);
 		}
@@ -288,11 +317,10 @@ namespace budget {
 	}
 	BudgetEntityModel::BudgetEntityModel(QList<BudgetEntity *> *items, QObject * parent) : QAbstractListModel(parent) {
 		entities = new QList<BudgetEntity *>();
-		setData(entities);
+		setData(items);
 	}
 	
 	BudgetEntityModel::~BudgetEntityModel() {
-		int c = 0;
 		while (entities && !entities->isEmpty()) {
 			BudgetEntity *ent = entities->takeFirst();
 			delete ent;
@@ -302,7 +330,6 @@ namespace budget {
 	
 	void BudgetEntityModel::setData(QList<BudgetEntity *> *items) {
 		beginResetModel();
-		int c = 0;
 		while (entities && !entities->isEmpty()) {
 			BudgetEntity *ent = entities->takeFirst();
 			delete ent;
@@ -334,6 +361,7 @@ namespace budget {
 	
 	
 	BudgetEntityDelegate::BudgetEntityDelegate(QObject * parent) : QStyledItemDelegate(parent) {
+		dateWidth = 0;
 	}
 	
 	void BudgetEntityDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
@@ -364,12 +392,18 @@ namespace budget {
 			painter->setPen(opt.palette.color(cg, QPalette::Text));
 		}
 		
+		if (dateWidth <= 0) {
+			QDate _date = QDate(9999, 12, 29);
+			*((int*)(&dateWidth)) = painter->fontMetrics().width(_date.toString(locale.dateFormat(QLocale::ShortFormat))) + 10;
+		}
+		
 		QString amount = locale.toCurrencyString(entity.amount(), locale.currencySymbol(QLocale::CurrencySymbol));
 		int amountWidth = painter->fontMetrics().width(amount);
 		QRect adj = rect.adjusted(3, rect.height()/3, -3, rect.height()/3);
 		
-		painter->drawText(adj.adjusted(0, 0, -amountWidth, 0), Qt::TextSingleLine, entity.description());
-		painter->drawText(adj.adjusted(adj.left() + amountWidth, 0, 0, 0), Qt::AlignRight | Qt::TextSingleLine, amount);
+		painter->drawText(adj.adjusted(0, 0, -amountWidth, 0), Qt::TextSingleLine, entity.date().toString(locale.dateFormat(QLocale::ShortFormat)));
+		painter->drawText(adj.adjusted(adj.left() + dateWidth, 0, -amountWidth, 0), Qt::TextSingleLine, entity.description());
+		painter->drawText(adj.adjusted(adj.left() + dateWidth + amountWidth, 0, 0, 0), Qt::AlignRight | Qt::TextSingleLine, amount);
 		
 		painter->restore();
 	}
