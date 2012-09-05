@@ -37,6 +37,7 @@
        <item>
         <widget class="QToolBar" name="horizontalWidget">
          <addaction name="actionCreateFolder"/>
+         <addaction name="actionCreateRootFolder"/>
          <addaction name="actionChangeFolder"/>
          <addaction name="actionRemoveFolder"/>
         </widget>
@@ -139,6 +140,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionCreateRootFolder">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/folder_new.png</normaloff>:/icons/resources/icons/folder_new.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create TopLevel-Folder</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new TopLevel-Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="actionRemoveFolder">

@@ -54,6 +54,8 @@ private:
 	budget::BudgetEntityModel *listModel;
 	
 	void showSummary(QList<BudgetEntity *> *list);
+  void doRemoveFolder();
+  void doRemoveEntry();
 
 public:
 	BudgetView(QWidget *parent = 0);
@@ -64,6 +66,7 @@ public:
 
 public slots:
 	void createFolder();
+  void createRootFolder();
 	void removeFolder();
 	void editFolder();
 	void createEntry();
@@ -80,18 +83,21 @@ namespace budget {
 	 */
 	class TreeItem {
 	public:
-		TreeItem(const QVariant &data, const qint32 id, TreeItem *parent = 0);
+		TreeItem(const qint32 id, TreeItem *parent = 0);
 		virtual ~TreeItem();
 		
-		void appendChild(TreeItem *child);
+    void appendChild(TreeItem *child);
 		TreeItem *child(qint32 row);
 		qint32 childCount() const;
+    qint32 childNumber() const
 		qint32 columnCount() const;
 		QVariant data(qint32 column) const;
 		qint32 row() const;
 		qint32 id() const;
 		TreeItem *parent();
-		void setComment(const QVariant &data);
+		bool setData(const qint32 pos, const QVariant &data);
+    bool insertChildren(qint32 position, qint32 count);
+    bool removeChildren(qint32 position, qint32 count);
 		
 	private:
 		QList<TreeItem *> childItems;
@@ -111,19 +117,23 @@ namespace budget {
 		virtual ~TreeModel();
 		
 		QVariant data(const QModelIndex &index, qint32 role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, qint32 role);
 		Qt::ItemFlags flags(const QModelIndex &index) const;
 		QVariant headerData(qint32 section, Qt::Orientation orientation, qint32 role = Qt::DisplayRole) const;
+    bool setHeaderData(qint32 section, Qt::Orientation orientation, const QVariant &value, qint32 role):
 		QModelIndex index(qint32 row, qint32 column, const QModelIndex &parent = QModelIndex()) const;
 		QModelIndex parent(const QModelIndex &index) const;
 		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
 		qint32 columnCount(const QModelIndex &parent = QModelIndex()) const;
-		bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    bool insertRows(qint32 position, qint32 rows, const QModelIndex &parent);
+		bool removeRows(qint32 row, qint32 count, const QModelIndex &parent = QModelIndex());
 		
 	private:
-		void setupModelData(TreeItem *parent);
-		
-		QSqlDatabase db;
+    QSqlDatabase db;
 		TreeItem *rootItem;
+    
+		void setupModelData(TreeItem *parent);
+    TreeItem *getItem(QModelIndex &index) const;
 	};
 	
 	/**

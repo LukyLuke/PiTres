@@ -37,6 +37,9 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	
 	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"));
 	treeView->setModel(treeModel);
+  for (qint32 i = 0; i < treeModel.columnCount(); ++i) {
+    treeView->resizeColumnToContents(i);
+  }
 	
 	listModel = new budget::BudgetEntityModel;
 	listView->setModel(listModel);
@@ -94,28 +97,48 @@ void BudgetView::showSummary(QList<BudgetEntity *> *list) {
 }
 
 void BudgetView::createFolder() {
-	/*QSqlQuery query(db);
-	QModelIndexList sel = treeView->selectedIndexes();
-	if (!sel.isEmpty()) {
-		QModelIndex idx = sel.at(0);
-		budget::TreeItem *item = static_cast<budget::TreeItem *>(idx.internalPointer());
-		
-		query.prepare("INSERT INTO budget_tree (entity_id,parent_id,name,description) VALUES (:id,:parent,:name,:descr);");
-		query.bindValue(":id", QString::number(item->id()) + "0");
-		query.bindValue(":parent", item->id());
-		query.bindValue(":name", "New Name");
-		query.bindValue(":descr", "Description");
-		query.exec();
-		
-		treeModel->insertRow(sel.at(0).row(), sel.at(0).parent());
-	}*/
+	QModelIndex sel = treeView->selectionModel()->currentIndex();
+  QAbstractItemModel *model = treeView->model();
+  
+  if (!model->insertRow(0, sel)) {
+    return;
+  }
+  
+  model->setData( model->index(0, 0, sel), model->data(model->index(0, 0, sel), Qt::DisplayRole), Qt::EditRole );
+  model->setData( model->index(0, 1, sel), QVariant(tr("Enter Data")), Qt::EditRole );
+  model->setData( model->index(0, 2, sel), QVariant(tr("Enter Data")), Qt::EditRole );
+  model->setData( model->index(0, 3, sel), QVariant(0.0), Qt::EditRole );
+  treeView->selectionModel()->setCurrentIndex(model->index(0, 0, sel), QItemSelectionModel::ClearAndSelect);
+}
+
+void BudgetView::createRootFolder() {
+	QModelIndex sel = treeView->selectionModel()->currentIndex();
+  QAbstractItemModel *model = treeView->model();
+  qint32 idx = sel.row()+1;
+  
+  if (!model->insertRow(idx, sel.parent())) {
+    return;
+  }
+  
+  model->setData( model->index(idx, 0, sel), model->data(model->index(0, 0, sel), Qt::DisplayRole), Qt::EditRole );
+  model->setData( model->index(idx, 1, sel), QVariant(tr("Enter Data")), Qt::EditRole );
+  model->setData( model->index(idx, 2, sel), QVariant(tr("Enter Data")), Qt::EditRole );
+  model->setData( model->index(idx, 3, sel), QVariant(0.0), Qt::EditRole );
+  
+  treeView->selectionModel()->setCurrentIndex(model->index(idx, 0, sel), QItemSelectionModel::ClearAndSelect);
 }
 
 void BudgetView::removeFolder() {
-	/*QModelIndexList sel = treeView->selectedIndexes();
-	if (!sel.isEmpty()) {
-		treeModel->removeRow(sel.at(0).row(), sel.at(0).parent());
-	}*/
+  // show Messagebox to confirm
+}
+
+void BudgetView::doRemoveFolder() {
+	QModelIndex sel = treeView->selectionModel()->currentIndex();
+  QAbstractItemModel *model = treeView->model();
+  
+	if (!model->removeRow(sel.row(), sel.parent())) {
+		// Show Error
+	}
 }
 
 void BudgetView::editFolder() {
@@ -127,7 +150,11 @@ void BudgetView::createEntry() {
 }
 
 void BudgetView::removeEntry() {
-	qDebug() << "Remove Entry...";
+  // Show MessageBox to confirm
+  qDebug() << "Remove Entry...";
+}
+void BudgetView::doRemoveEntry() {
+	// remove...
 }
 
 void BudgetView::editEntry() {
@@ -143,9 +170,9 @@ namespace budget {
 	/**
 	 * TreeView Itemts
 	 */
-	TreeItem::TreeItem(const QVariant &data, const qint32 id, TreeItem *parent) {
+	TreeItem::TreeItem(const qint32 id, TreeItem *parent) {
 		parentItem = parent;
-		itemData << data;
+		itemData << "" << "" << "" << "";
 		entityId = id;
 	}
 
@@ -153,8 +180,12 @@ namespace budget {
 		qDeleteAll(childItems);
 	}
 	
-	void TreeItem::setComment(const QVariant &data) {
-		itemData << data;
+	bool TreeItem::setData(const qint32 pos, const QVariant &data) {
+    if (pos > 0 && pos < itemData.size()) {
+      itemData[pos]= data;
+      return true;
+    }
+    return false;
 	}
 
 	qint32 TreeItem::id() const {
@@ -164,6 +195,26 @@ namespace budget {
 	void TreeItem::appendChild(TreeItem *child) {
 		childItems.append(child);
 	}
+  
+  bool TreeItem::insertChildren(qint32 position, qint32 count) {
+    if (position < 0 || position > childItems.size()) {
+      return false;
+    }
+    for (qint32 row = 0; row < count; ++row) {
+      TreeItem *item = new TreeItem(-1, this);
+      childItems.insert(position, item);
+    }
+    return true;
+  }
+  
+  bool TreeItem::removeChildren(qint32 position, qint32 count) {
+    if (position < 0 || position + count > childItems.size()) {
+      return false;
+    }
+    for (qint32 row = 0; row < count; ++row) {
+      delete childItems.takeAt(position);
+    }
+  }
 
 	TreeItem *TreeItem::child(qint32 row) {
 		return childItems.value(row);
@@ -172,6 +223,13 @@ namespace budget {
 	qint32 TreeItem::childCount() const {
 		return childItems.count();
 	}
+  
+  qint32 TreeItem::childNumber() const {
+    if (parentItem) {
+      return parentItem->childItems.indexOf(const_cast<TreeItem *>(this));
+    }
+    return 0;
+  }
 
 	qint32 TreeItem::columnCount() const {
 		return itemData.count();
@@ -196,10 +254,11 @@ namespace budget {
 	 * The Model implementation for the TreeView
 	 */
 	TreeModel::TreeModel(const QString number, const QString category, const QString comment, const QString amount, QObject *parent) : QAbstractItemModel(parent) {
-		rootItem = new TreeItem(number, 0);
-		rootItem->setComment(category);
-		rootItem->setComment(comment);
-		rootItem->setComment(amount);
+		rootItem = new TreeItem(0);
+    rootItem->setData(0, number);
+		rootItem->setData(1, category);
+		rootItem->setData(2, comment);
+		rootItem->setData(3, amount);
 		setupModelData(rootItem);
 	}
 	
@@ -208,22 +267,17 @@ namespace budget {
 	}
 	
 	QModelIndex TreeModel::index(qint32 row, qint32 column, const QModelIndex &parent) const {
-		if (!hasIndex(row, column, parent)) {
-			return QModelIndex();
-		}
-		
-		TreeItem *parentItem;
-		if (!parent.isValid()) {
-			parentItem = rootItem;
-		} else {
-			parentItem = static_cast<TreeItem*>(parent.internalPointer());
-		}
-		
-		TreeItem *childItem = parentItem->child(row);
-		if (childItem) {
-			return createIndex(row, column, childItem);
-		}
-		return QModelIndex();
+    if (parent.isValid() && parent.column() != 0) {
+      return QModelIndex();
+    }
+    
+    TreeItem *parentItem = getItem(parent);
+    TreeItem *childItem = parentItem->child(row);
+    
+    if (childItem) {
+      return createIndex(row, column, childItem);
+    }
+    return QModelIndex();
 	}
 	
 	QModelIndex TreeModel::parent(const QModelIndex &index) const {
@@ -231,52 +285,62 @@ namespace budget {
 			return QModelIndex();
 		}
 		
-		TreeItem *childItem = static_cast<TreeItem *>(index.internalPointer());
+		TreeItem *childItem = getItem(index);
 		TreeItem *parentItem = childItem->parent();
 		
 		if (parentItem == rootItem) {
 			return QModelIndex();
 		}
-		return createIndex(parentItem->row(), 0, parentItem);
+		return createIndex(parentItem->childNumber(), 0, parentItem);
 	}
 	
 	qint32 TreeModel::rowCount(const QModelIndex &parent) const {
-		TreeItem *parentItem;
-		if (parent.column() > 0) {
-			return 0;
-		}
-		
-		if (!parent.isValid()) {
-			parentItem = rootItem;
-		} else {
-			parentItem = static_cast<TreeItem *>(parent.internalPointer());
-		}
+		TreeItem *parentItem = getItem(parent);
 		return parentItem->childCount();
 	}
 	
-	qint32 TreeModel::columnCount(const QModelIndex &parent) const {
-		if (parent.isValid()) {
-			return static_cast<TreeItem *>(parent.internalPointer())->columnCount();
-		}
+	qint32 TreeModel::columnCount(const QModelIndex & /*parent*/) const {
 		return rootItem->columnCount();
 	}
 
 	QVariant TreeModel::data(const QModelIndex &index, qint32 role) const {
-		if (!index.isValid() || role != Qt::DisplayRole) {
+		if (!index.isValid()) {
 			return QVariant();
 		}
-		
-		TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
-		return item->data(index.column());
+    if (role != Qt::DisplayRole && role != Qt::EditRole) {
+      return QVariant();
+    }
+		return item->data(getItem(index));
 	}
+  
+  TreeItem *TreeModel::getItem(QModelIndex &index) const {
+    if (index.isValid()) {
+      TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
+      if (item) {
+        return item;
+      }
+    }
+    return rootItem;
+  }
 	
 	Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const {
 		if (index.isValid()) {
 			return 0;
 		}
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 	}
 	
+  bool TreeModel::setHeaderData(qint32 section, Qt::Orientation orientation, const QVariant &value, qint32 role) {
+    if (role != Qt::EditRole || orientation != Qt::Horizontal) {
+      return false;
+    }
+    bool success = rootItem->setData(section, value);
+    if (success) {
+      emit headerDataChanged(orientation, section, section);
+    }
+    return success;
+  }
+  
 	QVariant TreeModel::headerData(qint32 section, Qt::Orientation orientation, qint32 role) const {
 		if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
 			return rootItem->data(section);
@@ -284,11 +348,39 @@ namespace budget {
 		return QVariant();
 	}
 	
-	bool TreeModel::removeRows(int row, int count, const QModelIndex &parent) {
-		QSqlQuery query(db);
-		query.prepare("");
-		return QAbstractItemModel::removeRows(row, count, parent);
+  bool TreeModel::insertRows(qint32 position, qint32 rows, const QModelIndex &parent) {
+    TreeItem *parentItem = getItem(parent);
+    bool success;
+    
+    beginInsertRows(parent, position, position + rows - 1);
+    success = parentItem->insertChildren(position, rows, rootItem->columnCount());
+    endInsertRows();
+    
+    return success;
+  }
+  
+	bool TreeModel::removeRows(qint32 row, qint32 count, const QModelIndex &parent) {
+		TreeItem *parentItem = getItem(parent);
+    bool success;
+    
+    beginRemoveRows(parent, position, position + rows - 1);
+    success = parentItem->removeChildren(position, rows);
+    endRemoveRows();
+    
+    return success;
 	}
+  
+  bool TreeModel::setData(const QModelIndex &index, const QVariant &value, qint32 role) {
+    if (role != Qt::EditRole) {
+      return;
+    }
+    TreeItem *item = getItem(index);
+    bool success = item->setData(index.column(), value);
+    if (success) {
+      emit dataChanged(index, index);
+    }
+    return success;
+  }
 	
 	void TreeModel::setupModelData(TreeItem *parent) {
 		QLocale locale;
@@ -299,10 +391,11 @@ namespace budget {
 		
 		beginResetModel();
 		while (query.next()) {
-			TreeItem *child = new TreeItem( query.value(0).toString(), query.value(0).toInt(), parent);
-			child->setComment(query.value(1));
-			child->setComment(query.value(2));
-			child->setComment(locale.toCurrencyString(query.value(3).toFloat(), locale.currencySymbol(QLocale::CurrencySymbol)));
+			TreeItem *child = new TreeItem( query.value(0).toInt(), parent);
+      child->setData(0, query.value(0));
+			child->setData(1, query.value(1));
+			child->setData(2, query.value(2));
+			child->setData(3, locale.toCurrencyString(query.value(3).toFloat(), locale.currencySymbol(QLocale::CurrencySymbol)));
 			setupModelData(child);
 			parent->appendChild(child);
 		}
