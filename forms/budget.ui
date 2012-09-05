@@ -26,7 +26,7 @@
      <widget class="QWidget" name="widget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>3</horstretch>
+        <horstretch>2</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
@@ -43,7 +43,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeView" name="treeView"/>
+        <widget class="QTreeView" name="treeView">
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectItems</enum>
+         </property>
+         <property name="allColumnsShowFocus">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -145,7 +152,7 @@
   <action name="actionCreateRootFolder">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/folder_new.png</normaloff>:/icons/resources/icons/folder_new.png</iconset>
+     <normaloff>:/icons/resources/icons/folders.png</normaloff>:/icons/resources/icons/folders.png</iconset>
    </property>
    <property name="text">
     <string>Create TopLevel-Folder</string>
