@@ -37,15 +37,23 @@
        <item>
         <widget class="QToolBar" name="horizontalWidget">
          <addaction name="actionCreateFolder"/>
-         <addaction name="actionCreateRootFolder"/>
          <addaction name="actionChangeFolder"/>
          <addaction name="actionRemoveFolder"/>
         </widget>
        </item>
        <item>
         <widget class="QTreeView" name="treeView">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
          <property name="selectionBehavior">
           <enum>QAbstractItemView::SelectItems</enum>
+         </property>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="animated">
+          <bool>false</bool>
          </property>
          <property name="allColumnsShowFocus">
           <bool>true</bool>
@@ -122,8 +130,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>72</width>
-            <height>477</height>
+            <width>69</width>
+            <height>470</height>
            </rect>
           </property>
          </widget>
@@ -147,21 +155,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
-   </property>
-  </action>
-  <action name="actionCreateRootFolder">
-   <property name="icon">
-    <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/folders.png</normaloff>:/icons/resources/icons/folders.png</iconset>
-   </property>
-   <property name="text">
-    <string>Create TopLevel-Folder</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a new TopLevel-Folder</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="actionRemoveFolder">
