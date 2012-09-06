@@ -66,7 +66,6 @@ public:
 
 public slots:
 	void createFolder();
-	void createRootFolder();
 	void removeFolder();
 	void editFolder();
 	void createEntry();
@@ -87,7 +86,7 @@ namespace budget {
 		virtual ~TreeItem();
 		
 		void appendChild(TreeItem *child);
-		TreeItem *child(qint32 row);
+		TreeItem *child(qint32 number);
 		qint32 childCount() const;
 		qint32 childNumber() const;
 		qint32 columnCount() const;
@@ -118,15 +117,15 @@ namespace budget {
 		virtual ~TreeModel();
 		
 		QVariant data(const QModelIndex &index, qint32 role) const;
-		bool setData(const QModelIndex &index, const QVariant &value, qint32 role);
+		bool setData(const QModelIndex &index, const QVariant &value, qint32 role = Qt::EditRole);
 		Qt::ItemFlags flags(const QModelIndex &index) const;
 		QVariant headerData(qint32 section, Qt::Orientation orientation, qint32 role = Qt::DisplayRole) const;
-		bool setHeaderData(qint32 section, Qt::Orientation orientation, const QVariant &value, qint32 role);
+		bool setHeaderData(qint32 section, Qt::Orientation orientation, const QVariant &value, qint32 role = Qt::EditRole);
 		QModelIndex index(qint32 row, qint32 column, const QModelIndex &parent = QModelIndex()) const;
 		QModelIndex parent(const QModelIndex &index) const;
 		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
 		qint32 columnCount(const QModelIndex &parent = QModelIndex()) const;
-		bool insertRows(qint32 pos, qint32 count, const QModelIndex &parent);
+		bool insertRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
 		bool removeRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
 		
 	private:
