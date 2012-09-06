@@ -20,7 +20,6 @@
 
 #include <QDebug>
 #include <QSettings>
-#include <QPushButton>
 
 BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -33,13 +32,13 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	connect(actionRemoveEntry, SIGNAL(triggered()), this, SLOT(removeEntry()));
 	connect(actionChangeEntry, SIGNAL(triggered()), this, SLOT(editEntry()));
 	
-	connect(treeView, SIGNAL(clicked(QModelIndex)), this, SLOT(treeClicked(QModelIndex)));
-	
 	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"));
 	treeView->setModel(treeModel);
 	for (qint32 i = 0; i < treeModel->columnCount(); ++i) {
 		treeView->resizeColumnToContents(i);
 	}
+    connect(treeView, SIGNAL(clicked(QModelIndex)), this, SLOT(treeClicked(QModelIndex)));
+    connect(treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(treeSelectionChanged()));
 	
 	listModel = new budget::BudgetEntityModel;
 	listView->setModel(listModel);
@@ -96,6 +95,12 @@ void BudgetView::showSummary(QList<BudgetEntity *> *list) {
 	labelTotal->setText("<b>" + locale.toCurrencyString(amount, locale.currencySymbol(QLocale::CurrencySymbol)) + "</b>");
 }
 
+void BudgetView::treeSelectionChanged() {
+    if (treeView->selectionModel()->currentIndex().isValid()) {
+        treeView->closePersistentEditor(treeView->selectionModel()->currentIndex());
+    }
+}
+
 void BudgetView::createFolder() {
 	QModelIndex sel = treeView->selectionModel()->currentIndex();
     qint32 idx = 0;//sel.row() + 1;
@@ -111,7 +116,7 @@ void BudgetView::createFolder() {
     treeModel->setData( treeModel->index(idx, 3, sel), QVariant("0"), Qt::EditRole );
 	
     treeView->selectionModel()->setCurrentIndex(treeModel->index(idx, 0, sel), QItemSelectionModel::ClearAndSelect);
-    treeView->closePersistentEditor(treeView->selectionModel()->currentIndex());
+    treeSelectionChanged();
 }
 
 void BudgetView::removeFolder() {
@@ -159,7 +164,7 @@ namespace budget {
 	TreeItem::TreeItem(TreeItem *parent) {
 		parentItem = parent;
 		entityId = 0;
-		itemData << "" << "" << "" << "";
+        itemData << "22" << "Name" << "Description" << "0.0";
 	}
 
 	TreeItem::~TreeItem() {
@@ -365,6 +370,7 @@ namespace budget {
 		if (role != Qt::EditRole) {
 			return false;
 		}
+
 		TreeItem *item = getItem(index);
 		bool success = item->setData(index.column(), value);
 		if (success) {

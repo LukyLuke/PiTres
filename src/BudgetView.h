@@ -19,7 +19,7 @@
 #ifndef BudgetView_H
 #define BudgetView_H
 
-#include "../ui_budget.h"
+#include "ui_budget.h"
 
 #include "data/BudgetEntity.h"
 
@@ -42,7 +42,7 @@ namespace budget {
 	class TreeModel;
 	class BudgetEntityModel;
 	class BudgetEntityDelegate;
-};
+}
 
 class BudgetView : public QWidget, private Ui::BudgetForm {
 Q_OBJECT
@@ -72,6 +72,7 @@ public slots:
 	void removeEntry();
 	void editEntry();
 	void treeClicked(const QModelIndex index);
+    void treeSelectionChanged();
 	
 };
 
