@@ -38,7 +38,8 @@ OUT_PWD = build
 # Add special Platform-Dependant libraries and sources
 win32 {
 	CONFIG += windows
-	LIBS += -lldap -llber -lmagic
+	#LIBS += -lldap -llber -lmagic
+  WIN32 = yes
 }
 unix {
 	LIBS += -lldap -llber -lmagic

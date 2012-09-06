@@ -18,7 +18,10 @@
 
 #include "Smtp.h"
 
+#ifndef WIN32
 #include <magic.h>
+#endif
+
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
@@ -340,6 +343,7 @@ QString Smtp::getMimeType(const QString &fileName) {
 	// ToDo: Windows-Version
 	// ToDo: Mac-Version
 	QString result("applicatin/octet-stream");
+#ifndef WIN32
 	magic_t magicMimePredictor;
 	
 	magicMimePredictor = magic_open(MAGIC_MIME_TYPE);
@@ -360,5 +364,6 @@ QString Smtp::getMimeType(const QString &fileName) {
 		magic_close(magicMimePredictor);
 	}
 	qDebug() << "Smtp: LibMagic found Mimetype '" << result << "' for file " << fileName;
+#endif
 	return result;
 }

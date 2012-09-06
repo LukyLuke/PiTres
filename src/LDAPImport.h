@@ -27,17 +27,21 @@
 #include <QString>
 #include <QtSql>
 
+#ifndef WIN32
 extern "C" {
 #include <ldap.h>
 }
+#endif
 
 class LDAPImport : public QWidget, private Ui::LDAPImportForm {
 Q_OBJECT
 private:
+#ifndef WIN32
 	LDAP *ldap;
+  struct berval cred;
+#endif
 	QString ldapError;
 	int version;
-	struct berval cred;
 	bool connected;
 	QSqlDatabase db;
 	

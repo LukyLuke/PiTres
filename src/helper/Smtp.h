@@ -33,7 +33,7 @@ class Smtp : public QObject {
 Q_OBJECT
 
 public:
-	const int SMTP_CHUNK_SIZE = 76;
+    const static int SMTP_CHUNK_SIZE = 76;
 	Smtp(const QString &host, const int port);
 	virtual ~Smtp();
 	void authLogin(const QString &username, const QString &password);

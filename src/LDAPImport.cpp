@@ -37,9 +37,11 @@
 #include <QRegExp>
 #include <QDebug>
 
+#ifndef WIN32
 extern "C" {
 #include <ldap.h>
 }
+#endif
 
 LDAPImport::LDAPImport(QWidget *parent) {
 	setupUi(this);
@@ -47,8 +49,10 @@ LDAPImport::LDAPImport(QWidget *parent) {
 	
 	// Initialize some components
 	connected = FALSE;
-	version = LDAP_VERSION3;
 	stackedWidget->setCurrentIndex(0);
+#ifndef WIN32
+	version = LDAP_VERSION3;
+#endif
 	
 	// Load saved values
 	editServer->setText( settings.value("ldap/server", "localhost").toString() );
@@ -101,7 +105,9 @@ void LDAPImport::saveConfiguration() {
 
 void LDAPImport::disconnectLdap() {
 	if (connected) {
+#ifndef WIN32
 		ldap_unbind_ext(ldap, NULL, NULL);
+#endif
 	}
 	connected = FALSE;
 }
@@ -113,6 +119,7 @@ void LDAPImport::connectLdap() {
 	QString host = "ldap://" + editServer->text() + ":" + QString::number(editPort->value());
 	qDebug() << "Trying to connect: " + host;
 	
+#ifndef WIN32
 	if (LDAP_SUCCESS == ldap_initialize(&ldap, host.toStdString().c_str())) {
 		qDebug() << "Connection initialized...";
 		
@@ -141,6 +148,7 @@ void LDAPImport::connectLdap() {
 		qDebug() << "Bound to LDAP-Server with BindDN: " + binddn;
 		connected = TRUE;
 	}
+#endif
 }
 
 void LDAPImport::testConnection() {
@@ -178,15 +186,18 @@ void LDAPImport::importFromLdap() {
 		attrs[i] = attrlist[i].data();
 	}
 	
+#ifndef WIN32
 	LDAPMessage *res = NULL, *msg = NULL;
 	BerElement *ber = NULL;
 	//                                                                             attrs
 	// If we add "attrs" we get a Segfault here - strange...
 	rc = ldap_search_ext_s(ldap, basedn.data(), LDAP_SCOPE_SUBTREE, filter.data(), NULL, 0, NULL, NULL, NULL, LDAP_NO_LIMIT, &res);
-	
+#endif
+
 	// Cleanup calling parameters
 	delete[] attrs;
-	
+  
+#ifndef WIN32
 	if (rc != LDAP_SUCCESS) {
 		ldapError = ldap_err2string(rc);
 		qDebug() << QString("Search failed(%1): %2").arg(rc).arg(ldapError);
@@ -196,12 +207,14 @@ void LDAPImport::importFromLdap() {
 		return;
 	}
 	qDebug() << QString("Search for %1 succeed").arg(editSearch->text());
-	
-	// Create Persons Database Tables if needed
-	PPSPerson::createTables();
+#endif
 	
 	// Prepare the Progress-Bar
+#ifndef WIN32
 	int max = ldap_count_entries(ldap, res);
+#else
+  int max = 0;
+#endif
 	int count = 0;
 	progressBar->setMinimum(1);
 	progressBar->setMaximum(max);
@@ -209,14 +222,17 @@ void LDAPImport::importFromLdap() {
 	
 	// Get all results
 	char *attribute;
+#ifndef WIN32
 	berval **values, dnval;
+#endif
 	PPSPerson *person;
 	QStringList dnlist;
 	QString dn;
 
+#ifndef WIN32
 	for (msg = ldap_first_entry(ldap, res); msg != NULL; msg = ldap_next_entry(ldap, msg)) {
 		ldap_get_dn_ber(ldap, msg, &ber, &dnval);
-		
+
 		progressBar->setValue(++count);
 		labelImportState->setText(QString("Import %1 of %2").arg(count).arg(max));
 		
@@ -265,6 +281,10 @@ void LDAPImport::importFromLdap() {
 	if (person != NULL) {
 		delete person;
 	}
+#else
+  progressBar->setValue(max);
+  labelImportState->setText(QString("LDAP-Import not supported under windows at the moment, sorry..."));
+#endif
 }
 
 void LDAPImport::emptyDatabase() {
