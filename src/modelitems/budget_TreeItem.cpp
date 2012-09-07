@@ -1,0 +1,141 @@
+/*
+	The Budget-TreeItem is used in the TreeView of the Budget-View
+	Copyright (C) 2012  Lukas Zurschmiede <l.zurschmiede@delightsoftware.com>
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "budget_TreeItem.h"
+
+#include <QDebug>
+#include <QSettings>
+
+namespace budget {
+	
+	/**
+	* TreeView Itemts
+	*/
+	TreeItem::TreeItem(TreeItem *parent) {
+		parentItem = parent;
+		entityId = 0;
+		itemData << "0" << "" << "" << "0.0";
+	}
+	
+	TreeItem::~TreeItem() {
+		qDeleteAll(childItems);
+	}
+	
+	bool TreeItem::setData(const qint32 pos, const QVariant &data) {
+		if (pos >= 0) {
+			itemData[pos] = data;
+			save();
+			return true;
+		}
+		return false;
+	}
+	
+	qint32 TreeItem::id() const {
+		return itemData[0].toInt();
+	}
+	
+	void TreeItem::setId(qint32 id) {
+		entityId = id;
+	}
+	
+	void TreeItem::save() {
+		if (parentItem) {
+			QSqlQuery query(db);
+			if (entityId <= 0) {
+				query.prepare("INSERT INTO budget_tree (position,parent_id,name,description,amount) VALUES (:pos,:parent,:name,:description,:amount);");
+			} else {
+				query.prepare("UPDATE budget_tree SET position=:pos,parent_id=:parent,description=:description,amount=:amount,name=:name WHERE entity_id=:id;");
+				query.bindValue(":id", entityId);
+			}
+			query.bindValue(":pos", itemData[0]);
+			query.bindValue(":parent", parentItem->id());
+			query.bindValue(":name", itemData[1]);
+			query.bindValue(":description", itemData[2]);
+			query.bindValue(":amount", itemData[3]);
+			query.exec();
+			
+			if (query.lastError().type() != QSqlError::NoError) {
+				qDebug() << query.lastQuery();
+				qDebug() << query.lastError();
+			}
+			if (entityId <= 0) {
+				setId(query.lastInsertId().toInt());
+			}
+		}
+	}
+	
+	void TreeItem::appendChild(TreeItem *child) {
+		childItems.append(child);
+	}
+	
+	bool TreeItem::insertChildren(qint32 position, qint32 count) {
+		if (position < 0 || position > childItems.size()) {
+			return false;
+		}
+		for (qint32 row = 0; row < count; ++row) {
+			TreeItem *item = new TreeItem(this);
+			childItems.insert(position, item);
+		}
+		return true;
+	}
+	
+	bool TreeItem::removeChildren(qint32 position, qint32 count) {
+		if (position < 0 || position + count > childItems.size()) {
+			return false;
+		}
+		for (qint32 row = 0; row < count; ++row) {
+			delete childItems.takeAt(position);
+		}
+		return true;
+	}
+	
+	TreeItem *TreeItem::child(qint32 number) {
+		return childItems.value(number);
+	}
+	
+	qint32 TreeItem::childCount() const {
+		return childItems.count();
+	}
+	
+	qint32 TreeItem::childNumber() const {
+		if (parentItem) {
+			return parentItem->childItems.indexOf(const_cast<TreeItem *>(this));
+		}
+		return 0;
+	}
+	
+	qint32 TreeItem::columnCount() const {
+		return itemData.count();
+	}
+	
+	QVariant TreeItem::data(qint32 column) const {
+		return itemData.value(column);
+	}
+	
+	qint32 TreeItem::row() const {
+		if (parentItem) {
+			return parentItem->childItems.indexOf(const_cast<TreeItem*>(this));
+		}
+		return 0;
+	}
+	
+	TreeItem* TreeItem::parent() {
+		return parentItem;
+	}
+	
+}

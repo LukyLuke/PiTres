@@ -18,9 +18,13 @@ SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/Paymen
 HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Section.h src/data/BudgetEntity.h
 SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp src/data/Section.cpp src/data/BudgetEntity.cpp
 
-# Delegates
-#HEADERS += src/delegate/.h
-#SOURCES += src/delegate/.cpp
+# Delegates and Models
+HEADERS += src/budget_BudgetEntityDelegate.h src/budget_BudgetEntityModel.h src/budget_TreeModel.h
+SOURCES += src/budget_BudgetEntityDelegate.cpp src/budget_BudgetEntityModel.cpp src/budget_TreeModel.cpp
+
+# Model-Items
+HEADERS += src/modelitems/budget_TreeItem.h
+SOURCES += src/modelitems/budget_TreeItem.cpp
 
 # Helper Classes and Functions
 HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/Smtp.h
