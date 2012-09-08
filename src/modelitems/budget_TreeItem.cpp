@@ -23,13 +23,10 @@
 
 namespace budget {
 	
-	/**
-	* TreeView Itemts
-	*/
 	TreeItem::TreeItem(TreeItem *parent) {
 		parentItem = parent;
 		entityId = 0;
-		itemData << "0" << "" << "" << "0.0";
+		itemData << "0" << "" << "" << "0.0" << "0";
 	}
 	
 	TreeItem::~TreeItem() {
@@ -57,16 +54,20 @@ namespace budget {
 		if (parentItem) {
 			QSqlQuery query(db);
 			if (entityId <= 0) {
-				query.prepare("INSERT INTO budget_tree (position,parent_id,name,description,amount) VALUES (:pos,:parent,:name,:description,:amount);");
+				query.prepare("INSERT INTO budget_tree (position,parent_id,name,description,amount,type) VALUES (:pos,:parent,:name,:description,:amount,:type);");
 			} else {
-				query.prepare("UPDATE budget_tree SET position=:pos,parent_id=:parent,description=:description,amount=:amount,name=:name WHERE entity_id=:id;");
+				query.prepare("UPDATE budget_tree SET position=:pos,parent_id=:parent,description=:description,amount=:amount,name=:name,type=:type WHERE entity_id=:id;");
 				query.bindValue(":id", entityId);
 			}
-			query.bindValue(":pos", itemData[0]);
+			if (itemData[0].toInt() == parentItem->id()) {
+				itemData[0] = itemData[0].toInt() + 1;
+			}
+			query.bindValue(":pos", itemData[0].toInt());
 			query.bindValue(":parent", parentItem->id());
 			query.bindValue(":name", itemData[1]);
 			query.bindValue(":description", itemData[2]);
-			query.bindValue(":amount", itemData[3]);
+			query.bindValue(":amount", itemData[3].toReal());
+			query.bindValue(":type", itemData[4].toInt());
 			query.exec();
 			
 			if (query.lastError().type() != QSqlError::NoError) {

@@ -17,6 +17,7 @@
 */
 
 #include "BudgetView.h"
+#include "budget_TreeItemDelegate.h"
 
 #include <QDebug>
 #include <QSettings>
@@ -26,17 +27,18 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	
 	connect(actionCreateFolder, SIGNAL(triggered()), this, SLOT(createFolder()));
 	connect(actionRemoveFolder, SIGNAL(triggered()), this, SLOT(removeFolder()));
-	connect(actionChangeFolder, SIGNAL(triggered()), this, SLOT(editFolder()));
+	connect(actionCreateRoot, SIGNAL(triggered()), this, SLOT(createRoot()));
 	
 	connect(actionCreateEntry, SIGNAL(triggered()), this, SLOT(createEntry()));
 	connect(actionRemoveEntry, SIGNAL(triggered()), this, SLOT(removeEntry()));
 	connect(actionChangeEntry, SIGNAL(triggered()), this, SLOT(editEntry()));
 	
-	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"));
+	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"), tr("Type"));
 	treeView->setModel(treeModel);
 	for (qint32 i = 0; i < treeModel->columnCount(); ++i) {
 		treeView->resizeColumnToContents(i);
 	}
+	treeView->setItemDelegateForColumn(4, new budget::TreeItemDelegate());
 	connect(treeView, SIGNAL(clicked(QModelIndex)), this, SLOT(treeClicked(QModelIndex)));
 	connect(treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(treeSelectionChanged()));
 	
@@ -53,7 +55,9 @@ BudgetView::~BudgetView() {
 void BudgetView::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.exec("CREATE TABLE IF NOT EXISTS budget_tree (entity_id INTEGER PRIMARY KEY AUTOINCREMENT, position INTEGER, parent_id INTEGER, name TEXT, description TEXT, amount FLOAT);");
+	query.exec("CREATE TABLE IF NOT EXISTS budget_tree (entity_id INTEGER PRIMARY KEY AUTOINCREMENT,position INTEGER, parent_id INTEGER, name TEXT, description TEXT, amount FLOAT, type INTEGER DEFAULT 0);");
+	query.exec("CREATE INDEX IF NOT EXISTS parent_index ON budget_tree (parent_id);");
+	query.exec("CREATE INDEX IF NOT EXISTS position_index ON budget_tree (position);");
 }
 
 QList <qint32>BudgetView::getChildSections(qint32 section) {
@@ -103,20 +107,25 @@ void BudgetView::treeSelectionChanged() {
 
 void BudgetView::createFolder() {
 	QModelIndex sel = treeView->selectionModel()->currentIndex();
-	qint32 idx = 0;//sel.row() + 1;
+	qint32 row = 0;
 	
-	if (!treeModel->insertRow(idx, sel)) {
+	if (!treeModel->insertRow(row, sel)) {
 		return;
 	}
 	
 	// treeModel->data(treeModel->index(sel.row(), 0, sel), Qt::DisplayRole)
-	treeModel->setData( treeModel->index(idx, 0, sel), QVariant(0), Qt::EditRole );
-	treeModel->setData( treeModel->index(idx, 1, sel), QVariant(tr("Enter Data")), Qt::EditRole );
-	treeModel->setData( treeModel->index(idx, 2, sel), QVariant(tr("Enter Data")), Qt::EditRole );
-	treeModel->setData( treeModel->index(idx, 3, sel), QVariant("0"), Qt::EditRole );
+	treeModel->setData( treeModel->index(row, 0, sel), QVariant(0), Qt::EditRole );
+	treeModel->setData( treeModel->index(row, 1, sel), QVariant(tr("Enter Data")), Qt::EditRole );
+	treeModel->setData( treeModel->index(row, 2, sel), QVariant(tr("Enter Data")), Qt::EditRole );
+	treeModel->setData( treeModel->index(row, 3, sel), QVariant(0.0), Qt::EditRole );
 	
-	treeView->selectionModel()->setCurrentIndex(treeModel->index(idx, 0, sel), QItemSelectionModel::ClearAndSelect);
+	treeView->selectionModel()->setCurrentIndex(treeModel->index(row, 0, sel), QItemSelectionModel::ClearAndSelect);
 	treeSelectionChanged();
+}
+
+void BudgetView::createRoot() {
+	treeView->selectionModel()->clear();
+	createFolder();
 }
 
 void BudgetView::removeFolder() {
@@ -130,10 +139,6 @@ void BudgetView::doRemoveFolder() {
 	if (!treeModel->removeRow(sel.row(), sel.parent())) {
 		// Show Error
 	}
-}
-
-void BudgetView::editFolder() {
-	qDebug() << "Edit Folder...";
 }
 
 void BudgetView::createEntry() {

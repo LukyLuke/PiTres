@@ -23,12 +23,13 @@
 
 namespace budget {
 	
-	TreeModel::TreeModel(const QString number, const QString category, const QString comment, const QString amount, QObject *parent) : QAbstractItemModel(parent) {
+	TreeModel::TreeModel(const QString number, const QString category, const QString comment, const QString amount, const QString type, QObject *parent) : QAbstractItemModel(parent) {
 		rootItem = new TreeItem();
 		rootItem->setData(0, number);
 		rootItem->setData(1, category);
 		rootItem->setData(2, comment);
 		rootItem->setData(3, amount);
+		rootItem->setData(4, type);
 		
 		setupModelData(rootItem);
 	}
@@ -38,10 +39,6 @@ namespace budget {
 	}
 	
 	QModelIndex TreeModel::index(qint32 row, qint32 column, const QModelIndex &parent) const {
-		if (parent.isValid()) {
-			return QModelIndex();
-		}
-		
 		TreeItem *parentItem = getItem(parent);
 		TreeItem *childItem = parentItem->child(row);
 		
@@ -158,7 +155,7 @@ namespace budget {
 	void TreeModel::setupModelData(TreeItem *parent) {
 		QLocale locale;
 		QSqlQuery query(db);
-		query.prepare("SELECT entity_id,position,name,description,amount FROM budget_tree WHERE parent_id=? ORDER BY entity_id;");
+		query.prepare("SELECT entity_id,position,name,description,amount,type FROM budget_tree WHERE parent_id=? ORDER BY position ASC;");
 		query.bindValue(0, parent->id());
 		query.exec();
 		
@@ -168,7 +165,8 @@ namespace budget {
 			child->setData(0, query.value(1));
 			child->setData(1, query.value(2));
 			child->setData(2, query.value(3));
-			child->setData(3, locale.toCurrencyString(query.value(4).toFloat(), locale.currencySymbol(QLocale::CurrencySymbol)));
+			child->setData(3, query.value(4).toFloat());
+			child->setData(4, query.value(5).toInt());
 			parent->appendChild(child);
 			setupModelData(child);
 		}

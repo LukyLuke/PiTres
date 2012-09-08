@@ -38,7 +38,7 @@ namespace budget {
 	Q_OBJECT
 
 	public:
-		TreeModel(const QString number, const QString category, const QString comment, const QString amount, QObject *parent = 0);
+		TreeModel(const QString number, const QString category, const QString comment, const QString amount, const QString type, QObject *parent = 0);
 		virtual ~TreeModel();
 		
 		QVariant data(const QModelIndex &index, qint32 role) const;

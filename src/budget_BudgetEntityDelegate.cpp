@@ -24,7 +24,7 @@
 
 namespace budget {
 
-	BudgetEntityDelegate::BudgetEntityDelegate(QObject * parent) : QStyledItemDelegate(parent) {
+	BudgetEntityDelegate::BudgetEntityDelegate(QObject *parent) : QStyledItemDelegate(parent) {
 		dateWidth = 0;
 	}
 	
@@ -58,7 +58,8 @@ namespace budget {
 		
 		if (dateWidth <= 0) {
 			QDate _date = QDate(9999, 12, 29);
-			*((int*)(&dateWidth)) = painter->fontMetrics().width(_date.toString(locale.dateFormat(QLocale::ShortFormat))) + 10;
+			//*((int*)(&dateWidth)) = painter->fontMetrics().width(_date.toString(locale.dateFormat(QLocale::ShortFormat))) + 10;
+			dateWidth = painter->fontMetrics().width(_date.toString(locale.dateFormat(QLocale::ShortFormat))) + 10;;
 		}
 		
 		QString amount = locale.toCurrencyString(entity.amount(), locale.currencySymbol(QLocale::CurrencySymbol));

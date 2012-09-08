@@ -37,7 +37,7 @@
        <item>
         <widget class="QToolBar" name="horizontalWidget">
          <addaction name="actionCreateFolder"/>
-         <addaction name="actionChangeFolder"/>
+         <addaction name="actionCreateRoot"/>
          <addaction name="actionRemoveFolder"/>
         </widget>
        </item>
@@ -130,8 +130,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>69</width>
-            <height>470</height>
+            <width>72</width>
+            <height>477</height>
            </rect>
           </property>
          </widget>
@@ -145,7 +145,7 @@
   <action name="actionCreateFolder">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/folder_new.png</normaloff>:/icons/resources/icons/folder_new.png</iconset>
+     <normaloff>:/icons/resources/icons/folders.png</normaloff>:/icons/resources/icons/folders.png</iconset>
    </property>
    <property name="text">
     <string>Create Folder</string>
@@ -208,16 +208,13 @@
     <string>Change the Entry and it's values</string>
    </property>
   </action>
-  <action name="actionChangeFolder">
+  <action name="actionCreateRoot">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/folder_edit.png</normaloff>:/icons/resources/icons/folder_edit.png</iconset>
+     <normaloff>:/icons/resources/icons/folder_new.png</normaloff>:/icons/resources/icons/folder_new.png</iconset>
    </property>
    <property name="text">
-    <string>Change Folder</string>
-   </property>
-   <property name="toolTip">
-    <string>Change the Folder's attributes</string>
+    <string>Create Root-Folder</string>
    </property>
   </action>
  </widget>

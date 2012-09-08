@@ -62,7 +62,7 @@ public:
 public slots:
 	void createFolder();
 	void removeFolder();
-	void editFolder();
+	void createRoot();
 	void createEntry();
 	void removeEntry();
 	void editEntry();

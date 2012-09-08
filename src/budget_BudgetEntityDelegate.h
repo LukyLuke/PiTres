@@ -37,7 +37,7 @@ namespace budget {
 		QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 		
 	private:
-		qint32 dateWidth;
+		mutable qint32 dateWidth;
 	};
 };
 #endif // Budget_BudgetEntityDelegate_H
