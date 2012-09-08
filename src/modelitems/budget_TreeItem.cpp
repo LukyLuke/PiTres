@@ -80,6 +80,13 @@ namespace budget {
 		}
 	}
 	
+	void TreeItem::deleteItem() {
+		QSqlQuery query(db);
+		query.prepare("DELETE FROM budget_tree WHERE entity_id=?;");
+		query.bindValue(0, entityId);
+		query.exec();
+	}
+	
 	void TreeItem::appendChild(TreeItem *child) {
 		childItems.append(child);
 	}
@@ -100,7 +107,9 @@ namespace budget {
 			return false;
 		}
 		for (qint32 row = 0; row < count; ++row) {
-			delete childItems.takeAt(position);
+			TreeItem *item = childItems.takeAt(position);
+			item->deleteItem();
+			delete item;
 		}
 		return true;
 	}

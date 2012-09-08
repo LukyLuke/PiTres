@@ -48,6 +48,7 @@ namespace budget {
 		bool setData(const qint32 pos, const QVariant &data);
 		bool insertChildren(qint32 position, qint32 count);
 		bool removeChildren(qint32 position, qint32 count);
+		void deleteItem();
 		
 	private:
 		QSqlDatabase db;

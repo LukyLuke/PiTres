@@ -130,17 +130,16 @@ void BudgetView::createRoot() {
 }
 
 void BudgetView::removeFolder() {
-	int box = QMessageBox::question(this, tr("Delete Folder"), tr("Really delete the Selected Folder and all Subfolders?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
-	if (box == QMessageBox::Ok) {
+	int ret = QMessageBox::question(this, tr("Delete Folder"), tr("Really delete the Selected Folder and all Subfolders?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+	if (ret == QMessageBox::Ok) {
 		doRemoveFolder();
 	}
 }
 
 void BudgetView::doRemoveFolder() {
 	QModelIndex sel = treeView->selectionModel()->currentIndex();
-	
 	if (!treeModel->removeRow(sel.row(), sel.parent())) {
-		// Show Error
+		QMessageBox::critical(this, tr("Delete failed"), tr("Could not delete the Folder. Try it again or let it be..."));
 	}
 }
 
