@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QSettings>
+#include <QMessageBox>
 
 BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -129,8 +130,10 @@ void BudgetView::createRoot() {
 }
 
 void BudgetView::removeFolder() {
-	// show Messagebox to confirm
-	doRemoveFolder();
+	int box = QMessageBox::question(this, tr("Delete Folder"), tr("Really delete the Selected Folder and all Subfolders?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+	if (box == QMessageBox::Ok) {
+		doRemoveFolder();
+	}
 }
 
 void BudgetView::doRemoveFolder() {
