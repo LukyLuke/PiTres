@@ -148,8 +148,10 @@ void BudgetView::createEntry() {
 }
 
 void BudgetView::removeEntry() {
-	// Show MessageBox to confirm
-	qDebug() << "Remove Entry...";
+	int ret = QMessageBox::question(this, tr("Delete Entry"), tr("Really delete the Selected Entry?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+	if (ret == QMessageBox::Ok) {
+		doRemoveEntry();
+	}
 }
 void BudgetView::doRemoveEntry() {
 	// remove...

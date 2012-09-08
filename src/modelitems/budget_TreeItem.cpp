@@ -82,6 +82,13 @@ namespace budget {
 	
 	void TreeItem::deleteItem() {
 		QSqlQuery query(db);
+		
+		while (!childItems.isEmpty()) {
+			TreeItem *child = childItems.takeLast();
+			child->deleteItem();
+			delete child;
+		}
+		
 		query.prepare("DELETE FROM budget_tree WHERE entity_id=?;");
 		query.bindValue(0, entityId);
 		query.exec();
