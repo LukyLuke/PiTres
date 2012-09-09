@@ -17,37 +17,6 @@
 */
 
 #include "SentBills.h"
-#include "data/Person.h"
-#include "data/Invoice.h"
-#include "data/Reminder.h"
-#include "helper/XmlPdf.h"
-
-#include <QSizePolicy>
-#include <QWidget>
-#include <QTableView>
-#include <QVariant>
-#include <QString>
-#include <QStringList>
-#include <QFileInfo>
-#include <QDir>
-#include <QSqlDatabase>
-#include <QSqlQueryModel>
-#include <QSqlQuery>
-#include <QSettings>
-#include <QModelIndex>
-#include <QVariant>
-#include <QSqlRecord>
-#include <QSqlDriver>
-#include <QPoint>
-#include <QMenu>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QKeySequence>
-#include <QItemSelectionModel>
-#include <QModelIndexList>
-#include <QProgressDialog>
-#include <QDebug>
-
 
 SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -69,10 +38,6 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	
 	loadData();
 	createContextMenu();
-	
-	adjustMemberdateDialog = new QDialog(this);
-	adjustMembersDueDateForm.setupUi(adjustMemberdateDialog);
-	connect(adjustMembersDueDateForm.actionAdjust, SIGNAL(triggered()), this, SLOT(doAdjustDates()));
 	
 	invoiceQifDialog = new QDialog(this);
 	exportInvoiceQifForm.setupUi(invoiceQifDialog);
@@ -300,92 +265,6 @@ void SentBills::doExportQifPayments() {
 		}
 	}
 	paymentQifDialog->close();
-}
-
-void SentBills::doAdjustDates() {
-	QSettings settings;
-	QDate from = adjustMembersDueDateForm.paidDate->date();
-	QDate due = adjustMembersDueDateForm.paidDueDate->date();
-	
-	if (adjustMembersDueDateForm.checkDatabase->isChecked()) {
-		QSqlQuery query(db);
-		query.prepare("UPDATE ldap_persons SET paid_due=:paidDueDate WHERE uid IN (SELECT member_uid FROM pps_invoice "
-		              "WHERE amount_paid>=amount AND issue_date>=:issueDate AND paid_date>=:paidDate);");
-		query.bindValue(":paidDueDate", due.toString("yyyy-MM-dd"));
-		query.bindValue(":issueDate", from.toString("yyyy-MM-dd"));
-		query.bindValue(":paidDate", from.toString("yyyy-MM-dd"));
-		if (!query.exec()) {
-			if (query.lastError().type() != QSqlError::NoError) {
-				qDebug() << query.lastQuery();
-				qDebug() << query.lastError();
-			}
-			QMessageBox::warning(this, tr("Adjusting dates failed"), tr("An Error occured while adjusting Paid-Dues dates in Database:\n\n%1").arg(query.lastError().text()));
-		}
-	}
-	
-	if (adjustMembersDueDateForm.checkLdif->isChecked()) {
-		QString ldif = "";
-		QString section, member;
-		QString duedate = due.toString("yyyy-MM-dd");
-		QString members_dn = settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString();
-		QString main_dn = settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,st=%2,dc=piratenpartei,dc=ch").toString();
-		QString attribute = settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString();
-		bool replaceAttribute = settings.value("ldif/replace_attribute", false).toBool();
-		
-		QSqlQuery query(db);
-		query.prepare("SELECT p.uid, p.section FROM pps_invoice i, ldap_persons p WHERE i.amount_paid>=i.amount AND i.issue_date >= :issueDate "
-		              "AND i.paid_date >= :paidDate AND i.member_uid=p.uid AND (p.ldap_paid_due < :paidDueDate OR p.ldap_paid_due IS NULL OR p.ldap_paid_due='');");
-		query.bindValue(":paidDueDate", duedate);
-		query.bindValue(":issueDate", from.toString("yyyy-MM-dd"));
-		query.bindValue(":paidDate", from.toString("yyyy-MM-dd"));
-		
-		if (query.exec()) {
-			while (query.next()) {
-				section = query.value(1).toString();
-				member = query.value(0).toString();
-				
-				if (section.isEmpty() || section.length() > 2) {
-					ldif.append("dn: " + members_dn.arg(member));
-				} else {
-					ldif.append("dn: " + main_dn.arg(member, section));
-				}
-				ldif.append("\nchangetype: modify");
-				if (replaceAttribute) {
-					ldif.append("delete: ");
-					ldif.append(attribute);
-					ldif.append("\n-\n");
-				}
-				ldif.append("\nadd: ");
-				ldif.append(attribute);
-				ldif.append("\n");
-				ldif.append(attribute).append(": ").append(duedate);
-				ldif.append("\n\n");
-			}
-			
-			// Save the LDIF
-			if (ldif.length() > 0) {
-				QString fileName = QFileDialog::getSaveFileName(this, tr("Save LDIF File"), "", tr("LDIF (*.ldif);;Plaintext (*.txt)"));
-				if (!fileName.isEmpty()) {
-					QFile f(fileName);
-					if (f.open(QFile::WriteOnly | QFile::Truncate)) {
-						QTextStream out(&f);
-						out << ldif;
-					} else {
-						QMessageBox::warning(this, tr("Adjusting dates failed"), tr("An Error occured while opening the LDIF-File.\n\nDo you have Write-Permission to\n%1?").arg(fileName));
-					}
-				}
-			} else {
-				QMessageBox::warning(this, tr("Adjusting dates failed"), tr("No Datasets found which would need an Update..."));
-			}
-		} else {
-			if (query.lastError().type() != QSqlError::NoError) {
-				qDebug() << query.lastQuery();
-				qDebug() << query.lastError();
-			}
-			QMessageBox::warning(this, tr("Adjusting dates failed"), tr("An Error occured while getting Paid-Dues dates from Database:\n\n%1").arg(query.lastError().text()));
-		}
-	}
-	adjustMemberdateDialog->hide();
 }
 
 void SentBills::showTableContextMenu(const QPoint &point) {

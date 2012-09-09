@@ -49,12 +49,20 @@
 #include <QAction>
 #include <QSet>
 #include <QDialog>
+#include <QMessageBox>
 #include <QTimerEvent>
 #include <QDebug>
 
 class Userlist : public QWidget, private Ui::UserlistForm {
 Q_OBJECT
+
 private:
+	struct LdiffData {
+		QString section;
+		QString uid;
+		QStringList dates;
+	};
+	
 	QSqlDatabase db;
 	QSqlQueryModel *tableModel;
 	int searchTimer;
@@ -85,6 +93,7 @@ public slots:
 	void payMemberfeeCash();
 	void showMemberDueAdjust();
 	void adjustMemberDueDate();
+	void exportLdiff();
 
 protected:
 	void timerEvent(QTimerEvent *event);

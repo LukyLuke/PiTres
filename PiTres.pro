@@ -39,7 +39,7 @@ CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml
 FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
-        forms/adjustpaiddate.ui forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
+        forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
         forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui
 OUT_PWD = build
 

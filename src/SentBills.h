@@ -19,26 +19,46 @@
 #ifndef SentBills_H
 #define SentBills_H
 
-#include "../ui_sentbills.h"
-#include "../ui_adjustpaiddate.h"
-#include "../ui_fromtodates.h"
-#include "../ui_dateform.h"
-#include "../ui_invoiceedit.h"
+#include "ui_sentbills.h"
+#include "ui_adjustpaiddate.h"
+#include "ui_fromtodates.h"
+#include "ui_dateform.h"
+#include "ui_invoiceedit.h"
 #include "data/Reminder.h"
+#include "data/Person.h"
+#include "data/Invoice.h"
+#include "data/Reminder.h"
+#include "helper/XmlPdf.h"
 
 #include <QWidget>
-#include <QDialog>
+#include <QSettings>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QString>
+#include <QSqlRecord>
+#include <QSqlDriver>
 #include <QSqlQueryModel>
 #include <QModelIndex>
+#include <QString>
+#include <QStringList>
+#include <QVariant>
 #include <QTimerEvent>
 #include <QPoint>
 #include <QMenu>
 #include <QSet>
 #include <QAction>
+#include <QSizePolicy>
+#include <QTableView>
+#include <QItemSelectionModel>
+#include <QModelIndexList>
+#include <QFileInfo>
+#include <QDir>
+#include <QKeySequence>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDialog>
+#include <QProgressDialog>
+#include <QDebug>
 
 class SentBills : public QWidget, private Ui::SentBillsForm {
 Q_OBJECT
@@ -50,11 +70,9 @@ private:
 	QAction *actionPrintReminder;
 	QAction *actionShowEdit;
 	
-	QDialog *adjustMemberdateDialog;
 	QDialog *invoiceQifDialog;
 	QDialog *paymentQifDialog;
 	QDialog *editDialog;
-	Ui::adjustPaidDateForm adjustMembersDueDateForm;
 	Ui::fromToDatesForm exportInvoiceQifForm;
 	Ui::fromToDatesForm exportPaymentQifForm;
 	Ui::editEditInvoice editInvoice;
@@ -72,7 +90,6 @@ public:
 public slots:
 	void searchData();
 	void searchDataTimeout(QString data);
-	void doAdjustDates();
 	void exportQifAssets();
 	void doExportQifAssets();
 	void exportQifPayments();
