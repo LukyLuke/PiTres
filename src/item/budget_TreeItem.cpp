@@ -93,6 +93,11 @@ namespace budget {
 		query.prepare("DELETE FROM budget_tree WHERE entity_id=?;");
 		query.bindValue(0, i_entityId);
 		query.exec();
+		
+		// delete Budget-Entities also
+		query.prepare("DELETE FROM budget_entities WHERE section=?;");
+		query.bindValue(0, i_entityId);
+		query.exec();
 	}
 	
 	void TreeItem::appendChild(TreeItem *child) {
