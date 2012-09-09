@@ -19,7 +19,7 @@
 #ifndef Budget_TreeModel_H
 #define Budget_TreeModel_H
 
-#include "modelitems/budget_TreeItem.h"
+#include "item/budget_TreeItem.h"
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -29,6 +29,8 @@
 #include <QVariant>
 #include <QAbstractItemModel>
 #include <QModelIndex>
+#include <QSettings>
+#include <QDebug>
 
 namespace budget {
 	/**

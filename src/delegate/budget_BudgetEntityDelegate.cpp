@@ -18,10 +18,6 @@
 
 #include "budget_BudgetEntityDelegate.h"
 
-#include <QApplication>
-#include <QSettings>
-#include <QDebug>
-
 namespace budget {
 
 	BudgetEntityDelegate::BudgetEntityDelegate(QObject *parent) : QStyledItemDelegate(parent) {

@@ -21,11 +21,14 @@
 
 #include "data/BudgetEntity.h"
 
+#include <QApplication>
+#include <QSettings>
 #include <QString>
 #include <QList>
 #include <QVariant>
 #include <QPainter>
 #include <QStyledItemDelegate>
+#include <QDebug>
 
 namespace budget {
 	class BudgetEntityDelegate : public QStyledItemDelegate {

@@ -18,9 +18,6 @@
 
 #include "budget_TreeModel.h"
 
-#include <QDebug>
-#include <QSettings>
-
 namespace budget {
 	
 	TreeModel::TreeModel(const QString number, const QString category, const QString comment, const QString amount, const QString type, QObject *parent) : QAbstractItemModel(parent) {

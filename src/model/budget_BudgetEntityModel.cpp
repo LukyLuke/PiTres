@@ -18,9 +18,6 @@
 
 #include "budget_BudgetEntityModel.h"
 
-#include <QDebug>
-#include <QSettings>
-
 namespace budget {
 	
 	BudgetEntityModel::BudgetEntityModel(QObject * parent) : QAbstractListModel(parent) {

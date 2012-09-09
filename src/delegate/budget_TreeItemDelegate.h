@@ -20,9 +20,13 @@
 #ifndef budget_TreeItemDelegate_H
 #define budget_TreeItemDelegate_H
 
+#include "item/budget_TreeItem.h"
+
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QEvent>
+#include <QComboBox>
+#include <QDebug>
 
 namespace budget {
 	class TreeItemDelegate : public QStyledItemDelegate {

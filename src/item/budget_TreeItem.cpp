@@ -18,9 +18,6 @@
 
 #include "budget_TreeItem.h"
 
-#include <QDebug>
-#include <QSettings>
-
 namespace budget {
 	
 	TreeItem::TreeItem(TreeItem *parent) {

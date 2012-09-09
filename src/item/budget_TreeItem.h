@@ -25,6 +25,8 @@
 #include <QString>
 #include <QList>
 #include <QVariant>
+#include <QSettings>
+#include <QDebug>
 
 namespace budget {
 	/**

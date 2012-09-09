@@ -17,11 +17,6 @@
 */
 
 #include "BudgetView.h"
-#include "budget_TreeItemDelegate.h"
-
-#include <QDebug>
-#include <QSettings>
-#include <QMessageBox>
 
 BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	setupUi(this);

@@ -18,13 +18,17 @@ SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/Paymen
 HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Section.h src/data/BudgetEntity.h
 SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp src/data/Section.cpp src/data/BudgetEntity.cpp
 
-# Delegates and Models
-HEADERS += src/budget_BudgetEntityDelegate.h src/budget_BudgetEntityModel.h src/budget_TreeModel.h src/budget_TreeItemDelegate.h
-SOURCES += src/budget_BudgetEntityDelegate.cpp src/budget_BudgetEntityModel.cpp src/budget_TreeModel.cpp src/budget_TreeItemDelegate.cpp
+# Models
+HEADERS += src/model/budget_BudgetEntityModel.h src/model/budget_TreeModel.h
+SOURCES += src/model/budget_BudgetEntityModel.cpp src/model/budget_TreeModel.cpp
+
+# Delegates
+HEADERS += src/delegate/budget_BudgetEntityDelegate.h src/delegate/budget_TreeItemDelegate.h
+SOURCES += src/delegate/budget_BudgetEntityDelegate.cpp src/delegate/budget_TreeItemDelegate.cpp
 
 # Model-Items
-HEADERS += src/modelitems/budget_TreeItem.h
-SOURCES += src/modelitems/budget_TreeItem.cpp
+HEADERS += src/item/budget_TreeItem.h
+SOURCES += src/item/budget_TreeItem.cpp
 
 # Helper Classes and Functions
 HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/Smtp.h

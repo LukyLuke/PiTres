@@ -18,10 +18,6 @@
 
 
 #include "budget_TreeItemDelegate.h"
-#include "modelitems/budget_TreeItem.h"
-
-#include <QComboBox>
-#include <QDebug>
 
 namespace budget {
 	TreeItemDelegate::TreeItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {

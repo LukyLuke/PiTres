@@ -21,10 +21,11 @@
 
 #include "ui_budget.h"
 #include "data/BudgetEntity.h"
-#include "modelitems/budget_TreeItem.h"
-#include "budget_TreeModel.h"
-#include "budget_BudgetEntityModel.h"
-#include "budget_BudgetEntityDelegate.h"
+#include "item/budget_TreeItem.h"
+#include "model/budget_TreeModel.h"
+#include "model/budget_BudgetEntityModel.h"
+#include "delegate/budget_BudgetEntityDelegate.h"
+#include "delegate/budget_TreeItemDelegate.h"
 
 #include<QWidget>
 #include <QSqlDatabase>
@@ -38,6 +39,9 @@
 #include <QSqlQueryModel>
 #include <QPainter>
 #include <QStyledItemDelegate>
+#include <QSettings>
+#include <QMessageBox>
+#include <QDebug>
 
 class BudgetView : public QWidget, private Ui::BudgetForm {
 Q_OBJECT
