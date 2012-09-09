@@ -17,31 +17,6 @@
 */
 
 #include "Userlist.h"
-#include "data/Person.h"
-#include "data/Invoice.h"
-#include "PaymentWizard.h"
-
-#include <QSizePolicy>
-#include <QWidget>
-#include <QTableView>
-#include <QModelIndexList>
-#include <QVariant>
-#include <QString>
-#include <QStringList>
-#include <QFileInfo>
-#include <QDir>
-#include <QSqlDatabase>
-#include <QSqlQueryModel>
-#include <QSqlQuery>
-#include <QSettings>
-#include <QModelIndex>
-#include <QVariant>
-#include <QSqlRecord>
-#include <QFileDialog>
-#include <QRegExp>
-#include <QPoint>
-#include <QMenu>
-#include <QDebug>
 
 Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -108,17 +83,13 @@ void Userlist::loadData() {
 
 void Userlist::loadSections() {
 	selectSection->addItem(tr("All"), QVariant(""));
-	QSqlQuery query("SELECT section FROM ldap_persons GROUP BY section;");
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
+	QSqlQuery query("SELECT section FROM ldap_persons GROUP BY section;", db);
 	while (query.next()) {
 		selectSection->addItem(query.value(0).toString(), QVariant(query.value(0).toString()));
 	}
 }
 
-void Userlist::timerEvent(QTimerEvent *event) {
+void Userlist::timerEvent(QTimerEvent * /*event*/) {
 	killTimer(searchTimer);
 	searchData();
 }
@@ -127,7 +98,7 @@ void Userlist::searchData() {
 	filterSection(selectSection->currentText());
 }
 
-void Userlist::searchDataTimeout(QString data) {
+void Userlist::searchDataTimeout(QString /*data*/) {
 	killTimer(searchTimer);
 	searchTimer = startTimer(1000);
 }
@@ -174,15 +145,9 @@ QSqlQuery Userlist::createQuery() {
 	return query;
 }
 
-void Userlist::filterSection(QString section) {
+void Userlist::filterSection(QString /*section*/) {
 	QSqlQuery query = createQuery();
 	query.exec();
-	
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
-	
 	tableModel->setQuery(query);
 }
 

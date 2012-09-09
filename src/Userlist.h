@@ -19,20 +19,38 @@
 #ifndef Userlist_H
 #define Userlist_H
 
-#include "../ui_userlist.h"
-#include "../ui_dateform.h"
+#include "ui_userlist.h"
+#include "ui_dateform.h"
+
+#include "data/Person.h"
+#include "data/Invoice.h"
+#include "PaymentWizard.h"
 
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QSqlQueryModel>
+#include <QVariant>
 #include <QString>
+#include <QStringList>
+#include <QSizePolicy>
+#include <QTableView>
+#include <QModelIndex>
+#include <QModelIndexList>
+#include <QFileInfo>
+#include <QDir>
+#include <QSettings>
+#include <QSqlRecord>
+#include <QFileDialog>
+#include <QRegExp>
+#include <QPoint>
+#include <QMenu>
 #include <QAction>
 #include <QSet>
-#include <QSqlQueryModel>
-#include <QModelIndex>
 #include <QDialog>
 #include <QTimerEvent>
+#include <QDebug>
 
 class Userlist : public QWidget, private Ui::UserlistForm {
 Q_OBJECT
