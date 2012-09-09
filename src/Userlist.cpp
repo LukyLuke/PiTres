@@ -344,7 +344,9 @@ void Userlist::exportLdiff() {
 			}
 			
 			d = hashList.value(member);
-			d.dates.append(duedate);
+			if (!d.dates.contains(duedate)) {
+				d.dates.append(duedate);
+			}
 			hashList.insert(member, d);
 		}
 	} else {
@@ -367,6 +369,7 @@ void Userlist::exportLdiff() {
 		ldif.append("\n-");
 		ldif.append("\nadd: " + attribute);
 		ldif.append("\n");
+		
 		for (int i = 0; i < d.dates.size(); ++i) {
 			ldif.append(attribute).append(": ").append(d.dates.at(i));
 			ldif.append("\n");
