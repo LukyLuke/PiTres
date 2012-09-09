@@ -37,15 +37,21 @@ namespace budget {
 		
 	public:
 		BudgetEntityModel(QObject *parent = 0);
-		BudgetEntityModel(QList<BudgetEntity *> *entities, QObject *parent = 0);
+		BudgetEntityModel(qint32 section, QList<BudgetEntity *> *entities, QObject *parent = 0);
 		virtual ~BudgetEntityModel();
+		void setData(qint32 section, QList<BudgetEntity *> *entities);
+		void setSection(qint32 section) { i_section = section; };
+		qint32 section() const { return i_section; };
 		
 		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
 		QVariant data(const QModelIndex &index, qint32 role) const;
-		void setData(QList<BudgetEntity *> *entities);
+		bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+		bool insertRows(qint32 row, qint32 count, const QModelIndex &parent = QModelIndex());
+		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 	private:
 		QList<BudgetEntity *> *entities;
+		qint32 i_section;
 	};
 };
 #endif // Budget_BudgetEntityModel_H

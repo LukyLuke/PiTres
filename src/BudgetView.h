@@ -69,7 +69,6 @@ public slots:
 	void createRoot();
 	void createEntry();
 	void removeEntry();
-	void editEntry();
 	void treeClicked(const QModelIndex index);
 	void treeSelectionChanged();
 	

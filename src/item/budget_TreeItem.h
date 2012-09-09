@@ -45,6 +45,7 @@ namespace budget {
 		QVariant data(qint32 column) const;
 		qint32 row() const;
 		qint32 id() const;
+		qint32 entityId() const;
 		TreeItem *parent();
 		void setId(qint32 id);
 		bool setData(const qint32 pos, const QVariant &data);
@@ -56,7 +57,7 @@ namespace budget {
 		QSqlDatabase db;
 		QList<QVariant> itemData;
 		QList<TreeItem *> childItems;
-		qint32 entityId;
+		qint32 i_entityId;
 		TreeItem *parentItem;
 		void save();
 	};

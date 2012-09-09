@@ -22,11 +22,12 @@ namespace budget {
 	
 	BudgetEntityModel::BudgetEntityModel(QObject * parent) : QAbstractListModel(parent) {
 		entities = new QList<BudgetEntity *>();
+		i_section = 0;
 	}
 	
-	BudgetEntityModel::BudgetEntityModel(QList<BudgetEntity *> *items, QObject * parent) : QAbstractListModel(parent) {
+	BudgetEntityModel::BudgetEntityModel(qint32 section, QList<BudgetEntity *> *items, QObject * parent) : QAbstractListModel(parent) {
 		entities = new QList<BudgetEntity *>();
-		setData(items);
+		setData(section, items);
 	}
 	
 	BudgetEntityModel::~BudgetEntityModel() {
@@ -37,17 +38,63 @@ namespace budget {
 		delete entities;
 	}
 	
-	void BudgetEntityModel::setData(QList<BudgetEntity *> *items) {
+	Qt::ItemFlags BudgetEntityModel::flags(const QModelIndex &index) const {
+		if (!index.isValid()) {
+			return 0;
+		}
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	}
+	
+	void BudgetEntityModel::setData(qint32 section, QList<BudgetEntity *> *items) {
 		beginResetModel();
 		while (entities && !entities->isEmpty()) {
 			BudgetEntity *ent = entities->takeFirst();
 			delete ent;
 		}
 		entities = items;
+		i_section = section;
 		endResetModel();
 	}
 	
-	qint32 BudgetEntityModel::rowCount(const QModelIndex &parent) const {
+	bool BudgetEntityModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+		if (role != Qt::EditRole) {
+			return false;
+		}
+		
+		BudgetEntity entity = qvariant_cast<BudgetEntity>(index.data());
+		BudgetEntity val = value.value<BudgetEntity>();
+		
+		for (qint32 i = 0; i < entities->size(); ++i) {
+			if (entities->at(i)->id() == entity.id()) {
+				entities->at(i)->setAmount( val.amount() );
+				entities->at(i)->setDate( val.date() );
+				entities->at(i)->setDescription( val.description() );
+				entities->at(i)->setSection( val.section() );
+				entities->at(i)->save();
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	bool BudgetEntityModel::insertRows(qint32 pos, qint32 count, const QModelIndex &parent) {
+		beginInsertRows(parent, pos, pos + count - 1);
+		for (qint32 i = 0; i < count; ++i) {
+			BudgetEntity *item = new BudgetEntity();
+			item->setDate(QDate::currentDate());
+			item->setAmount(0);
+			item->setDescription(tr("Description"));
+			item->setSection(i_section);
+			item->save();
+			entities->append(item);
+		}
+		endInsertRows();
+		
+		return TRUE;
+	}
+	
+	qint32 BudgetEntityModel::rowCount(const QModelIndex & /*parent*/) const {
 		if (entities) {
 			return entities->size();
 		}

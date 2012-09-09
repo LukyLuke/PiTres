@@ -22,7 +22,7 @@ namespace budget {
 	
 	TreeItem::TreeItem(TreeItem *parent) {
 		parentItem = parent;
-		entityId = 0;
+		i_entityId = 0;
 		itemData << "0" << "" << "" << "0.0" << "0";
 	}
 	
@@ -43,18 +43,22 @@ namespace budget {
 		return itemData[0].toInt();
 	}
 	
+	qint32 TreeItem::entityId() const {
+		return i_entityId;
+	}
+	
 	void TreeItem::setId(qint32 id) {
-		entityId = id;
+		i_entityId = id;
 	}
 	
 	void TreeItem::save() {
 		if (parentItem) {
 			QSqlQuery query(db);
-			if (entityId <= 0) {
+			if (i_entityId <= 0) {
 				query.prepare("INSERT INTO budget_tree (position,parent_id,name,description,amount,type) VALUES (:pos,:parent,:name,:description,:amount,:type);");
 			} else {
 				query.prepare("UPDATE budget_tree SET position=:pos,parent_id=:parent,description=:description,amount=:amount,name=:name,type=:type WHERE entity_id=:id;");
-				query.bindValue(":id", entityId);
+				query.bindValue(":id", i_entityId);
 			}
 			if (itemData[0].toInt() == parentItem->id()) {
 				itemData[0] = itemData[0].toInt() + 1;
@@ -71,7 +75,7 @@ namespace budget {
 				qDebug() << query.lastQuery();
 				qDebug() << query.lastError();
 			}
-			if (entityId <= 0) {
+			if (i_entityId <= 0) {
 				setId(query.lastInsertId().toInt());
 			}
 		}
@@ -87,7 +91,7 @@ namespace budget {
 		}
 		
 		query.prepare("DELETE FROM budget_tree WHERE entity_id=?;");
-		query.bindValue(0, entityId);
+		query.bindValue(0, i_entityId);
 		query.exec();
 	}
 	

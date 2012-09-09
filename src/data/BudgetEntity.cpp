@@ -31,10 +31,12 @@ BudgetEntity::BudgetEntity(qint32 id, QObject *parent) : QObject(parent) {
 }
 
 BudgetEntity::BudgetEntity(const BudgetEntity &entity) : QObject(0) {
+	i_id = entity.id();
 	i_section = entity.section();
 	d_date = entity.date();
 	s_descr = entity.description();
 	f_amount = entity.amount();
+	_loaded = i_id > 0;
 }
 
 BudgetEntity::~BudgetEntity() {}
@@ -63,14 +65,14 @@ void BudgetEntity::clear() {
 void BudgetEntity::save() {
 	QSqlQuery query(db);
 	if (_loaded) {
-		query.prepare("UPDATE budget_entities SET section=:section,valuta=:date,description=:desc,amount=:amount WHERE entity_id=:id;");
+		query.prepare("UPDATE budget_entities SET section=:section,valuta=:date,description=:description,amount=:amount WHERE entity_id=:id;");
 		query.bindValue(":id", i_id);
 	} else {
-		query.prepare("INSERT INTO budget_entities (section,valuta,description,amount) VALUES (:section,:date,:descr,:amount);");
+		query.prepare("INSERT INTO budget_entities (section,valuta,description,amount) VALUES (:section,:date,:description,:amount);");
 	}
 	query.bindValue(":section", i_section);
 	query.bindValue(":date", d_date.toString("yyyy-MM-dd"));
-	query.bindValue(":descr", s_descr);
+	query.bindValue(":description", s_descr);
 	query.bindValue(":amount", f_amount);
 	query.exec();
 	
@@ -95,7 +97,7 @@ QList<BudgetEntity *> *BudgetEntity::getEntities(qint32 section, bool childs) {
 	QList<BudgetEntity *> *list = new QList<BudgetEntity *>();
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.prepare("SELECT entity_id FROM budget_entities WHERE section=:section;");
+	query.prepare("SELECT entity_id FROM budget_entities WHERE section=:section ORDER BY valuta,amount;");
 	query.bindValue(":section", section);
 	query.exec();
 	

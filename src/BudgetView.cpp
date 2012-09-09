@@ -27,7 +27,6 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	
 	connect(actionCreateEntry, SIGNAL(triggered()), this, SLOT(createEntry()));
 	connect(actionRemoveEntry, SIGNAL(triggered()), this, SLOT(removeEntry()));
-	connect(actionChangeEntry, SIGNAL(triggered()), this, SLOT(editEntry()));
 	
 	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"), tr("Type"));
 	treeView->setModel(treeModel);
@@ -80,10 +79,10 @@ QList <qint32>BudgetView::getChildSections(qint32 section, bool childs) {
 
 void BudgetView::treeClicked(const QModelIndex index) {
 	budget::TreeItem *item = static_cast<budget::TreeItem *>(index.internalPointer());
-	QList<BudgetEntity *> *list = BudgetEntity::getEntities(item->id(), TRUE);
+	QList<BudgetEntity *> *list = BudgetEntity::getEntities(item->entityId(), TRUE);
 	
 	showSummary(list);
-	listModel->setData(list);
+	listModel->setData(item->entityId(), list);
 }
 
 void BudgetView::showSummary(QList<BudgetEntity *> *list) {
@@ -139,7 +138,15 @@ void BudgetView::doRemoveFolder() {
 }
 
 void BudgetView::createEntry() {
-	qDebug() << "Create Entry...";
+	QModelIndex sel = listView->selectionModel()->currentIndex();
+	qint32 row = sel.row() + 1;
+	
+	if (!listModel->insertRow(row, sel)) {
+		return;
+	}
+	
+	listView->selectionModel()->setCurrentIndex( listModel->index(row, 0, sel.parent()), QItemSelectionModel::ClearAndSelect );
+	listView->closePersistentEditor( listView->selectionModel()->currentIndex() );
 }
 
 void BudgetView::removeEntry() {
@@ -150,8 +157,6 @@ void BudgetView::removeEntry() {
 }
 void BudgetView::doRemoveEntry() {
 	// remove...
+	qDebug("Remove entry...");
 }
 
-void BudgetView::editEntry() {
-	qDebug() << "Edit Entry...";
-}

@@ -17,6 +17,10 @@
 */
 
 #include "budget_BudgetEntityDelegate.h"
+#include <QHBoxLayout>
+#include <QDateEdit>
+#include <QPlainTextEdit>
+#include <QDoubleSpinBox>
 
 namespace budget {
 
@@ -73,6 +77,61 @@ namespace budget {
 		QSize size = QStyledItemDelegate::sizeHint(option, index);
 		size.setHeight(size.height() * 3);
 		return size;
+	}
+	
+	QWidget *BudgetEntityDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const {
+		QLocale locale;
+		QWidget *editor = new QWidget(parent);
+		QHBoxLayout *lay = new QHBoxLayout;
+		QDateEdit *dateEdit = new QDateEdit(QDate::currentDate());
+		QPlainTextEdit *textEdit = new QPlainTextEdit("Textedig");
+		QDoubleSpinBox *spinBox = new QDoubleSpinBox;
+		
+		dateEdit->setDisplayFormat("yyyy-MM-dd");
+		dateEdit->setCalendarPopup(true);
+		
+		spinBox->setMaximum(9999999.99);
+		spinBox->setPrefix(locale.currencySymbol(QLocale::CurrencySymbol));
+		spinBox->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+		
+		editor->setLayout(lay);
+		lay->addWidget(dateEdit);
+		lay->addWidget(textEdit);
+		lay->addWidget(spinBox);
+		
+		return editor;
+	}
+	
+	void BudgetEntityDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+		BudgetEntity entity = qvariant_cast<BudgetEntity>(index.data());
+		
+		QDateEdit *dateEdit = qobject_cast<QDateEdit *>( editor->layout()->itemAt(0)->widget() );
+		QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit *>( editor->layout()->itemAt(1)->widget() );
+		QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( editor->layout()->itemAt(2)->widget() );
+		
+		dateEdit->setDate(entity.date());
+		textEdit->setPlainText(entity.description());
+		spinBox->setValue(entity.amount());
+	}
+	
+	void BudgetEntityDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+		BudgetEntity entity = qvariant_cast<BudgetEntity>(index.data());
+		
+		QDateEdit *dateEdit = qobject_cast<QDateEdit *>( editor->layout()->itemAt(0)->widget() );
+		QPlainTextEdit *textEdit = qobject_cast<QPlainTextEdit *>( editor->layout()->itemAt(1)->widget() );
+		QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( editor->layout()->itemAt(2)->widget() );
+		
+		entity.setDate(dateEdit->date());
+		entity.setDescription(textEdit->toPlainText());
+		entity.setAmount(spinBox->value());
+		
+		QVariant val;
+		val.setValue<BudgetEntity>(entity);
+		model->setData(index, val, Qt::EditRole);
+	}
+	
+	void BudgetEntityDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const {
+		editor->setGeometry(option.rect);
 	}
 	
 }

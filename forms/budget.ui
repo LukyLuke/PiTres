@@ -76,7 +76,6 @@
        <item>
         <widget class="QToolBar" name="horizontalWidget_2">
          <addaction name="actionCreateEntry"/>
-         <addaction name="actionChangeEntry"/>
          <addaction name="actionRemoveEntry"/>
         </widget>
        </item>
@@ -194,18 +193,6 @@
    </property>
    <property name="toolTip">
     <string>Remove the Entry</string>
-   </property>
-  </action>
-  <action name="actionChangeEntry">
-   <property name="icon">
-    <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/edit.png</normaloff>:/icons/resources/icons/edit.png</iconset>
-   </property>
-   <property name="text">
-    <string>Change Entry</string>
-   </property>
-   <property name="toolTip">
-    <string>Change the Entry and it's values</string>
    </property>
   </action>
   <action name="actionCreateRoot">
