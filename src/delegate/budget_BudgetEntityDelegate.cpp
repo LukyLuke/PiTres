@@ -67,7 +67,7 @@ namespace budget {
 		QRect adj = rect.adjusted(3, rect.height()/3, -3, rect.height()/3);
 		
 		painter->drawText(adj.adjusted(0, 0, -amountWidth, 0), Qt::TextSingleLine, entity.date().toString(locale.dateFormat(QLocale::ShortFormat)));
-		painter->drawText(adj.adjusted(adj.left() + dateWidth, 0, -amountWidth, 0), Qt::TextSingleLine, entity.description());
+		painter->drawText(adj.adjusted(adj.left() + dateWidth, 0, -amountWidth, 0), Qt::TextWordWrap, entity.description());
 		painter->drawText(adj.adjusted(adj.left() + dateWidth + amountWidth, 0, 0, 0), Qt::AlignRight | Qt::TextSingleLine, amount);
 		
 		painter->restore();
