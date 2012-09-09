@@ -45,6 +45,7 @@ public:
 	static QList<BudgetEntity *> *getEntities(qint32 section, bool childs);
 	void load(qint32 id);
 	void save();
+	void deleteItem();
 	
 	// Setter
 	void setId(qint32 id);

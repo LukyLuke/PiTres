@@ -94,6 +94,21 @@ namespace budget {
 		return TRUE;
 	}
 	
+	bool BudgetEntityModel::removeRows(qint32 pos, qint32 count, const QModelIndex &parent) {
+		if (entities->size() < pos + count) {
+			count = entities->size() - pos;
+		}
+		
+		beginRemoveRows(parent, pos, pos + count - 1);
+		for (qint32 i = 0; i < count; ++i) {
+			BudgetEntity *item = entities->takeAt(pos);
+			item->deleteItem();
+			delete item;
+		}
+		endRemoveRows();
+		return true;
+	}
+	
 	qint32 BudgetEntityModel::rowCount(const QModelIndex & /*parent*/) const {
 		if (entities) {
 			return entities->size();

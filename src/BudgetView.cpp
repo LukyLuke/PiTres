@@ -156,7 +156,9 @@ void BudgetView::removeEntry() {
 	}
 }
 void BudgetView::doRemoveEntry() {
-	// remove...
-	qDebug("Remove entry...");
+	QModelIndex sel = listView->selectionModel()->currentIndex();
+	if (!listModel->removeRow(sel.row(), sel.parent())) {
+		QMessageBox::critical(this, tr("Failed to remove"), tr("Error while remove the Budget-Entity. Try again or let it be..."));
+	}
 }
 

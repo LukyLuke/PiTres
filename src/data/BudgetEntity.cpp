@@ -83,6 +83,18 @@ void BudgetEntity::save() {
 	}
 }
 
+void BudgetEntity::deleteItem() {
+	if (!_loaded) {
+		return;
+	}
+	
+	QSqlQuery query(db);
+	query.prepare("DELETE FROM budget_entities WHERE entity_id=?;");
+	query.bindValue(0, i_id);
+	query.exec();
+	clear();
+}
+
 void BudgetEntity::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);

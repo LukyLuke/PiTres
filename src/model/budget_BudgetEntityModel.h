@@ -46,7 +46,8 @@ namespace budget {
 		qint32 rowCount(const QModelIndex &parent = QModelIndex()) const;
 		QVariant data(const QModelIndex &index, qint32 role) const;
 		bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-		bool insertRows(qint32 row, qint32 count, const QModelIndex &parent = QModelIndex());
+		bool insertRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
+		bool removeRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
 		Qt::ItemFlags flags(const QModelIndex & index) const;
 		
 	private:
