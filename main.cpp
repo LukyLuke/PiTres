@@ -36,13 +36,14 @@ int main(int argc, char** argv) {
 	QCoreApplication::setApplicationVersion("0.1.0");
 	
 	// Some default Settings
-	QLocale::setDefault(settings.value("core/locale", QLocale(QLocale::SwissGerman, QLocale::Switzerland)).toLocale());
+	QLocale::setDefault(settings.value("core/locale", QLocale::system()).toLocale());
 	QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
-	QString lang = settings.value("core/language", QLocale::system().name()).toString();
+	QLocale locale;
+	QString lang = settings.value("core/language", locale.name()).toString();
 	
 	// Translations
 	QTranslator translator;
-	if (!translator.load(QString("pitres_") + lang, "./i10n/")) {
+	if (!translator.load(QString("pitres_") + lang, "./i18n")) {
 		qDebug() << "Translation not found for " + lang;
 	}
 	app.installTranslator(&translator);

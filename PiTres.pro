@@ -43,6 +43,12 @@ FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport
         forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui
 OUT_PWD = build
 
+# Translations
+TRANSLATIONS = i18n/pitres_de.ts \
+               i18n/pitres_en.ts \
+               i18n/pitres_fr.ts \
+               i18n/pitres_it.ts
+
 # Add special Platform-Dependant libraries and sources
 win32 {
 	CONFIG += windows

@@ -188,7 +188,7 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Create new Bills and send they as EMails or print out the PDFs and Letters</string>
+        <string>Pay Memberfees to Sections</string>
        </property>
        <property name="text">
         <string>Contributions</string>
@@ -274,7 +274,7 @@
     <string>Import from &amp;LDAP</string>
    </property>
    <property name="toolTip">
-    <string>Synchronize the USertable with the LDAP-Database</string>
+    <string>Synchronize the Usertable with the LDAP-Database</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
@@ -319,7 +319,7 @@
     <string>Show &amp;Users</string>
    </property>
    <property name="toolTip">
-    <string>Show all USers, either from you Section or from all if you are allowed</string>
+    <string>Show all Users, either from you Section or from all if you are allowed</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+U</string>
@@ -349,7 +349,7 @@
     <string>Import Payments</string>
    </property>
    <property name="toolTip">
-    <string>Import Payments based on the Reference-Number, the Member UID, the Member name or based on ESR</string>
+    <string>Import Payments based on the Referencenumber, the Member UID, his Name, etc.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
