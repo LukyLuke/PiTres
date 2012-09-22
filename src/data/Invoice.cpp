@@ -409,11 +409,11 @@ QString Invoice::getEsr() {
 int Invoice::esrChecksum(QString num) {
 	int checkSum[10] = {0, 9, 4, 6, 8, 2, 7, 1, 3, 5};
 	int pos, sum = 0;
-	for (int i = 0; i < num.length(); i++) {
+	for (unsigned int i = 0; i < num.length(); i++) {
 		pos = (sum += num.at(i).digitValue()) % 10;
 		sum = checkSum[pos];
 	}
-	return checkSum[10 - sum];
+	return (10 - sum) % 10;
 }
 
 void Invoice::setMemberUid(int memberUid) {
