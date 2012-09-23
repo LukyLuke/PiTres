@@ -48,6 +48,7 @@ void Section::clear() {
 	s_address = "";
 	s_account = "";
 	i_treasurer = 0;
+	d_founded = QDate::currentDate();
 	_loaded = FALSE;
 }
 
@@ -55,12 +56,8 @@ void Section::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS pps_sections (name TEXT, parent TEXT, amount FLOAT, description TEXT,"
-	              "bank_account TEXT, address TEXT, treasurer INTEGER);");
+	              "bank_account TEXT, address TEXT, treasurer INTEGER, founded DATE);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 }
 
 void Section::load(const QString name) {
@@ -70,11 +67,6 @@ void Section::load(const QString name) {
 	query.bindValue(0, name);
 	query.exec();
 	
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
-	
 	_loaded = query.first();
 	if (_loaded) {
 		QSqlRecord record = query.record();
@@ -83,8 +75,9 @@ void Section::load(const QString name) {
 		f_amount = query.value( record.indexOf("amount") ).toFloat();
 		s_description = query.value( record.indexOf("description") ).toString();
 		s_address = query.value( record.indexOf("address") ).toString();
-		s_account = query.value( record.indexOf("account") ).toString();
+		s_account = query.value( record.indexOf("bank_account") ).toString();
 		i_treasurer = query.value( record.indexOf("treasurer") ).toInt();
+		d_founded = query.value( record.indexOf("founded") ).toDate();
 	}
 }
 
@@ -121,11 +114,11 @@ void Section::save() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	if (loaded()) {
-		query.prepare("UPDATE pps_section SET description=:description,amount=:amount,parent=:parent,address=:address,account=:account,treasurer=:treasurer"
+		query.prepare("UPDATE pps_section SET description=:description,amount=:amount,parent=:parent,address=:address,account=:account,treasurer=:treasurer,founded=:founded"
 		              " WHERE name=:name;");
 	} else {
-		query.prepare("INSERT INTO pps_section SET (name,description,amount,parent,address,account,treasurer)"
-		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer);");
+		query.prepare("INSERT INTO pps_section SET (name,description,amount,parent,address,account,treasurer,founded)"
+		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded);");
 	}
 	query.bindValue(":name", s_name);
 	query.bindValue(":description", s_description);
@@ -134,6 +127,7 @@ void Section::save() {
 	query.bindValue(":address", s_address);
 	query.bindValue(":account", s_account);
 	query.bindValue(":treasurer", i_treasurer);
+	query.bindValue(":founded", d_founded);
 	query.exec();
 	
 	if (query.lastError().type() != QSqlError::NoError) {
@@ -143,6 +137,11 @@ void Section::save() {
 	} else {
 		_loaded = TRUE;
 	}
+}
+
+void Section::setParent(QString parent) {
+	s_parent = parent;
+	emit parentChanged(parent);
 }
 
 void Section::setName(QString name) {
@@ -173,4 +172,9 @@ void Section::setAccount(QString account) {
 void Section::setTreasurer(int treasurer) {
 	i_treasurer = treasurer;
 	emit treasurerChanged(treasurer);
+}
+
+void Section::setFoundingDate(QDate date) {
+	d_founded = date;
+	emit foundedChanged(date);
 }

@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QDate>
 #include <QSqlDatabase>
 
 class Section : public QObject {
@@ -32,6 +33,7 @@ Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY desc
 Q_PROPERTY(QString address READ address WRITE setAddress NOTIFY addressChanged)
 Q_PROPERTY(QString account READ account WRITE setAccount NOTIFY accountChanged)
 Q_PROPERTY(int treasurer READ treasurer WRITE setTreasurer NOTIFY treasurerChanged)
+Q_PROPERTY(QDate founded READ founded WRITE setFoundingDate NOTIFY foundedChanged)
 
 Q_ENUMS(AmountType)
 
@@ -49,12 +51,14 @@ public:
 	enum AmountType { AmountPercent=0, AmountMoney=1 };
 	
 	// Setter
+	void setParent(QString parent);
 	void setName(QString name);
 	void setAmount(float amount);
 	void setDescription(QString description);
 	void setAddress(QString address);
 	void setAccount(QString account);
 	void setTreasurer(int treasurer);
+	void setFoundingDate(QDate date);
 	
 	// Getter
 	bool loaded() { return _loaded; };
@@ -64,14 +68,17 @@ public:
 	QString address() const { return s_address; }
 	QString account() const { return s_account; }
 	int treasurer() const { return i_treasurer; }
+	QDate founded() const { return d_founded; }
 	
 signals:
+	void parentChanged(QString);
 	void nameChanged(QString);
 	void amountChanged(float);
 	void descriptionChanged(QString);
 	void addressChanged(QString);
 	void accountChanged(QString);
 	void treasurerChanged(int);
+	void foundedChanged(QDate);
 	
 private:
 	QSqlDatabase db;
@@ -83,6 +90,7 @@ private:
 	QString s_address;
 	QString s_account;
 	int i_treasurer;
+	QDate d_founded;
 	
 	void clear();
 };
