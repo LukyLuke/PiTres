@@ -55,7 +55,6 @@
     </property>
     <addaction name="actionFrom_LDAP"/>
     <addaction name="actionShow_Users"/>
-    <addaction name="actionAdjustDates"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Bills"/>
     <addaction name="actionInvoiceWizard"/>
@@ -94,8 +93,8 @@
    </attribute>
    <addaction name="actionFrom_LDAP"/>
    <addaction name="actionImport_Payments"/>
-   <addaction name="actionAdjustDates"/>
    <addaction name="actionInvoiceWizard"/>
+   <addaction name="actionEditSections"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="sizePolicy">
@@ -106,6 +105,9 @@
    </property>
    <property name="features">
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Views</string>
@@ -367,18 +369,6 @@
     <string>Configure PiTres</string>
    </property>
   </action>
-  <action name="actionAdjustDates">
-   <property name="icon">
-    <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/adjust_members.png</normaloff>:/icons/resources/icons/adjust_members.png</iconset>
-   </property>
-   <property name="text">
-    <string>Adjust Member Dates</string>
-   </property>
-   <property name="toolTip">
-    <string>Adjust Member Dates</string>
-   </property>
-  </action>
   <action name="actionContribution">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
@@ -401,6 +391,18 @@
    </property>
    <property name="toolTip">
     <string>Show and manage the Budget</string>
+   </property>
+  </action>
+  <action name="actionEditSections">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/folder_edit.png</normaloff>:/icons/resources/icons/folder_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Sections</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Sections</string>
    </property>
   </action>
  </widget>

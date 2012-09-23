@@ -10,9 +10,9 @@ DEBUG = 1
 
 # Main sources
 HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h src/InvoiceWizard.h \
-           src/PaymentWizard.h src/Contributions.h src/BudgetView.h
+           src/PaymentWizard.h src/Contributions.h src/BudgetView.h src/SectionEdit.h
 SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp src/InvoiceWizard.cpp \
-           src/PaymentWizard.cpp src/Contributions.cpp src/BudgetView.cpp
+           src/PaymentWizard.cpp src/Contributions.cpp src/BudgetView.cpp src/SectionEdit.cpp
 
 # Data Objects
 HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Section.h src/data/BudgetEntity.h
@@ -40,12 +40,11 @@ RESOURCES += PiTres.qrc
 QT = core gui network sql xml
 FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
         forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
-        forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui
+        forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui
 OUT_PWD = build
 
 # Translations
 TRANSLATIONS = i18n/pitres_de.ts \
-               i18n/pitres_en.ts \
                i18n/pitres_fr.ts \
                i18n/pitres_it.ts
 

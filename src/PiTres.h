@@ -19,11 +19,31 @@
 #ifndef PiTres_H
 #define PiTres_H
 
-#include "../ui_PiTres.h"
-#include "../ui_settings.h"
-#include "../ui_invoicewizard.h"
+#include "ui_PiTres.h"
+#include "ui_settings.h"
+#include "ui_invoicewizard.h"
+
+#include "Userlist.h"
+#include "SentBills.h"
+#include "PaymentImport.h"
+#include "LDAPImport.h"
+#include "InvoiceWizard.h"
+#include "Contributions.h"
+#include "BudgetView.h"
+#include "SectionEdit.h"
+
+#include "data/Person.h"
+#include "data/Invoice.h"
+#include "data/Section.h"
+#include "data/BudgetEntity.h"
+#include "helper/XmlPdf.h"
 
 #include <QtGui/QMainWindow>
+#include <QtGui>
+#include <QFileDialog>
+#include <QtGui/QGridLayout>
+#include <QFileInfo>
+#include <QSettings>
 #include <QWidget>
 #include <QDialog>
 #include <QString>
@@ -62,6 +82,7 @@ public slots:
 	void showReceiptFileDialog();
 	void showContributions();
 	void showBudget();
+	void showSectionEdit();
 };
 
 #endif // PiTres_H

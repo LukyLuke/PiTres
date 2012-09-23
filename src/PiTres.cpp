@@ -17,25 +17,6 @@
 */
 
 #include "PiTres.h"
-#include "Userlist.h"
-#include "SentBills.h"
-#include "PaymentImport.h"
-#include "LDAPImport.h"
-#include "InvoiceWizard.h"
-#include "Contributions.h"
-#include "BudgetView.h"
-
-#include "data/Person.h"
-#include "data/Invoice.h"
-#include "data/Section.h"
-#include "data/BudgetEntity.h"
-#include "helper/XmlPdf.h"
-
-#include <QtGui>
-#include <QFileDialog>
-#include <QtGui/QGridLayout>
-#include <QFileInfo>
-#include <QSettings>
 
 PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	QSettings settings;
@@ -113,6 +94,7 @@ void PiTres::connectActions() {
 	connect(actionInvoiceWizard, SIGNAL(triggered()), this, SLOT(showInvoiceWizard()));
 	connect(actionContribution, SIGNAL(triggered()), this, SLOT(showContributions()));
 	connect(actionBudget, SIGNAL(triggered()), this, SLOT(showBudget()));
+	connect(actionEditSections, SIGNAL(triggered()), this, SLOT(showSectionEdit()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -168,6 +150,11 @@ void PiTres::showContributions() {
 
 void PiTres::showBudget() {
 	BudgetView *widget = new BudgetView;
+	setContent(widget);
+}
+
+void PiTres::showSectionEdit() {
+	SectionEdit *widget = new SectionEdit;
 	setContent(widget);
 }
 
