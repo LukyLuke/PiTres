@@ -27,7 +27,7 @@
 #include "delegate/budget_BudgetEntityDelegate.h"
 #include "delegate/budget_TreeItemDelegate.h"
 
-#include<QWidget>
+#include <QWidget>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
