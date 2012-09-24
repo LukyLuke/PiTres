@@ -114,10 +114,10 @@ void Section::save() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	if (loaded()) {
-		query.prepare("UPDATE pps_section SET description=:description,amount=:amount,parent=:parent,address=:address,account=:account,treasurer=:treasurer,founded=:founded"
+		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address,bank_account=:account,treasurer=:treasurer,founded=:founded"
 		              " WHERE name=:name;");
 	} else {
-		query.prepare("INSERT INTO pps_section SET (name,description,amount,parent,address,account,treasurer,founded)"
+		query.prepare("INSERT INTO pps_sections SET (name,description,amount,parent,address,bank_account,treasurer,founded)"
 		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded);");
 	}
 	query.bindValue(":name", s_name);
