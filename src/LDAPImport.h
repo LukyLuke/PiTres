@@ -22,6 +22,7 @@
 #include "../ui_LDAPImport.h"
 
 #include "data/Person.h"
+#include "data/Section.h"
 
 #include <QWidget>
 #include <QString>
@@ -48,6 +49,7 @@ private:
 	void connectLdap();
 	void disconnectLdap();
 	void setPersonValue(PPSPerson *person, QString field, QString value);
+	void addSection(QString section);
 
 public:
 	LDAPImport(QWidget *parent = 0);

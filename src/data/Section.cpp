@@ -34,7 +34,6 @@ Section::Section(QObject *parent) : QObject(parent) {
 }
 
 Section::Section(const QString name, QObject *parent) : QObject(parent) {
-	clear();
 	load(name);
 }
 
@@ -67,6 +66,7 @@ void Section::load(const QString name) {
 	query.bindValue(0, name);
 	query.exec();
 	
+	clear();
 	_loaded = query.first();
 	if (_loaded) {
 		QSqlRecord record = query.record();
@@ -78,6 +78,8 @@ void Section::load(const QString name) {
 		s_account = query.value( record.indexOf("bank_account") ).toString();
 		i_treasurer = query.value( record.indexOf("treasurer") ).toInt();
 		d_founded = query.value( record.indexOf("founded") ).toDate();
+	} else {
+		qWarning() << "Error while loading Section with name " << name << "; Error: " << query.lastError();
 	}
 }
 
@@ -93,7 +95,7 @@ QList<Section *> Section::children() {
 	if (loaded()) {
 		QSqlDatabase db;
 		QSqlQuery query(db);
-		query.prepare("SELECT name FROM pps_section WHERE parent=?;");
+		query.prepare("SELECT name FROM pps_sections WHERE parent=?;");
 		query.bindValue(0, s_name);
 		query.exec();
 		QSqlRecord record = query.record();
@@ -117,7 +119,7 @@ void Section::save() {
 		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address,bank_account=:account,treasurer=:treasurer,founded=:founded"
 		              " WHERE name=:name;");
 	} else {
-		query.prepare("INSERT INTO pps_sections SET (name,description,amount,parent,address,bank_account,treasurer,founded)"
+		query.prepare("INSERT INTO pps_sections (name,description,amount,parent,address,bank_account,treasurer,founded)"
 		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded);");
 	}
 	query.bindValue(":name", s_name);

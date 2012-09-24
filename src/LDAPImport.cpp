@@ -43,7 +43,7 @@ extern "C" {
 }
 #endif
 
-LDAPImport::LDAPImport(QWidget *parent) {
+LDAPImport::LDAPImport(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	QSettings settings;
 	
@@ -117,20 +117,18 @@ void LDAPImport::connectLdap() {
 
 	int rc;
 	QString host = "ldap://" + editServer->text() + ":" + QString::number(editPort->value());
-	qDebug() << "Trying to connect: " + host;
 	
 #ifndef WIN32
 	if (LDAP_SUCCESS == ldap_initialize(&ldap, host.toStdString().c_str())) {
-		qDebug() << "Connection initialized...";
 		
 		if (ldap_set_option(ldap, LDAP_OPT_PROTOCOL_VERSION, &version) != LDAP_OPT_SUCCESS) {
-			qDebug() << "Could not set LDAP_OPT_PROTOCOL_VERSION to v3";
+			qCritical("Could not set LDAP_OPT_PROTOCOL_VERSION to v3");
 		}
 		if (ldap_set_option(ldap, LDAP_OPT_DEREF, LDAP_DEREF_NEVER) != LDAP_OPT_SUCCESS) {
-			qDebug() << QString("Could not set LDAP_OPT_DEREF to NEVER");
+			qCritical("Could not set LDAP_OPT_DEREF to NEVER");
 		}
 		if (ldap_set_option(ldap, LDAP_OPT_REFERRALS, LDAP_OPT_ON) != LDAP_OPT_SUCCESS) {
-			qDebug() << "Could not set LDAP_OPT_REFERRALS off.";
+			qCritical("Could not set LDAP_OPT_REFERRALS off.");
 		}
 		
 		QByteArray pwd = editPassword->text().toLocal8Bit();
@@ -141,11 +139,10 @@ void LDAPImport::connectLdap() {
 		rc = ldap_sasl_bind_s(ldap, binddn.data(), LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
 		if (rc != LDAP_SUCCESS) {
 			ldapError = ldap_err2string(rc);
-			qDebug() << QString("Unable to bind(%1): %2").arg(rc).arg(ldapError);
+			qWarning() << QString("Unable to bind(%1): %2").arg(rc).arg(ldapError);
 			ldap_unbind_ext(ldap, NULL, NULL);
 			return;
 		}
-		qDebug() << "Bound to LDAP-Server with BindDN: " + binddn;
 		connected = TRUE;
 	}
 #endif
@@ -200,13 +197,12 @@ void LDAPImport::importFromLdap() {
 #ifndef WIN32
 	if (rc != LDAP_SUCCESS) {
 		ldapError = ldap_err2string(rc);
-		qDebug() << QString("Search failed(%1): %2").arg(rc).arg(ldapError);
+		qWarning() << QString("Search failed(%1): %2").arg(rc).arg(ldapError);
 		if (res != NULL) {
 			ldap_msgfree(res);
 		}
 		return;
 	}
-	qDebug() << QString("Search for %1 succeed").arg(editSearch->text());
 #endif
 	
 	// Prepare the Progress-Bar
@@ -245,11 +241,12 @@ void LDAPImport::importFromLdap() {
 			dn.replace(QRegExp(dnlist.at(i)), "\\1");
 			if ((dn != dnval.bv_val)) {
 				setPersonValue(person, QString("section"), dn);
+				addSection(dn);
 				break;
 			}
 		}
 		
-		// dont't insert empty sections
+		// dont't insert persons with empty sections
 		if (person->section() == "") {
 			continue;
 		}
@@ -375,3 +372,12 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 		}
 	}
 }
+
+void LDAPImport::addSection(QString section) {
+	Section s(section);
+	s.setName(section);
+	if (!s.loaded()) {
+		s.save();
+	}
+}
+
