@@ -187,7 +187,7 @@ void PiTres::showSettings() {
 	settingsForm.ldapPassword->setText(settings.value("ldap/password", "").toString());
 	settingsForm.ldapBaseDn->setText(settings.value("ldap/basedn", "dc=members,st=<Your Section here>,dc=piratenpartei,dc=ch").toString());
 	settingsForm.ldapSearch->setText(settings.value("ldap/search", "(objectClass=ppsPerson)").toString());
-	settingsForm.ldapSectionRegex->setText(settings.value("ldap/sectionregex", "^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString());
+	settingsForm.ldapSectionRegex->setText(settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$|^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString());
 	
 	settingsForm.ldifNonsectionMembers->setText(settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString());
 	settingsForm.ldifSectionMembers->setText(settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,st=%2,dc=piratenpartei,dc=ch").toString());

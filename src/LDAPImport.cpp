@@ -61,7 +61,7 @@ LDAPImport::LDAPImport(QWidget *parent) : QWidget(parent) {
 	editBaseDN->setText( settings.value("ldap/basedn", "dc=members,st=<Your Section here>,dc=piratenpartei,dc=ch").toString() );
 	editPassword->setText( settings.value("ldap/password", "").toString() );
 	editSearch->setText( settings.value("ldap/search", "(objectClass=ppsPerson)").toString() );
-	sectionExtract->setText( settings.value("ldap/sectionregex", "^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString() );
+	sectionExtract->setText( settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$|^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString() );
 	
 	// Setup StackWidget Navigation
 	connect(btnGoToSearch, SIGNAL(clicked()), this, SLOT(nextPage()));
