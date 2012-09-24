@@ -27,7 +27,7 @@ SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 	connect(sectionList, SIGNAL(clicked(QModelIndex)), this, SLOT(showData(QModelIndex)));
 	
 	QSqlQuery query(db);
-	query.exec("SELECT name || ', ' || description || ' (' || parent || ')' AS label, name FROM pps_sections ORDER BY parent,name ASC;");
+	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections ORDER BY parent,name ASC;");
 	listModel = new QSqlQueryModel;
 	listModel->setQuery(query);
 	sectionList->setModel(listModel);
@@ -44,7 +44,7 @@ SectionEdit::~SectionEdit() {
 void SectionEdit::initComboBoxes() {
 	// The Parent-Combobox
 	QSqlQuery query(db);
-	query.exec("SELECT name || ', ' || description || ' (' || parent || ')' AS label, name FROM pps_sections ORDER BY parent,name ASC;");
+	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections ORDER BY parent,name ASC;");
 	while (query.next()) {
 		editParent->addItem(query.value(0).toString(), query.value(1).toString());
 	}
