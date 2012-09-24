@@ -25,6 +25,7 @@ SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 	connect(btnSave, SIGNAL(clicked()), this, SLOT(saveSection()));
 	connect(btnCancel, SIGNAL(clicked()), this, SLOT(resetSectionData()));
 	connect(sectionList, SIGNAL(clicked(QModelIndex)), this, SLOT(showData(QModelIndex)));
+	connect(btnReassign, SIGNAL(clicked()), this, SLOT(reassignInvoices()));
 	
 	QSqlQuery query(db);
 	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections ORDER BY parent,name ASC;");
@@ -33,18 +34,58 @@ SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 	sectionList->setModel(listModel);
 	sectionList->setModelColumn(0);
 	
+	// Reassignment table
+	reassignModel = new QSqlQueryModel(tableInvoices);
+	setReassignQuery();
+	reassignModel->setHeaderData(0, Qt::Horizontal, tr("Section"));
+	reassignModel->setHeaderData(1, Qt::Horizontal, tr("Member"));
+	reassignModel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+	reassignModel->setHeaderData(3, Qt::Horizontal, tr("Paid date"));
+	reassignModel->setHeaderData(4, Qt::Horizontal, tr("Issued"));
+	reassignModel->setHeaderData(5, Qt::Horizontal, tr("Reference"));
+	tableInvoices->setModel(reassignModel);
+	
 	initComboBoxes();
 }
 
 SectionEdit::~SectionEdit() {
 	delete listModel;
 	delete userModel;
+	delete tableInvoices;
+}
+
+void SectionEdit::setReassignQuery() {
+	Section s(listModel->index(i_index, 1).data().toString());
+	QSqlQuery query(db);
+	query.prepare("SELECT pps_invoice.for_section, ldap_persons.section, pps_invoice.address_name, pps_invoice.paid_date, pps_invoice.issue_date, pps_invoice.reference"
+	              " FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
+	              " WHERE ldap_persons.section = :section AND pps_invoice.for_section != ldap_persons.section"
+	              " AND (pps_invoice.paid_date = '' OR pps_invoice.paid_date > :founded);");
+	query.bindValue(":section", s.name());
+	query.bindValue(":founded", s.founded());
+	query.exec();
+	reassignModel->setQuery(query);
+}
+
+void SectionEdit::reassignInvoices() {
+	if (reassignModel->query().first()) {
+		QSqlQuery query(db);
+		query.prepare("UPDATE pps_invoice SET for_section=:section WHERE reference=:reference AND for_section=:oldsection;");
+		while (reassignModel->query().next()) {
+			query.bindValue(":section", reassignModel->query().value(1));
+			query.bindValue(":reference", reassignModel->query().value(5));
+			query.bindValue(":oldsection", reassignModel->query().value(0));
+			query.exec();
+			qDebug() << query.lastError();
+		}
+	}
 }
 
 void SectionEdit::initComboBoxes() {
 	// The Parent-Combobox
 	QSqlQuery query(db);
-	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections ORDER BY parent,name ASC;");
+	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections "
+	           "ORDER BY parent,name ASC;");
 	while (query.next()) {
 		editParent->addItem(query.value(0).toString(), query.value(1).toString());
 	}
@@ -69,6 +110,7 @@ void SectionEdit::initComboBoxes() {
 void SectionEdit::showData(QModelIndex index) {
 	i_index = index.row();
 	resetSectionData();
+	setReassignQuery();
 }
 
 void SectionEdit::resetSectionData() {
@@ -96,7 +138,7 @@ void SectionEdit::saveSection() {
 	s.setAccount(editBankAccountNumber->text());
 	s.setAddress(editAddress->toPlainText());
 	s.setFoundingDate(editFoundingDate->date());
-	s.setParent( editParent->itemText(editParent->currentIndex()) );
+	s.setParent( editParent->itemData(editParent->currentIndex()).toString() );
 	
 	QModelIndexList list = userModel->match(userModel->index(0, 0), Qt::DisplayRole, editTreasurer->itemText(editTreasurer->currentIndex()), 1, Qt::MatchExactly);
 	if (list.size() > 0) {

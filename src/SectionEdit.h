@@ -43,15 +43,18 @@ private slots:
 	void saveSection();
 	void resetSectionData();
 	void showData(QModelIndex index);
+	void reassignInvoices();
 	
 private:
 	quint32 i_index;
 	QSqlDatabase db;
 	QSqlQueryModel *listModel;
 	QSqlQueryModel *userModel;
+	QSqlQueryModel *reassignModel;
 	QCompleter *completer;
 	
 	void initComboBoxes();
+	void setReassignQuery();
 };
 
 #endif // SectionEdit_H
