@@ -31,8 +31,9 @@ namespace budget {
 		painter->save();
 		QString s;
 		switch (value) {
-			case 0: s = tr("Expense"); break;
-			case 1: s = tr("Income"); break;
+			case 0: s = tr("Budget"); break;
+			case 1: s = tr("Expense"); break;
+			case 2: s = tr("Income"); break;
 			default: s = tr("Unknown"); break;
 		}
 		painter->drawText(opt.rect, Qt::TextSingleLine, s);
@@ -41,8 +42,9 @@ namespace budget {
 	
 	QWidget *TreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
 		QComboBox *box = new QComboBox(parent);
-		box->addItem(tr("Expense"), QVariant(0));
-		box->addItem(tr("Income"), QVariant(1));
+		box->addItem(tr("Budget"), QVariant(0));
+		box->addItem(tr("Expense"), QVariant(1));
+		box->addItem(tr("Income"), QVariant(2));
 		return box;
 	}
 	

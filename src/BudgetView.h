@@ -62,6 +62,8 @@ public:
 	static void createTables();
 	static QList<qint32> getChildSections(qint32 section);
 	static QList<qint32> getChildSections(qint32 section, bool childs);
+	static QList<qint32> getParentSections(qint32 section);
+	static QList<qint32> getParentSections(qint32 section, bool childs);
 
 public slots:
 	void createFolder();

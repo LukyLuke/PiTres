@@ -17,10 +17,8 @@
 */
 
 #include "BudgetEntity.h"
-#include <BudgetView.h>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QVariant>
+
+#include "BudgetView.h"
 
 BudgetEntity::BudgetEntity(QObject *parent) : QObject(parent) {
 	clear();
@@ -127,6 +125,7 @@ QList<BudgetEntity *> BudgetEntity::getChildEntities(qint32 section) {
 	QList<BudgetEntity *> list;
 	QList<BudgetEntity *> *_list;
 	QList<qint32> ids = BudgetView::getChildSections(section);
+	
 	for (qint32 i = 0; i < ids.size(); i++) {
 		_list = getEntities(ids.at(i), TRUE);
 		for (qint32 j = 0; j < _list->size(); j++) {

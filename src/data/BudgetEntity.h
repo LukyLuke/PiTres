@@ -22,7 +22,10 @@
 #include <QObject>
 #include <QDate>
 #include <QString>
+#include <QVariant>
 #include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QList>
 #include <QMetaType>
 #include <QDebug>

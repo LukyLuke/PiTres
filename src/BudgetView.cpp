@@ -55,11 +55,11 @@ void BudgetView::createTables() {
 	query.exec("CREATE INDEX IF NOT EXISTS position_index ON budget_tree (position);");
 }
 
-QList <qint32>BudgetView::getChildSections(qint32 section) {
+QList<qint32> BudgetView::getChildSections(qint32 section) {
 	return getChildSections(section, FALSE);
 }
 
-QList <qint32>BudgetView::getChildSections(qint32 section, bool childs) {
+QList<qint32> BudgetView::getChildSections(qint32 section, bool childs) {
 	QList<qint32> list;
 	qint32 id;
 	QSqlDatabase db;
@@ -72,6 +72,28 @@ QList <qint32>BudgetView::getChildSections(qint32 section, bool childs) {
 		list << id;
 		if (childs) {
 			list.append(getChildSections(id, TRUE));
+		}
+	}
+	return list;
+}
+
+QList<qint32> BudgetView::getParentSections(qint32 section) {
+	return getParentSections(section, FALSE);
+}
+
+QList<qint32> BudgetView::getParentSections(qint32 section, bool childs) {
+	QList<qint32> list;
+	qint32 id;
+	QSqlDatabase db;
+	QSqlQuery query(db);
+	query.prepare("SELECT parent_id FROM budget_tree WHERE entity_id=:section;");
+	query.bindValue(":section", section);
+	query.exec();
+	while (query.next()) {
+		id = query.value(0).toInt();
+		list << id;
+		if (childs) {
+			list.append(getParentSections(id, TRUE));
 		}
 	}
 	return list;
@@ -124,7 +146,7 @@ void BudgetView::createRoot() {
 }
 
 void BudgetView::removeFolder() {
-	int ret = QMessageBox::question(this, tr("Delete Folder"), tr("Really delete the Selected Folder and all Subfolders?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+	int ret = QMessageBox::question(this, tr("Delete Folder"), tr("Really delete the selected Position and all Subpositions?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
 	if (ret == QMessageBox::Ok) {
 		doRemoveFolder();
 	}
@@ -133,7 +155,7 @@ void BudgetView::removeFolder() {
 void BudgetView::doRemoveFolder() {
 	QModelIndex sel = treeView->selectionModel()->currentIndex();
 	if (!treeModel->removeRow(sel.row(), sel.parent())) {
-		QMessageBox::critical(this, tr("Delete failed"), tr("Could not delete the Folder. Try it again or let it be..."));
+		QMessageBox::critical(this, tr("Delete failed"), tr("Could not delete the Position. Try it again or let it be..."));
 	}
 }
 
@@ -155,6 +177,7 @@ void BudgetView::removeEntry() {
 		doRemoveEntry();
 	}
 }
+
 void BudgetView::doRemoveEntry() {
 	QModelIndex sel = listView->selectionModel()->currentIndex();
 	if (!listModel->removeRow(sel.row(), sel.parent())) {

@@ -36,8 +36,8 @@
        </property>
        <item>
         <widget class="QToolBar" name="horizontalWidget">
-         <addaction name="actionCreateFolder"/>
          <addaction name="actionCreateRoot"/>
+         <addaction name="actionCreateFolder"/>
          <addaction name="actionRemoveFolder"/>
         </widget>
        </item>
@@ -147,10 +147,10 @@
      <normaloff>:/icons/resources/icons/folders.png</normaloff>:/icons/resources/icons/folders.png</iconset>
    </property>
    <property name="text">
-    <string>Create Folder</string>
+    <string>Create Position</string>
    </property>
    <property name="toolTip">
-    <string>Create a new Folder</string>
+    <string>Create a new Position</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -162,10 +162,10 @@
      <normaloff>:/icons/resources/icons/folder_delete.png</normaloff>:/icons/resources/icons/folder_delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove Folder</string>
+    <string>Remove Position</string>
    </property>
    <property name="toolTip">
-    <string>Remove the Selected Folder and all Entries and Subfolders</string>
+    <string>Remove the selected Position and all entries and Subpositions</string>
    </property>
   </action>
   <action name="actionCreateEntry">
@@ -198,10 +198,13 @@
   <action name="actionCreateRoot">
    <property name="icon">
     <iconset resource="../PiTres.qrc">
-     <normaloff>:/icons/resources/icons/folder_new.png</normaloff>:/icons/resources/icons/folder_new.png</iconset>
+     <normaloff>:/icons/resources/icons/chart.png</normaloff>:/icons/resources/icons/chart.png</iconset>
    </property>
    <property name="text">
-    <string>Create Root-Folder</string>
+    <string>New Budget</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Budget</string>
    </property>
   </action>
  </widget>

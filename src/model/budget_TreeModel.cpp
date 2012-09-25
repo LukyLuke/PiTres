@@ -17,6 +17,7 @@
 */
 
 #include "budget_TreeModel.h"
+#include <QPixmap>
 
 namespace budget {
 	
@@ -72,6 +73,16 @@ namespace budget {
 	QVariant TreeModel::data(const QModelIndex &index, qint32 role) const {
 		if (!index.isValid()) {
 			return QVariant();
+		}
+		if (role == Qt::DecorationRole && index.column() == 0) {
+			int t = getItem(index)->data(4).toInt();
+			if (t == 1) {
+				return QPixmap(QString::fromUtf8(":/icons/resources/icons/expense.png")).scaled(16, 16, Qt::KeepAspectRatio);
+			} else if (t == 2) {
+				return QPixmap(QString::fromUtf8(":/icons/resources/icons/income.png")).scaled(16, 16, Qt::KeepAspectRatio);
+			} else {
+				return QPixmap(QString::fromUtf8(":/icons/resources/icons/chart.png")).scaled(16, 16, Qt::KeepAspectRatio);
+			}
 		}
 		if (role != Qt::DisplayRole && role != Qt::EditRole) {
 			return QVariant();
