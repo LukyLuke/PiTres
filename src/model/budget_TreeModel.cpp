@@ -164,7 +164,7 @@ namespace budget {
 		QLocale locale;
 		QSqlQuery query(db);
 		query.prepare("SELECT entity_id,position,name,description,amount,type FROM budget_tree WHERE parent_id=? ORDER BY position ASC;");
-		query.bindValue(0, parent->id());
+		query.bindValue(0, parent->entityId());
 		query.exec();
 		
 		while (query.next()) {
@@ -178,6 +178,24 @@ namespace budget {
 			parent->appendChild(child);
 			setupModelData(child);
 		}
+	}
+	
+	TreeItem *TreeModel::search(qint32 id) {
+		TreeItem *item = new TreeItem;
+		QSqlQuery query(db);
+		query.prepare("SELECT entity_id,position,name,description,amount,type,parent_id FROM budget_tree WHERE entity_id=?;");
+		query.bindValue(0, id);
+		query.exec();
+		if (query.first()) {
+			item->setId(query.value(0).toInt());
+			item->setData(0, query.value(1));
+			item->setData(1, query.value(2));
+			item->setData(2, query.value(3));
+			item->setData(4, query.value(5).toInt());
+			item->setData(3, query.value(4).toFloat());
+			item->setParentId(query.value(6).toInt());
+		}
+		return item;
 	}
 	
 }

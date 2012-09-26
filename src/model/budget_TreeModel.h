@@ -54,6 +54,7 @@ namespace budget {
 		qint32 columnCount(const QModelIndex &parent = QModelIndex()) const;
 		bool insertRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
 		bool removeRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
+		TreeItem *search(qint32 id);
 		
 	private:
 		QSqlDatabase db;

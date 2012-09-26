@@ -52,7 +52,7 @@ private:
 	budget::TreeModel *treeModel;
 	budget::BudgetEntityModel *listModel;
 	
-	void showSummary(QList<BudgetEntity *> *list);
+	void showSummary(QList<BudgetEntity *> *list, budget::TreeItem *item);
 	void doRemoveFolder();
 	void doRemoveEntry();
 

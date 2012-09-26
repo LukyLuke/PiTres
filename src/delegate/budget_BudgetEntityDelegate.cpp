@@ -90,7 +90,8 @@ namespace budget {
 		dateEdit->setDisplayFormat("yyyy-MM-dd");
 		dateEdit->setCalendarPopup(true);
 		
-		spinBox->setMaximum(9999999.99);
+		spinBox->setMaximum(1e+08);
+		spinBox->setMinimum(-1e+07);
 		spinBox->setPrefix(locale.currencySymbol(QLocale::CurrencySymbol));
 		spinBox->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 		

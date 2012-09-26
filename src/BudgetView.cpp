@@ -28,12 +28,13 @@ BudgetView::BudgetView(QWidget *parent) : QWidget(parent) {
 	connect(actionCreateEntry, SIGNAL(triggered()), this, SLOT(createEntry()));
 	connect(actionRemoveEntry, SIGNAL(triggered()), this, SLOT(removeEntry()));
 	
-	treeModel = new budget::TreeModel(tr("#"), tr("Category"), tr("Description"), tr("Amount"), tr("Type"));
+	treeModel = new budget::TreeModel(tr("#"), tr("Name"), tr("Description"), tr("Amount"), tr("Type"));
 	treeView->setModel(treeModel);
 	for (qint32 i = 0; i < treeModel->columnCount(); ++i) {
 		treeView->resizeColumnToContents(i);
 	}
-	treeView->setItemDelegateForColumn(4, new budget::TreeItemDelegate());
+	treeView->setItemDelegateForColumn(3, new budget::TreeItemAmountDelegate);
+	treeView->setItemDelegateForColumn(4, new budget::TreeItemTypeDelegate);
 	connect(treeView, SIGNAL(clicked(QModelIndex)), this, SLOT(treeClicked(QModelIndex)));
 	connect(treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(treeSelectionChanged()));
 	
@@ -91,9 +92,11 @@ QList<qint32> BudgetView::getParentSections(qint32 section, bool childs) {
 	query.exec();
 	while (query.next()) {
 		id = query.value(0).toInt();
-		list << id;
-		if (childs) {
-			list.append(getParentSections(id, TRUE));
+		if (id > 0) {
+			list << id;
+			if (childs) {
+				list.append(getParentSections(id, TRUE));
+			}
 		}
 	}
 	return list;
@@ -103,17 +106,50 @@ void BudgetView::treeClicked(const QModelIndex index) {
 	budget::TreeItem *item = static_cast<budget::TreeItem *>(index.internalPointer());
 	QList<BudgetEntity *> *list = BudgetEntity::getEntities(item->entityId(), TRUE);
 	
-	showSummary(list);
+	showSummary(list, item);
 	listModel->setData(item->entityId(), list);
 }
 
-void BudgetView::showSummary(QList<BudgetEntity *> *list) {
-	qreal amount = 0;
+void BudgetView::showSummary(QList<BudgetEntity *> *list, budget::TreeItem *item) {
+	qreal spent = 0, budgeted = 0, spentCurrent = 0;
+	QList<qint32> parents = getParentSections(item->entityId(), TRUE);
+	QList<qint32> childs = getChildSections(item->entityId(), TRUE);
+	budget::TreeItem *treeItem;
+	qint32 current = item->entityId();
+	
+	// Calculate the spent amount
 	for (qint32 i = 0; i < list->size(); i++) {
 		BudgetEntity *entity = list->at(i);
-		amount += entity->amount();
+		spent += entity->amount();
+		if (entity->section() == current) {
+			spentCurrent += entity->amount();
+		}
 	}
-	labelTotal->setText("<b>" + locale.toCurrencyString(amount, locale.currencySymbol(QLocale::CurrencySymbol)) + "</b>");
+	labelTotal->setText("<b>" + locale.toCurrencyString(spent, locale.currencySymbol(QLocale::CurrencySymbol)) + "</b>");
+	
+	// Show the Details
+	budgeted += item->data(3).toFloat();
+	for (qint32 i = 0; i < childs.size(); ++i) {
+		treeItem = treeModel->search(childs.at(i));
+		budgeted += treeItem->data(3).toFloat();
+	}
+	
+	if (!parents.empty()) {
+		treeItem = treeModel->search(parents.last());
+		labelSummaryBudget->setText(treeItem->data(1).toString());
+		
+	} else {
+		labelSummaryBudget->setText(tr("Unknown Budget"));
+	}
+	labelSummaryPosition->setText(item->data(1).toString());
+	labelSummaryBudgeted->setText(locale.toCurrencyString(budgeted, locale.currencySymbol(QLocale::CurrencySymbol)));
+	labelSummarySpent->setText(locale.toCurrencyString(spent, locale.currencySymbol(QLocale::CurrencySymbol)));
+	labelSummaryTotal->setText(locale.toCurrencyString(budgeted - spent, locale.currencySymbol(QLocale::CurrencySymbol)));
+	
+	labelOverviewPosition->setText(item->data(1).toString());
+	labelOverviewBudgeted->setText(locale.toCurrencyString(item->data(3).toFloat(), locale.currencySymbol(QLocale::CurrencySymbol)));
+	labelOverviewSpent->setText(locale.toCurrencyString(spentCurrent, locale.currencySymbol(QLocale::CurrencySymbol)));
+	labelOverviewTotal->setText(locale.toCurrencyString(item->data(3).toFloat() - spentCurrent, locale.currencySymbol(QLocale::CurrencySymbol)));
 }
 
 void BudgetView::treeSelectionChanged() {

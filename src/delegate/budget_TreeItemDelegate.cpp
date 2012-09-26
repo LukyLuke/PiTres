@@ -18,12 +18,12 @@
 
 
 #include "budget_TreeItemDelegate.h"
+#include <QDoubleSpinBox>
 
 namespace budget {
-	TreeItemDelegate::TreeItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {
-	}
+	TreeItemTypeDelegate::TreeItemTypeDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
 	
-	void TreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+	void TreeItemTypeDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
 		qint32 value = index.model()->data(index, Qt::EditRole).toInt();
 		QStyleOptionViewItemV4 opt = option;
 		QStyledItemDelegate::initStyleOption(&opt, index);
@@ -40,7 +40,7 @@ namespace budget {
 		painter->restore();
 	}
 	
-	QWidget *TreeItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+	QWidget *TreeItemTypeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const {
 		QComboBox *box = new QComboBox(parent);
 		box->addItem(tr("Budget"), QVariant(0));
 		box->addItem(tr("Expense"), QVariant(1));
@@ -48,20 +48,59 @@ namespace budget {
 		return box;
 	}
 	
-	void TreeItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+	void TreeItemTypeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
 		qint32 value = index.model()->data(index, Qt::EditRole).toInt();
 		QComboBox *box = static_cast<QComboBox *>(editor);
 		box->setCurrentIndex( box->findData(value) );
 	}
 	
-	void TreeItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+	void TreeItemTypeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
 		QComboBox *box = static_cast<QComboBox *>(editor);
 		int value = box->itemData( box->currentIndex() ).toInt();
 		model->setData(index, value, Qt::EditRole);
 	}
 	
-	void TreeItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+	void TreeItemTypeDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const {
 		editor->setGeometry(option.rect);
 	}
 	
+	
+	
+	TreeItemAmountDelegate::TreeItemAmountDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
+	
+	void TreeItemAmountDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+		QLocale locale;
+		double value = index.model()->data(index, Qt::EditRole).toDouble();
+		QStyleOptionViewItemV4 opt = option;
+		QStyledItemDelegate::initStyleOption(&opt, index);
+		
+		painter->save();
+		painter->drawText(opt.rect, Qt::TextSingleLine, locale.toCurrencyString(value, locale.currencySymbol(QLocale::CurrencySymbol)) );
+		painter->restore();
+	}
+	
+	QWidget *TreeItemAmountDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const {
+		QLocale locale;
+		QDoubleSpinBox *box = new QDoubleSpinBox(parent);
+		box->setMaximum(1e+08);
+		box->setMinimum(-1e+07);
+		box->setDecimals(2);
+		return box;
+	}
+	
+	void TreeItemAmountDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+		double value = index.model()->data(index, Qt::EditRole).toDouble();
+		QDoubleSpinBox *box = static_cast<QDoubleSpinBox *>(editor);
+		box->setValue(value);
+	}
+	
+	void TreeItemAmountDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+		QDoubleSpinBox *box = static_cast<QDoubleSpinBox *>(editor);
+		double value = box->value();
+		model->setData(index, value, Qt::EditRole);
+	}
+	
+	void TreeItemAmountDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const {
+		editor->setGeometry(option.rect);
+	}
 }

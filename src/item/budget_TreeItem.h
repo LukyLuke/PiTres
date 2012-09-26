@@ -47,6 +47,7 @@ namespace budget {
 		qint32 id() const;
 		qint32 entityId() const;
 		TreeItem *parent();
+		void setParentId(qint32 parent);
 		void setId(qint32 id);
 		bool setData(const qint32 pos, const QVariant &data);
 		bool insertChildren(qint32 position, qint32 count);
