@@ -59,6 +59,22 @@ void Section::createTables() {
 	query.exec();
 }
 
+void Section::getNameParentHash(QHash<QString, QString> *hash) {
+	if (hash) {
+		QString section, parent;
+		QSqlDatabase db;
+		QSqlQuery query(db);
+		query.exec("SELECT name,parent FROM pps_sections ORDER BY parent,name ASC;");
+		while (query.next()) {
+			section = query.value(0).toString();
+			parent = query.value(1).toString();
+			if (!section.isEmpty() && !parent.isEmpty()) {
+				hash->insert( section, parent );
+			}
+		}
+	}
+}
+
 void Section::load(const QString name) {
 	QSqlDatabase db;
 	QSqlQuery query(db);

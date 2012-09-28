@@ -187,10 +187,11 @@ void PiTres::showSettings() {
 	settingsForm.ldapPassword->setText(settings.value("ldap/password", "").toString());
 	settingsForm.ldapBaseDn->setText(settings.value("ldap/basedn", "dc=members,st=<Your Section here>,dc=piratenpartei,dc=ch").toString());
 	settingsForm.ldapSearch->setText(settings.value("ldap/search", "(objectClass=ppsPerson)").toString());
-	settingsForm.ldapSectionRegex->setText(settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$|^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString());
+	settingsForm.ldapSectionRegex->setText(settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$||^.*,st=([a-z]{2}).*$||^.*,dc=(members).*$").toString());
 	
 	settingsForm.ldifNonsectionMembers->setText(settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString());
-	settingsForm.ldifSectionMembers->setText(settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,st=%2,dc=piratenpartei,dc=ch").toString());
+	settingsForm.ldifSectionMembers->setText(settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,%3st=%2,dc=piratenpartei,dc=ch").toString());
+	settingsForm.ldifSubSection->setText(settings.value("ldif/subsection_concat", "l=%1,").toString());
 	settingsForm.ldifPaidDueAttribute->setText(settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString());
 	settingsForm.ldifPaidDueReplace->setChecked(settings.value("ldif/replace_attribute", false).toBool());
 	
@@ -263,6 +264,7 @@ void PiTres::doSaveSettings() {
 	
 	settings.setValue("ldif/members_dn", settingsForm.ldifNonsectionMembers->text());
 	settings.setValue("ldif/main_dn", settingsForm.ldifSectionMembers->text());
+	settings.setValue("ldif/subsection_concat", settingsForm.ldifSubSection->text());
 	settings.setValue("ldif/memberstate_attribute", settingsForm.ldifPaidDueAttribute->text());
 	settings.setValue("ldif/replace_attribute", settingsForm.ldifPaidDueReplace->isChecked());
 	

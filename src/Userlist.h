@@ -57,7 +57,7 @@ class Userlist : public QWidget, private Ui::UserlistForm {
 Q_OBJECT
 
 private:
-	struct LdiffData {
+	struct LdifData {
 		QString section;
 		QString uid;
 		QStringList dates;

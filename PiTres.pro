@@ -66,7 +66,8 @@ include(build.pri)
 
 # enable debuging
 !isEmpty(DEBUG) {
-	CONFIG += debug
+	CONFIG += debug warn_on
+	CONFIG -= release
 	win32:debug {
 		CONFIG += console
 	}

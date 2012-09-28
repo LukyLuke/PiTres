@@ -17,6 +17,7 @@
 */
 
 #include "Userlist.h"
+#include "data/Section.h"
 
 Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -86,9 +87,9 @@ void Userlist::loadData() {
 
 void Userlist::loadSections() {
 	selectSection->addItem(tr("All"), QVariant(""));
-	QSqlQuery query("SELECT section FROM ldap_persons GROUP BY section;", db);
+	QSqlQuery query("SELECT name FROM pps_sections ORDER BY name;", db);
 	while (query.next()) {
-		selectSection->addItem(query.value(0).toString(), QVariant(query.value(0).toString()));
+		selectSection->addItem(query.value(0).toString(), query.value(0));
 	}
 }
 
@@ -229,11 +230,6 @@ void Userlist::exportData() {
 	QSqlQuery query = createQuery();
 	query.exec();
 	
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
-	
 	QRegExp re("[\"',\r\n]+");
 	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Paid\n");
 	while (query.next()) {
@@ -312,11 +308,14 @@ void Userlist::adjustMemberDueDate() {
 
 void Userlist::exportLdiff() {
 	QSettings settings;
-	QHash< QString, LdiffData > hashList;
+	QHash<QString, LdifData> hashList;
+	QHash<QString, QString> sections;
 	QString ldif = "";
-	QString section, member, duedate;
+	QString section, member, duedate, subsection, value, save_section;
+	qint32 cnt = 0;
 	QString members_dn = settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString();
-	QString main_dn = settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,st=%2,dc=piratenpartei,dc=ch").toString();
+	QString main_dn = settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,%3st=%2,dc=piratenpartei,dc=ch").toString();
+	QString sub_concat = settings.value("ldif/subsection_concat", "l=%1,").toString();
 	QString attribute = settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString();
 	bool replaceAttribute = settings.value("ldif/replace_attribute", false).toBool();
 	QSqlQuery query(db);
@@ -334,9 +333,10 @@ void Userlist::exportLdiff() {
 		while (query.next()) {
 			member = query.value(0).toString();
 			duedate = query.value(1).toString();
-			section = query.value(2).toString();
+			//nickname = query.value(2).toString();
+			section = query.value(3).toString();
 			
-			LdiffData d;
+			LdifData d;
 			if (!hashList.contains(member)) {
 				d.section = section;
 				d.uid = member;
@@ -354,13 +354,35 @@ void Userlist::exportLdiff() {
 		return;
 	}
 	
-	QHash< QString, LdiffData >::const_iterator it = hashList.constBegin();
+	// Load all Sections in a Hash-Cache
+	Section::getNameParentHash(&sections);
+	
+	// Create the LDIF
+	QHash<QString, LdifData>::const_iterator it = hashList.constBegin();
 	while (it != hashList.constEnd()) {
-		LdiffData d = it.value();
-		if (d.section.isEmpty() || d.section.length() > 2) {
+		LdifData d = it.value();
+		
+		if (d.section.isEmpty() || !sections.contains(d.section)) {
 			ldif.append("dn: " + members_dn.arg(d.uid));
+			
 		} else {
-			ldif.append("dn: " + main_dn.arg(d.uid, section));
+			// Create the SubSection String if needed
+			section = d.section;
+			subsection = "";
+			cnt = 0;
+			do {
+				save_section = section;
+				value = sections.value(section);
+				if (sections.contains(value)) {
+					subsection.append(sub_concat.arg(section));
+					section = value;
+				} else {
+					section = save_section;
+					break;
+				}
+			} while (++cnt < sections.size());
+			
+			ldif.append("dn: " + main_dn.arg(d.uid, section, subsection));
 		}
 		ldif.append("\nchangetype: modify");
 		

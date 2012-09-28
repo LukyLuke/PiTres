@@ -61,7 +61,7 @@ LDAPImport::LDAPImport(QWidget *parent) : QWidget(parent) {
 	editBaseDN->setText( settings.value("ldap/basedn", "dc=members,st=<Your Section here>,dc=piratenpartei,dc=ch").toString() );
 	editPassword->setText( settings.value("ldap/password", "").toString() );
 	editSearch->setText( settings.value("ldap/search", "(objectClass=ppsPerson)").toString() );
-	sectionExtract->setText( settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$|^.*,st=([a-z]{2}).*$|^.*,dc=(members).*$").toString() );
+	sectionExtract->setText( settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$||^.*,st=([a-z]{2}).*$||^.*,dc=(members).*$").toString() );
 	
 	// Setup StackWidget Navigation
 	connect(btnGoToSearch, SIGNAL(clicked()), this, SLOT(nextPage()));
@@ -222,7 +222,7 @@ void LDAPImport::importFromLdap() {
 	berval **values, dnval;
 #endif
 	PPSPerson *person;
-	QStringList dnlist;
+	QStringList dnlist = sectionExtract->text().split("||");
 	QString dn;
 
 #ifndef WIN32
@@ -235,7 +235,6 @@ void LDAPImport::importFromLdap() {
 		person = new PPSPerson;
 		
 		setPersonValue(person, QString("section"), "");
-		dnlist = sectionExtract->text().split('|');
 		for (int i = 0; i < dnlist.size(); i++) {
 			dn = QString(dnval.bv_val);
 			dn.replace(QRegExp(dnlist.at(i)), "\\1");
@@ -375,8 +374,8 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 
 void LDAPImport::addSection(QString section) {
 	Section s(section);
-	s.setName(section);
 	if (!s.loaded()) {
+		s.setName(section);
 		s.save();
 	}
 }

@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QHash>
 #include <QDate>
 #include <QSqlDatabase>
 
@@ -46,6 +47,7 @@ public:
 	QList<Section *> children();
 	Section *parent();
 	static void createTables();
+	static void getNameParentHash(QHash<QString, QString> *hash);
 	
 	// enums
 	enum AmountType { AmountPercent=0, AmountMoney=1 };
