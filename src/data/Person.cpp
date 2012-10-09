@@ -35,6 +35,10 @@ PPSPerson::PPSPerson(QObject *parent) : QObject(parent) {
 	clear();
 }
 
+PPSPerson::PPSPerson(const PPSPerson &other) : QObject(other.parent()) {
+	// TODO: Implement
+}
+
 PPSPerson::~PPSPerson() {}
 
 void PPSPerson::createTables() {
@@ -44,40 +48,20 @@ void PPSPerson::createTables() {
 	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
 	              "ldap_paid_due DATE, type INTEGER);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_email (uid INTEGER, type TEXT, mail TEXT);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_telephone (uid INTEGER, type TEXT, number TEXT);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_mobile (uid INTEGER, type TEXT, number TEXT);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	// Persistent matching table between PaidUntilDates and MemberUIDs
 	// insert into ldap_persons_dates select distinct member_uid,"2012-12-31" from pps_invoice where state = 2 and paid_date > "2011-12-31"
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_dates (uid INTEGER, paid_due DATE);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 }
 
 void PPSPerson::emptyTables() {
@@ -85,31 +69,15 @@ void PPSPerson::emptyTables() {
 	QSqlQuery query(db);
 	query.prepare("DELETE FROM ldap_persons;");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("DELETE FROM ldap_persons_email;");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("DELETE FROM ldap_persons_telephone;");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("DELETE FROM ldap_persons_mobile;");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	
 	query.prepare("VACUUM;");
 	query.exec();

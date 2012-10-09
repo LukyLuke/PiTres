@@ -4,6 +4,7 @@
     <file>resources/ocrb.ttf</file>
   </qresource>
   <qresource prefix="icons">
+    <file>resources/icons/goldbars.png</file>
     <file>resources/icons/expense.png</file>
     <file>resources/icons/income.png</file>
     <file>resources/icons/folders.png</file>

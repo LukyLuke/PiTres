@@ -93,6 +93,7 @@
    </attribute>
    <addaction name="actionFrom_LDAP"/>
    <addaction name="actionImport_Payments"/>
+   <addaction name="actionDonations"/>
    <addaction name="actionInvoiceWizard"/>
    <addaction name="actionEditSections"/>
   </widget>
@@ -403,6 +404,18 @@
    </property>
    <property name="toolTip">
     <string>Edit Sections</string>
+   </property>
+  </action>
+  <action name="actionDonations">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/goldbars.png</normaloff>:/icons/resources/icons/goldbars.png</iconset>
+   </property>
+   <property name="text">
+    <string>Donations</string>
+   </property>
+   <property name="toolTip">
+    <string>Show and manage Donations</string>
    </property>
   </action>
  </widget>

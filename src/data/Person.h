@@ -59,6 +59,7 @@ Q_ENUMS(PersonType)
 
 public:
 	PPSPerson(QObject *parent = 0);
+	PPSPerson(const PPSPerson &other);
 	virtual ~PPSPerson();
 	void save();
 	void clear();

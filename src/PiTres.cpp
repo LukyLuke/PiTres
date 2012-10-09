@@ -60,6 +60,7 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	Section::createTables();
 	BudgetView::createTables();
 	BudgetEntity::createTables();
+	Donation::createTables();
 	
 	// Set some default values we need later
 	settings.setValue("sentbills/sincedate", QDate::currentDate().addMonths(-3));
@@ -95,6 +96,7 @@ void PiTres::connectActions() {
 	connect(actionContribution, SIGNAL(triggered()), this, SLOT(showContributions()));
 	connect(actionBudget, SIGNAL(triggered()), this, SLOT(showBudget()));
 	connect(actionEditSections, SIGNAL(triggered()), this, SLOT(showSectionEdit()));
+	connect(actionDonations, SIGNAL(triggered()), this, SLOT(showDonations()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -155,6 +157,11 @@ void PiTres::showBudget() {
 
 void PiTres::showSectionEdit() {
 	SectionEdit *widget = new SectionEdit;
+	setContent(widget);
+}
+
+void PiTres::showDonations() {
+	Donations *widget = new Donations;
 	setContent(widget);
 }
 

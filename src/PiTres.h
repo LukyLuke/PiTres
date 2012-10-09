@@ -31,11 +31,13 @@
 #include "Contributions.h"
 #include "BudgetView.h"
 #include "SectionEdit.h"
+#include "Donations.h"
 
 #include "data/Person.h"
 #include "data/Invoice.h"
 #include "data/Section.h"
 #include "data/BudgetEntity.h"
+#include "data/Donation.h"
 #include "helper/XmlPdf.h"
 
 #include <QtGui/QMainWindow>
@@ -83,6 +85,7 @@ public slots:
 	void showContributions();
 	void showBudget();
 	void showSectionEdit();
+	void showDonations();
 };
 
 #endif // PiTres_H

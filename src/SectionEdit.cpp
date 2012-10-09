@@ -60,9 +60,10 @@ void SectionEdit::setReassignQuery() {
 	query.prepare("SELECT pps_invoice.for_section, ldap_persons.section, pps_invoice.address_name, pps_invoice.paid_date, pps_invoice.issue_date, pps_invoice.reference"
 	              " FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
 	              " WHERE ldap_persons.section = :section AND pps_invoice.for_section != ldap_persons.section"
-	              " AND (pps_invoice.paid_date = '' OR pps_invoice.paid_date > :founded);");
+	              " AND (pps_invoice.paid_date = '' OR pps_invoice.paid_date > :founded) AND pps_invoice.issue_date >= :year;");
 	query.bindValue(":section", s.name());
 	query.bindValue(":founded", s.founded());
+	query.bindValue(":year", s.founded().toString("yyyy-01-01"));
 	query.exec();
 	reassignModel->setQuery(query);
 }
@@ -71,13 +72,12 @@ void SectionEdit::reassignInvoices() {
 	if (reassignModel->query().first()) {
 		QSqlQuery query(db);
 		query.prepare("UPDATE pps_invoice SET for_section=:section WHERE reference=:reference AND for_section=:oldsection;");
-		while (reassignModel->query().next()) {
+		do {
 			query.bindValue(":section", reassignModel->query().value(1));
 			query.bindValue(":reference", reassignModel->query().value(5));
 			query.bindValue(":oldsection", reassignModel->query().value(0));
 			query.exec();
-			qDebug() << query.lastError();
-		}
+		} while (reassignModel->query().next());
 	}
 }
 

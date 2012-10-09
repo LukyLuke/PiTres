@@ -19,7 +19,7 @@
 #ifndef Contributions_H
 #define Contributions_H
 
-#include "../ui_contributions.h"
+#include "ui_contributions.h"
 
 #include <QWidget>
 #include <QSqlDatabase>
