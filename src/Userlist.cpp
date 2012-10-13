@@ -27,7 +27,7 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	connect(selectSection, SIGNAL(currentIndexChanged(QString)), this, SLOT(filterSection(QString)));
 	connect(tableView, SIGNAL(activated(QModelIndex)), this, SLOT(showDetails(QModelIndex)));
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
-	connect(btnLdap, SIGNAL(clicked()), this, SLOT(exportLdiff()));
+	connect(btnLdap, SIGNAL(clicked()), this, SLOT(exportLdif()));
 	
 	tableModel = new QSqlQueryModel(tableView);
 	
@@ -306,7 +306,7 @@ void Userlist::adjustMemberDueDate() {
 	editDateDialog->hide();
 }
 
-void Userlist::exportLdiff() {
+void Userlist::exportLdif() {
 	QSettings settings;
 	QHash<QString, LdifData> hashList;
 	QHash<QString, QString> sections;

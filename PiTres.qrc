@@ -4,6 +4,11 @@
     <file>resources/ocrb.ttf</file>
   </qresource>
   <qresource prefix="icons">
+    <file>resources/icons/pie-chart_view.png</file>
+    <file>resources/icons/mime-csv.png</file>
+    <file>resources/icons/mime-pdf.png</file>
+    <file>resources/icons/mime-qif.png</file>
+    <file>resources/icons/printer.png</file>
     <file>resources/icons/goldbars.png</file>
     <file>resources/icons/expense.png</file>
     <file>resources/icons/income.png</file>

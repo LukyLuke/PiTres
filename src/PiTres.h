@@ -32,6 +32,7 @@
 #include "BudgetView.h"
 #include "SectionEdit.h"
 #include "Donations.h"
+#include "Statistics.h"
 
 #include "data/Person.h"
 #include "data/Invoice.h"
@@ -86,6 +87,7 @@ public slots:
 	void showBudget();
 	void showSectionEdit();
 	void showDonations();
+	void showStatistics();
 };
 
 #endif // PiTres_H

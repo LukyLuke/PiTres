@@ -58,6 +58,8 @@ protected:
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
 	qreal toQReal(QString value);
+	qreal offsetX;
+	qreal offsetY;
 };
 
 class PdfElementLine : public PdfElement {

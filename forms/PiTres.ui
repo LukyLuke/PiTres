@@ -55,6 +55,7 @@
     </property>
     <addaction name="actionFrom_LDAP"/>
     <addaction name="actionShow_Users"/>
+    <addaction name="actionStatistics"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Bills"/>
     <addaction name="actionInvoiceWizard"/>
@@ -96,6 +97,7 @@
    <addaction name="actionDonations"/>
    <addaction name="actionInvoiceWizard"/>
    <addaction name="actionEditSections"/>
+   <addaction name="actionStatistics"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="sizePolicy">
@@ -416,6 +418,15 @@
    </property>
    <property name="toolTip">
     <string>Show and manage Donations</string>
+   </property>
+  </action>
+  <action name="actionStatistics">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/pie-chart_view.png</normaloff>:/icons/resources/icons/pie-chart_view.png</iconset>
+   </property>
+   <property name="text">
+    <string>Statistics</string>
    </property>
   </action>
  </widget>

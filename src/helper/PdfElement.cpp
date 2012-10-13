@@ -104,6 +104,9 @@ PdfElement PdfElement::fromElement(QDomElement element, QString templatePath) {
 
 void PdfElement::setElement(QDomElement element) {
 	_nodes.clear();
+	offsetX = element.hasAttribute("offsetx") ? toQReal(element.attribute("offsetx")) : 0;
+	offsetY = element.hasAttribute("offsety") ? toQReal(element.attribute("offsety")) : 0;
+	
 	for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling()) {
 		parse(n);
 	}

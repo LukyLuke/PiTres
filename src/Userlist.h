@@ -68,7 +68,6 @@ private:
 	int searchTimer;
 	QAction *actionManualPayment;
 	QAction *actionEditDueDate;
-	
 	QDialog *editDateDialog;
 	Ui::dateForm dateForm;
 	
@@ -93,7 +92,7 @@ public slots:
 	void payMemberfeeCash();
 	void showMemberDueAdjust();
 	void adjustMemberDueDate();
-	void exportLdiff();
+	void exportLdif();
 
 protected:
 	void timerEvent(QTimerEvent *event);
