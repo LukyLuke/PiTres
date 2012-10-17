@@ -23,7 +23,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
-      <number>-1</number>
+      <number>6</number>
      </property>
      <property name="bottomMargin">
       <number>0</number>
@@ -146,7 +146,7 @@
          </property>
         </widget>
        </item>
-       <item row="15" column="1">
+       <item row="16" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -294,6 +294,20 @@
        </item>
        <item row="12" column="2">
         <widget class="QLabel" name="detailSection">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="1">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Notify:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="2">
+        <widget class="QLabel" name="detailNotifyType">
          <property name="text">
           <string/>
          </property>

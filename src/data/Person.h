@@ -51,11 +51,13 @@ Q_PROPERTY(Language language READ language WRITE setLanguage NOTIFY languageChan
 Q_PROPERTY(QDate paidDue READ paidDue WRITE setPaidDue NOTIFY paidDueChanged)
 Q_PROPERTY(QDate ldapPaidDue READ ldapPaidDue WRITE setLdapPaidDue NOTIFY ldapPaidDueChanged)
 Q_PROPERTY(PersonType type READ type WRITE setType NOTIFY typeChanged)
+Q_PROPERTY(NotifyMethod notify READ notify WRITE setNotify NOTIFY notifyChanged)
 
 Q_ENUMS(ContributionClass)
 Q_ENUMS(Gender)
 Q_ENUMS(Language)
 Q_ENUMS(PersonType)
+Q_ENUMS(NotifyMethod)
 
 public:
 	PPSPerson(QObject *parent = 0);
@@ -68,12 +70,13 @@ public:
 	QList<Invoice *> getInvoices();
 	static void createTables();
 	static void emptyTables();
-	
+
 	enum ContributionClass { ContributeFull=0 , ContributeStudent=1 };
 	enum Gender { GenderMale=0, GenderFemale=1, GenderBoth=2, GenderNone=3, GenderUnknown=-1 };
 	enum Language { DE=0, FR=1, IT=2, EN=3 };
 	enum PersonType { LandLubber=0, Sympathizer=1, Pirate=2, Veteran=3, PlankWalker=4, FleetPirate=5, UnknownType=99 };
-	
+	enum NotifyMethod { SnailMail=0, EMail=1 };
+
 	// Setter
 	void setUid(int uid);
 	void setSection(QString section);
@@ -105,7 +108,8 @@ public:
 	void setPaidDue(QDate paidDue);
 	void setLdapPaidDue(QDate paidDue);
 	void setType(PersonType type);
-	
+	void setNotify(NotifyMethod notify);
+
 	// Getter
 	bool isLoaded() { return i_uid > 0; };
 	int uid() const { return i_uid; };
@@ -129,6 +133,7 @@ public:
 	QDate paidDue() const { return d_paidDue; };
 	QDate ldapPaidDue() const { return d_ldapPaidDue; };
 	PersonType type() const { return m_type; };
+	NotifyMethod notify() const { return m_notify; };
 
 signals:
 	void uidChanged(int);
@@ -161,6 +166,7 @@ signals:
 	void paidDueChanged(QDate);
 	void ldapPaidDueChanged(QDate);
 	void typeChanged(PersonType);
+	void notifyChanged(NotifyMethod);
 
 private:
 	QSqlDatabase db;
@@ -186,6 +192,7 @@ private:
 	QDate d_paidDue;
 	QDate d_ldapPaidDue;
 	PersonType m_type;
+	NotifyMethod m_notify;
 	bool is_loaded;
 	bool b_paidDueLoaded;
 };

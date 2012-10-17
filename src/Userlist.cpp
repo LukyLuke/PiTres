@@ -21,24 +21,24 @@
 
 Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
-	
+
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(selectSection, SIGNAL(currentIndexChanged(QString)), this, SLOT(filterSection(QString)));
 	connect(tableView, SIGNAL(activated(QModelIndex)), this, SLOT(showDetails(QModelIndex)));
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	connect(btnLdap, SIGNAL(clicked()), this, SLOT(exportLdif()));
-	
+
 	tableModel = new QSqlQueryModel(tableView);
-	
+
 	createContextMenu();
 	loadSections();
 	loadData();
-	
+
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showTableContextMenu(const QPoint&)));
-	
+
 	editDateDialog = new QDialog(this);
 	dateForm.setupUi(editDateDialog);
 	dateForm.hintLabel->setText(tr("Select the new 'Member Due'-Date for the selected member."));
@@ -55,7 +55,7 @@ void Userlist::createContextMenu() {
 	actionManualPayment->setShortcut(QKeySequence::Print);
 	actionManualPayment->setStatusTip(tr("User pays current Memberfee cash"));
 	connect(actionManualPayment, SIGNAL(triggered()), this, SLOT(payMemberfeeCash()));
-	
+
 	actionEditDueDate = new QAction(tr("&Change Member due Date"), this);
 	actionEditDueDate->setShortcut(QKeySequence("CTRL + D"));
 	actionEditDueDate->setStatusTip(tr("Change the 'Member due' Date from the current User"));
@@ -64,14 +64,14 @@ void Userlist::createContextMenu() {
 
 void Userlist::loadData() {
 	QSqlQuery query("SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname,"
-	                " ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons"
-	                " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;", db);
+					" ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons"
+					" LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;", db);
 	tableModel->setQuery(query);
-	
+
 	// InvoiceState: o_pen, c_anceled, p_aid, u_nknown
 	// Type: amount_f_ee, u_nknown
 	// MemberState: m_ember, l_eave, i_nactive
-	
+
 	tableModel->setHeaderData(0, Qt::Horizontal, tr("UID"));
 	tableModel->setHeaderData(1, Qt::Horizontal, tr("Due"));
 	tableModel->setHeaderData(2, Qt::Horizontal, tr("Nickname"));
@@ -80,7 +80,7 @@ void Userlist::loadData() {
 	tableModel->setHeaderData(5, Qt::Horizontal, tr("City"));
 	tableModel->setHeaderData(6, Qt::Horizontal, tr("Joining Date"));
 	tableModel->setHeaderData(7, Qt::Horizontal, tr("Section"));
-	
+
 	tableView->setSortingEnabled(true);
 	tableView->setModel(tableModel);
 }
@@ -121,28 +121,28 @@ QSqlQuery Userlist::createQuery() {
 			.append(" OR ldap_persons.givenname LIKE :given").append(QString::number(i)).append(")")
 		);
 	}
-	
+
 	QSqlQuery query(db);
 	QString qs;
 	bool bindSection = (section != "All");
 	if (!bindSection) {
 		qs = "SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname,"
-		     " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)";
+			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)";
 		if (sl.size() > 0) {
 			qs.append(" WHERE ").append(search);
 		}
 		qs.append(" GROUP BY ldap_persons_dates.uid;");
-		
+
 	} else {
 		qs = "SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname,"
-		     " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
-		     " WHERE ldap_persons.section=:section";
+			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
+			 " WHERE ldap_persons.section=:section";
 		if (sl.size() > 0) {
 			qs.append(" AND (").append(search).append(")");
 		}
 		qs.append(" GROUP BY ldap_persons_dates.uid;");
 	}
-	
+
 	query.prepare(qs);
 	if (bindSection) {
 		query.bindValue(":section", section);
@@ -173,7 +173,7 @@ void Userlist::showDetails(int index) {
 	int uid = tableModel->record(index).value(0).toInt();
 	PPSPerson person;
 	person.load(uid);
-	
+
 	detailUid->setText(QString::number(person.uid()));
 	detailNickname->setText(person.nickname());
 	switch (person.gender()) {
@@ -201,7 +201,12 @@ void Userlist::showDetails(int index) {
 		case PPSPerson::ContributeStudent: detailContributionClass->setText(tr("Limited")); break;
 		default: detailContributionClass->setText(tr("Full")); break;
 	}
-	
+
+	switch (person.notify()) {
+		case PPSPerson::SnailMail: detailNotifyType->setText(tr("Snail-Mail")); break;
+		case PPSPerson::EMail: detailNotifyType->setText(tr("E-Mail")); break;
+	}
+
 	QString s;
 	QList<QString> l = person.telephone();
 	for (int i = 0; i < l.size(); i++) {
@@ -212,24 +217,24 @@ void Userlist::showDetails(int index) {
 		s.append(l.at(i) + "\n");
 	}
 	detailTelephone->setText(s.trimmed());
-	
+
 	s = "";
 	l = person.email();
 	for (int i = 0; i < l.size(); i++) {
 		s.append(l.at(i) + "\n");
 	}
 	detailEmail->setText(s.trimmed());
-	
+
 	//Invoice *invoice = person.getInvoice();
 	detailMemberDue->setText(person.paidDue().toString("yyyy-MM-dd"));
-	
+
 	//delete invoice;
 }
 
 void Userlist::exportData() {
 	QSqlQuery query = createQuery();
 	query.exec();
-	
+
 	QRegExp re("[\"',\r\n]+");
 	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Paid\n");
 	while (query.next()) {
@@ -242,7 +247,7 @@ void Userlist::exportData() {
 		csv.append( query.value(7).toString().remove(re) ).append(",");
 		csv.append( query.value(1).toString().remove(re) ).append("\n");
 	}
-	
+
 	// Safe as File
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save the Userlist"), "", tr("CSV (*.csv);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
@@ -319,30 +324,30 @@ void Userlist::exportLdif() {
 	QString attribute = settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString();
 	bool replaceAttribute = settings.value("ldif/replace_attribute", false).toBool();
 	QSqlQuery query(db);
-	
+
 	// Only get the last if entries should be relaced or all the other way
 	if (replaceAttribute) {
 		query.prepare("SELECT ldap_persons.uid,MAX(ldap_persons_dates.paid_due) AS paid_due,ldap_persons.nickname,ldap_persons.section FROM ldap_persons"
-		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
+					  " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
 	} else {
 		query.prepare("SELECT ldap_persons.uid,ldap_persons_dates.paid_due,ldap_persons.nickname,ldap_persons.section FROM ldap_persons"
-		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
+					  " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
 	}
-	
+
 	if (query.exec()) {
 		while (query.next()) {
 			member = query.value(0).toString();
 			duedate = query.value(1).toString();
 			//nickname = query.value(2).toString();
 			section = query.value(3).toString();
-			
+
 			LdifData d;
 			if (!hashList.contains(member)) {
 				d.section = section;
 				d.uid = member;
 				hashList.insert(member, d);
 			}
-			
+
 			d = hashList.value(member);
 			if (!d.dates.contains(duedate)) {
 				d.dates.append(duedate);
@@ -353,18 +358,18 @@ void Userlist::exportLdif() {
 		QMessageBox::warning(this, tr("Adjusting dates failed"), tr("An Error occured while getting Userdata and Paiddue-Dates from Database:\n\n%1").arg(query.lastError().text()));
 		return;
 	}
-	
+
 	// Load all Sections in a Hash-Cache
 	Section::getNameParentHash(&sections);
-	
+
 	// Create the LDIF
 	QHash<QString, LdifData>::const_iterator it = hashList.constBegin();
 	while (it != hashList.constEnd()) {
 		LdifData d = it.value();
-		
+
 		if (d.section.isEmpty() || !sections.contains(d.section)) {
 			ldif.append("dn: " + members_dn.arg(d.uid));
-			
+
 		} else {
 			// Create the SubSection String if needed
 			section = d.section;
@@ -381,26 +386,26 @@ void Userlist::exportLdif() {
 					break;
 				}
 			} while (++cnt < sections.size());
-			
+
 			ldif.append("dn: " + main_dn.arg(d.uid, section, subsection));
 		}
 		ldif.append("\nchangetype: modify");
-		
+
 		// Always delete all Entries, we readd all after
 		ldif.append("\ndelete: " + attribute);
 		ldif.append("\n-");
 		ldif.append("\nadd: " + attribute);
 		ldif.append("\n");
-		
+
 		for (int i = 0; i < d.dates.size(); ++i) {
 			ldif.append(attribute).append(": ").append(d.dates.at(i));
 			ldif.append("\n");
 		}
 		ldif.append("-\n\n");
-		
+
 		++it;
 	}
-	
+
 	// Save the LDIF
 	if (ldif.length() > 0) {
 		QString fileName = QFileDialog::getSaveFileName(this, tr("Save LDIF File"), "", tr("LDIF (*.ldif);;Plaintext (*.txt)"));
