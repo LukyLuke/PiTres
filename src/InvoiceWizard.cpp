@@ -37,7 +37,7 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	newMemberDate->setDate(QDate::currentDate());
 	memberUntil->setDate(QDate::currentDate());
-	
+
 	connect(memberUid, SIGNAL(returnPressed()), this, SLOT(insertMemberUid()));
 	connect(btnUidInvoice, SIGNAL(clicked()), this, SLOT(invoiceMembers()));
 	connect(btnInvoiceNew, SIGNAL(clicked()), this, SLOT(invoiceNewMembers()));
@@ -50,7 +50,7 @@ InvoiceWizard::~InvoiceWizard() {
 
 void InvoiceWizard::insertMemberUid() {
 	PPSPerson pers;
-	if (pers.load(memberUid->text().toInt())) { 
+	if (pers.load(memberUid->text().toInt())) {
 		memberUidList->addItem(memberUid->text());
 		memberUid->clear();
 	} else {
@@ -63,11 +63,7 @@ void InvoiceWizard::invoiceMembers() {
 	Invoice invoice;
 	XmlPdf *pdf;
 	QString fileName;
-	
-	if (checkPrint->isChecked()) {
-		fileName = getSaveFileName();
-	}
-	
+
 	QProgressDialog bar(this);
 	int max = memberUidList->count();
 	bar.setRange(0, max);
@@ -75,7 +71,7 @@ void InvoiceWizard::invoiceMembers() {
 	bar.setWindowTitle(tr("Create Invoices"));
 	bar.setWindowModality(Qt::WindowModal);
 	bar.show();
-	
+
 	for (int i = 0; i < max; i++) {
 		QListWidgetItem *item = memberUidList->item(i);
 		bar.setValue(i);
@@ -83,10 +79,15 @@ void InvoiceWizard::invoiceMembers() {
 			if (bar.wasCanceled()) break;
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(i).arg(max) );
 			invoice.create(&pers);
-			
-			if (checkPrint->isChecked()) {
+
+			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he ahs no EMailaddress
+			// The "invoice" template is the one without an invoiceSlip, the "reminder" has attached one normally
+			if (checkPrint->isChecked() || invoice.addressEmail().isEmpty() || (pers.isLoaded() && pers.notify() == PPSPerson::SnailMail)) {
+				if (fileName.isEmpty()) {
+					fileName = getSaveFileName();
+				}
 				pdf = invoice.createPdf("reminder");
-				pdf->print( QString(fileName).arg(invoice.memberUid()) );
+				pdf->print( fileName.arg(invoice.memberUid()) );
 			} else {
 				pdf = invoice.createPdf("invoice");
 				pdf->send(invoice.addressEmail());
@@ -127,11 +128,7 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 	Invoice invoice;
 	XmlPdf *pdf;
 	QString fileName;
-	
-	if (checkPrintDate->isChecked()) {
-		fileName = getSaveFileName();
-	}
-	
+
 	int num = query->size();
 	int cnt = 0;
 	QProgressDialog bar(this);
@@ -140,21 +137,26 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 	bar.setWindowTitle(tr("Create Invoices"));
 	bar.setWindowModality(Qt::WindowModal);
 	bar.show();
-	
+
 	while (query->next()) {
 		if (bar.wasCanceled()) {
 			break;
 		}
 		bar.setValue(cnt++);
-		
+
 		if (pers.load(query->value(0).toInt())) {
 			if (bar.wasCanceled()) break;
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
-			
 			invoice.create(&pers);
-			if (checkPrintDate->isChecked()) {
+
+			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he ahs no EMailaddress
+			// The "invoice" template is the one without an invoiceSlip, the "reminder" has attached one normally
+			if (checkPrintDate->isChecked() || invoice.addressEmail().isEmpty() || (pers.isLoaded() && pers.notify() == PPSPerson::SnailMail)) {
+				if (fileName.isEmpty()) {
+					fileName = getSaveFileName();
+				}
 				pdf = invoice.createPdf("reminder");
-				pdf->print( QString(fileName).arg(invoice.memberUid()) );
+				pdf->print( fileName.arg(invoice.memberUid()) );
 			} else {
 				pdf = invoice.createPdf("invoice");
 				pdf->send(invoice.addressEmail());

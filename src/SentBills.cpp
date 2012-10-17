@@ -20,12 +20,12 @@
 
 SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
-	
+
 	QSettings settings;
 	pendingOnly->setChecked(settings.value("sentbills/pending", false).toBool());
 	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate().addMonths(-3)).toDate());
 	maxDate->setDate(settings.value("sentbills/maxdate", QDate::currentDate().addDays(1)).toDate());
-	
+
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
@@ -33,26 +33,26 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
-	
+
 	tableModel = new QSqlQueryModel(tableView);
-	
+
 	loadData();
 	createContextMenu();
-	
+
 	invoiceQifDialog = new QDialog(this);
 	exportInvoiceQifForm.setupUi(invoiceQifDialog);
 	exportInvoiceQifForm.hintLabel->setText(tr("Export all created Invoices, issued in this Daterange, as a QIF to import in GnuCash."));
 	connect(exportInvoiceQifForm.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifAssets()));
-	
+
 	paymentQifDialog = new QDialog(this);
 	exportPaymentQifForm.setupUi(paymentQifDialog);
 	exportPaymentQifForm.hintLabel->setText(tr("Export all Payments, payed in this Daterange, as a QIF to import in GnuCash."));
 	connect(exportPaymentQifForm.actionChoose, SIGNAL(triggered()), this, SLOT(doExportQifPayments()));
-	
+
 	editDialog = new QDialog(this);
 	editInvoice.setupUi(editDialog);
 	connect(editInvoice.actionSave, SIGNAL(triggered()), this, SLOT(doEditInvoice()));
-	
+
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showTableContextMenu(const QPoint&)));
@@ -69,12 +69,12 @@ void SentBills::createContextMenu() {
 	actionShowEdit = new QAction(tr("Edit Invoice"), this);
 	actionShowEdit->setStatusTip(tr("Edit the curretly selected Invoice"));
 	connect(actionShowEdit, SIGNAL(triggered()), this, SLOT(showEditInvoiceForm()));
-	
+
 	actionSendReminder = new QAction(tr("&Send Reminder"), this);
 	//actionPrintReminder->setShortcuts(QKeySequence(Qt::CTRL + Qt::Key_R));
 	actionSendReminder->setStatusTip(tr("Create a new Reminder and send it by EMail"));
 	connect(actionSendReminder, SIGNAL(triggered()), this, SLOT(sendNewReminder()));
-	
+
 	actionPrintReminder = new QAction(tr("&Pdf Reminder"), this);
 	actionPrintReminder->setShortcuts(QKeySequence::Print);
 	actionPrintReminder->setStatusTip(tr("Create a new Reminder and creates a PDF to save and Print it"));
@@ -83,7 +83,7 @@ void SentBills::createContextMenu() {
 
 void SentBills::loadData() {
 	tableModel->setQuery(createQuery());
-	
+
 	tableModel->setHeaderData(0,  Qt::Horizontal, tr("UID"));
 	tableModel->setHeaderData(1,  Qt::Horizontal, tr("Reference"));
 	tableModel->setHeaderData(2,  Qt::Horizontal, tr("Issue Date"));
@@ -100,7 +100,7 @@ void SentBills::loadData() {
 	tableModel->setHeaderData(13, Qt::Horizontal, tr("PLZ, City"));
 	tableModel->setHeaderData(14, Qt::Horizontal, tr("Email"));
 	tableModel->setHeaderData(15, Qt::Horizontal, tr("Section"));
-	
+
 	tableView->setSortingEnabled(true);
 	tableView->setModel(tableModel);
 }
@@ -119,11 +119,11 @@ QSqlQuery SentBills::createQuery() {
 	QSqlQuery query(db);
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	QString qs("SELECT * FROM pps_invoice WHERE issue_date >= :issued_after AND issue_date <= :issued_before");
-	
+
 	if (pendingOnly->isChecked()) {
 		qs.append(" AND state=" + QString::number((int)Invoice::StateOpen));
 	}
-	
+
 	if (sl.size() > 0) {
 		qs.append(" AND (reference LIKE :reference OR (");
 		for (int i = 0; i < sl.size(); i++) {
@@ -138,11 +138,11 @@ QSqlQuery SentBills::createQuery() {
 		qs.append("))");
 	}
 	qs.append(" ORDER BY issue_date,paid_date,state ASC");
-	
+
 	query.prepare(qs);
 	query.bindValue(":issued_after", sinceDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":issued_before", maxDate->date().toString("yyyy-MM-dd"));
-	
+
 	if (sl.size() > 0) {
 		query.bindValue(":reference", QString("%%1%").arg(sl.join(" ")));
 		for (int i = 0; i < sl.size(); i++) {
@@ -154,7 +154,7 @@ QSqlQuery SentBills::createQuery() {
 		}
 	}
 	query.exec();
-	
+
 	if (query.lastError().type() != QSqlError::NoError) {
 		qDebug() << query.lastQuery();
 		qDebug() << query.lastError();
@@ -167,7 +167,7 @@ void SentBills::searchData() {
 	settings.setValue("sentbills/pending", pendingOnly->isChecked());
 	settings.setValue("sentbills/sincedate", sinceDate->date());
 	settings.setValue("sentbills/maxdate", maxDate->date());
-	
+
 	QSqlQuery query = createQuery();
 	tableModel->setQuery(query);
 }
@@ -191,20 +191,20 @@ void SentBills::doExportQifAssets() {
 	QString qif("!Type:" + settings.value("qif/account_asset", "Oth A").toString());
 	float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
 	//float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
-	
+
 	QSqlQuery query(db);
 	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
 	query.bindValue(":date1", exportInvoiceQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportInvoiceQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
-	
+
 	while (query.next()) {
 		QString member = query.value(0).toString();
 		QString ref = query.value(1).toString();
 		QString amount = query.value(2).toString();
 		QString valuta = query.value(3).toString();
 		QString name = query.value(4).toString();
-		
+
 		qif.append("\nD" + valuta);
 		qif.append("\nT" + amount);
 		qif.append("\nP" + settings.value("qif/payee_label", tr("Membership: ")).toString() + name + "("+member+")");
@@ -217,7 +217,7 @@ void SentBills::doExportQifAssets() {
 		}
 		qif.append("\n^\n");
 	}
-	
+
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
 		QFile f(fileName);
@@ -232,20 +232,20 @@ void SentBills::doExportQifAssets() {
 void SentBills::doExportQifPayments() {
 	QSettings settings;
 	QString qif("!Type:" + settings.value("qif/account_cash", "Cash").toString());
-	
+
 	QSqlQuery query(db);
 	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
 	query.bindValue(":date1", exportPaymentQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportPaymentQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
-	
+
 	while (query.next()) {
 		QString member = query.value(0).toString();
 		QString ref = query.value(1).toString();
 		QString amount = query.value(2).toString();
 		QString valuta = query.value(3).toString();
 		QString name = query.value(4).toString();
-		
+
 		// Payment QIF
 		qif.append("\nD" + valuta);
 		qif.append("\nT" + amount);
@@ -255,7 +255,7 @@ void SentBills::doExportQifPayments() {
 		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
 		qif.append("\n^\n");
 	}
-	
+
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
 		QFile f(fileName);
@@ -311,7 +311,7 @@ void SentBills::doEditInvoice() {
 	query.bindValue(":issue_date", editInvoice.editInvoiceDate->date());
 	query.bindValue(":old_reference", old_reference);
 	query.bindValue(":state", editInvoice.selectState->currentIndex());
-	
+
 	if (!query.exec()) {
 		if (query.lastError().type() != QSqlError::NoError) {
 			qDebug() << query.lastQuery();
@@ -337,6 +337,7 @@ void SentBills::createPdfReminds(bool email) {
 	QProgressDialog bar(this);
 	QString fileName;
 	Reminder reminder;
+	PPSPerson pers;
 	XmlPdf *pdf;
 	QSet<int> rows = getSelectedRows();
 	int max = rows.size();
@@ -344,31 +345,30 @@ void SentBills::createPdfReminds(bool email) {
 	bar.setCancelButtonText(tr("&Cancel"));
 	bar.setWindowTitle(tr("Create Invoices"));
 	bar.setWindowModality(Qt::WindowModal);
-	
-	if (!email) {
-		fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
-		if (!fileName.isEmpty()) {
-			fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
-		}
-	}
-	
+
 	bar.show();
-	foreach(const int &i, rows) {
+	foreach (const int &i, rows) {
 		uid = tableModel->record(i).value(0).toInt();
 		reminder.loadLast(uid);
-		
+		pers.load(uid);
+
 		bar.setValue(i);
 		bar.setLabelText(tr("Create Invoice for %1 (%2 of %3)").arg(reminder.addressName()).arg(i).arg(max) );
-		
-		if (email) {
-			pdf = reminder.createPdf("invoice");
-			pdf->send(reminder.addressEmail());
-		} else {
+
+		if (!email || reminder.addressEmail().isEmpty() || (pers.isLoaded() && pers.notify() == PPSPerson::SnailMail)) {
+			if (fileName.isEmpty()) {
+				fileName = QFileDialog::getSaveFileName(this, tr("Save PDF-File"), "", tr("PDF (*.pdf)"));
+				if (!fileName.isEmpty()) {
+					fileName.replace(QRegExp("\\.pdf$"), "_%1.pdf");
+				}
+			}
 			pdf = reminder.createPdf("reminder");
 			pdf->print( QString(fileName).arg(reminder.memberUid()) );
+		} else {
+			pdf = reminder.createPdf("invoice");
+			pdf->send(reminder.addressEmail());
 		}
 	}
 	bar.setValue(max);
 }
-
 
