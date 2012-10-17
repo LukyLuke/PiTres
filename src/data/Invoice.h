@@ -39,6 +39,7 @@ Q_PROPERTY(float amount READ amount WRITE setAmount NOTIFY amountChanged)
 Q_PROPERTY(float amountPaid READ amountPaid WRITE setAmountPaid NOTIFY amountPaidChanged)
 Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged)
 Q_PROPERTY(int reminded READ reminded WRITE setReminded NOTIFY remindedChanged)
+Q_PROPERTY(QDate lastReminded READ lastReminded WRITE setLastReminded NOTIFY lastRemindedChanged)
 
 // This is the owner
 Q_PROPERTY(QString addressPrefix READ addressPrefix WRITE setAddressPrefix NOTIFY addressPrefixChanged)
@@ -76,7 +77,7 @@ public:
 	// InvoiceState in old DB: o_pen, c_anceled, p_aid, u_nknown
 	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3, StateContributed=4 };
 	enum Language { DE=0, FR=1, IT=2, EN=3 };
-	
+
 	// Setter
 	void setMemberUid(int memberUid);
 	void setReference(QString reference);
@@ -87,6 +88,7 @@ public:
 	void setAmountPaid(float amountPaid);
 	void setState(State state);
 	void setReminded(int reminded);
+	void setLastReminded(QDate lastReminded);
 	void setAddressPrefix(QString addressPrefix);
 	void setAddressCompany(QString addressCompany);
 	void setAddressName(QString addressName);
@@ -97,7 +99,7 @@ public:
 	void setAddressEmail(QString addressEmail);
 	void setForSection(QString forSection);
 	void setLanguage(Language language);
-	
+
 	// Getter
 	int memberUid() const { return i_memberUid; };
 	QString reference();// const { return s_reference; }; // Reformatted
@@ -109,6 +111,7 @@ public:
 	State state() const { return m_state; };
 	bool isPaid() const { return m_state == StatePaid; };
 	int reminded() const { return i_reminded; };
+	QDate lastReminded() const { return d_last_reminded; };
 	QString addressPrefix() const { return s_addressPrefix; };
 	QString addressCompany() const { return s_addressCompany; };
 	QString addressName() const { return s_addressName; };
@@ -119,7 +122,7 @@ public:
 	QString addressEmail() const { return s_addressEmail; };
 	QString forSection() const { return s_forSection; };
 	Language language() const { return m_language; };
-	
+
 signals:
 	void memberUidChanged(int);
 	void referenceChanged(QString);
@@ -130,6 +133,7 @@ signals:
 	void amountPaidChanged(float);
 	void stateChanged(State);
 	void remindedChanged(int);
+	void lastRemindedChanged(QDate);
 	void addressPrefixChanged(QString);
 	void addressCompanyChanged(QString);
 	void addressNameChanged(QString);
@@ -140,7 +144,7 @@ signals:
 	void addressEmailChanged(QString);
 	void forSectionChanged(QString);
 	void languageChanged(Language);
-	
+
 private:
 	QSqlDatabase db;
 	bool _loaded;
@@ -153,6 +157,7 @@ private:
 	float f_amountPaid;
 	State m_state;
 	int i_reminded;
+	QDate d_last_reminded;
 	QString s_addressPrefix;
 	QString s_addressCompany;
 	QString s_addressName;
@@ -163,7 +168,7 @@ private:
 	QString s_addressEmail;
 	QString s_forSection;
 	Language m_language;
-	
+
 	int esrChecksum(QString num);
 	QString createReference(int memberUid);
 	QString getLanguageString(Language lang);
