@@ -46,14 +46,14 @@ extern "C" {
 LDAPImport::LDAPImport(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	QSettings settings;
-	
+
 	// Initialize some components
 	connected = FALSE;
 	stackedWidget->setCurrentIndex(0);
 #ifndef WIN32
 	version = LDAP_VERSION3;
 #endif
-	
+
 	// Load saved values
 	editServer->setText( settings.value("ldap/server", "localhost").toString() );
 	editPort->setValue( settings.value("ldap/port", 389).toInt() );
@@ -62,13 +62,13 @@ LDAPImport::LDAPImport(QWidget *parent) : QWidget(parent) {
 	editPassword->setText( settings.value("ldap/password", "").toString() );
 	editSearch->setText( settings.value("ldap/search", "(objectClass=ppsPerson)").toString() );
 	sectionExtract->setText( settings.value("ldap/sectionregex", "^.*,l=([a-z]+),(st|l)=.*$||^.*,st=([a-z]{2}).*$||^.*,dc=(members).*$").toString() );
-	
+
 	// Setup StackWidget Navigation
 	connect(btnGoToSearch, SIGNAL(clicked()), this, SLOT(nextPage()));
 	connect(btnGoToImport, SIGNAL(clicked()), this, SLOT(nextPage()));
 	connect(btnGoToSettings, SIGNAL(clicked()), this, SLOT(previousPage()));
 	connect(btnEndBack, SIGNAL(clicked()), this, SLOT(previousPage()));
-	
+
 	// Connect Search and TestConnection
 	connect(btnTestConnection, SIGNAL(clicked()), this, SLOT(testConnection()));
 	connect(btnSearch, SIGNAL(clicked()), this, SLOT(searchLdap()));
@@ -115,12 +115,12 @@ void LDAPImport::disconnectLdap() {
 void LDAPImport::connectLdap() {
 	if (connected) return;
 
+#ifndef WIN32
 	int rc;
 	QString host = "ldap://" + editServer->text() + ":" + QString::number(editPort->value());
-	
-#ifndef WIN32
+
 	if (LDAP_SUCCESS == ldap_initialize(&ldap, host.toStdString().c_str())) {
-		
+
 		if (ldap_set_option(ldap, LDAP_OPT_PROTOCOL_VERSION, &version) != LDAP_OPT_SUCCESS) {
 			qCritical("Could not set LDAP_OPT_PROTOCOL_VERSION to v3");
 		}
@@ -130,11 +130,11 @@ void LDAPImport::connectLdap() {
 		if (ldap_set_option(ldap, LDAP_OPT_REFERRALS, LDAP_OPT_ON) != LDAP_OPT_SUCCESS) {
 			qCritical("Could not set LDAP_OPT_REFERRALS off.");
 		}
-		
+
 		QByteArray pwd = editPassword->text().toLocal8Bit();
 		cred.bv_val = pwd.data();
 		cred.bv_len = strlen(cred.bv_val);
-		
+
 		QByteArray binddn = editBindDN->text().toLocal8Bit();
 		rc = ldap_sasl_bind_s(ldap, binddn.data(), LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
 		if (rc != LDAP_SUCCESS) {
@@ -171,8 +171,7 @@ void LDAPImport::importFromLdap() {
 		);
 		return;
 	}
-	
-	int rc;
+
 	QByteArray basedn = editBaseDN->text().toLocal8Bit();
 	QByteArray filter = editSearch->text().toLocal8Bit();
 	QByteArray _attrs = editAttributes->text().simplified().toLocal8Bit();
@@ -182,8 +181,9 @@ void LDAPImport::importFromLdap() {
 	for (i = 0; i < attrc; i++) {
 		attrs[i] = attrlist[i].data();
 	}
-	
+
 #ifndef WIN32
+	int rc;
 	LDAPMessage *res = NULL, *msg = NULL;
 	BerElement *ber = NULL;
 	//                                                                             attrs
@@ -193,7 +193,7 @@ void LDAPImport::importFromLdap() {
 
 	// Cleanup calling parameters
 	delete[] attrs;
-  
+
 #ifndef WIN32
 	if (rc != LDAP_SUCCESS) {
 		ldapError = ldap_err2string(rc);
@@ -204,36 +204,34 @@ void LDAPImport::importFromLdap() {
 		return;
 	}
 #endif
-	
+
 	// Prepare the Progress-Bar
 #ifndef WIN32
+	int count = 0;
 	int max = ldap_count_entries(ldap, res);
 #else
-  int max = 0;
+	int max = 0;
 #endif
-	int count = 0;
 	progressBar->setMinimum(1);
 	progressBar->setMaximum(max);
 	progressBar->setValue(0);
-	
+
+#ifndef WIN32
 	// Get all results
 	char *attribute;
-#ifndef WIN32
 	berval **values, dnval;
-#endif
 	PPSPerson *person;
 	QStringList dnlist = sectionExtract->text().split("||");
 	QString dn;
 
-#ifndef WIN32
 	for (msg = ldap_first_entry(ldap, res); msg != NULL; msg = ldap_next_entry(ldap, msg)) {
 		ldap_get_dn_ber(ldap, msg, &ber, &dnval);
 
 		progressBar->setValue(++count);
 		labelImportState->setText(QString("Import %1 of %2").arg(count).arg(max));
-		
+
 		person = new PPSPerson;
-		
+
 		setPersonValue(person, QString("section"), "");
 		for (int i = 0; i < dnlist.size(); i++) {
 			dn = QString(dnval.bv_val);
@@ -244,12 +242,12 @@ void LDAPImport::importFromLdap() {
 				break;
 			}
 		}
-		
+
 		// dont't insert persons with empty sections
 		if (person->section() == "") {
 			continue;
 		}
-		
+
 		for (attribute = ldap_first_attribute(ldap, msg, &ber); attribute != NULL; attribute = ldap_next_attribute(ldap, msg, ber)) {
 			if ((values = ldap_get_values_len(ldap, msg, attribute)) != NULL) {
 				for (int i = 0; values[i] != NULL; i++) {
@@ -259,11 +257,11 @@ void LDAPImport::importFromLdap() {
 			ldap_value_free_len(values);
 		}
 		ldap_memfree(attribute);
-		
+
 		person->save();
 		person->clear();
 	}
-	
+
 	// Clean up
 	if (ber != NULL) {
 		ber_free(ber, 0);
@@ -289,19 +287,19 @@ void LDAPImport::emptyDatabase() {
 
 void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value) {
 	field = field.toLower();
-	
+
 	if (field == "uniqueidentifier") {
 		person->setUid(value.toInt());
-		
+
 	} else if (field == "ppscontributionclass") {
 		person->setContributionClass(value.toInt() == PPSPerson::ContributeFull ? PPSPerson::ContributeFull : PPSPerson::ContributeStudent);
-		
+
 	} else if (field == "uid") {
 		person->setNickname(value);
-		
+
 	} else if (field == "section") {
 		person->setSection(value);
-		
+
 	} else if (field == "ppsgender") {
 		switch(value.toInt()) {
 			case 0: person->setGender(PPSPerson::GenderUnknown); break;
@@ -309,56 +307,56 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 			case 2: person->setGender(PPSPerson::GenderFemale); break;
 			case 3: person->setGender(PPSPerson::GenderBoth); break;
 		}
-		
+
 	} else if (field == "sn") {
 		person->setFamilyName(value);
-		
+
 	} else if (field == "givenname") {
 		person->setGivenName(value);
-		
+
 	} else if (field == "street") {
 		person->setStreet(value);
-		
+
 	} else if (field == "postalcode") {
 		person->setPostalCode(value);
-		
+
 	} else if (field == "l") {
 		person->setCity(value);
-		
+
 	} else if (field == "c") {
 		person->setCountry(value);
-		
+
 	} else if (field == "st") {
 		person->setState(value);
-		
+
 	} else if (field == "telephonenumber") {
 		person->addTelephone(value);
-		
+
 	} else if (field == "mobile") {
 		person->addMobile(value);
-		
+
 	} else if (field == "mail") {
 		person->addEmail(value);
-		
+
 	} else if (field == "ppsbirthdate") {
 		value.resize(8);
 		person->setBirthdate(QDate::fromString(value, "yyyyMMdd"));
-		
+
 	} else if (field == "ppsjoining") {
 		value.resize(8);
 		person->setJoining(QDate::fromString(value, "yyyyMMdd"));
-		
+
 	} else if (field == "ppsvotingrightuntil") {
 		value.resize(8);
 		person->setLdapPaidDue(QDate::fromString(value, "yyyyMMdd"));
-		
+
 	} else if (field == "preferredlanguage") {
 		value = value.toLower();
 		if (value == "de") { person->setLanguage(PPSPerson::DE); }
 		else if (value == "it") { person->setLanguage(PPSPerson::IT); }
 		else if (value == "fr") { person->setLanguage(PPSPerson::FR); }
 		else { person->setLanguage(PPSPerson::EN); }
-		
+
 	} else if (field == "employeetype") {
 		switch (value.toInt()) {
 			case PPSPerson::LandLubber: person->setType(PPSPerson::LandLubber); break;
@@ -368,6 +366,13 @@ void LDAPImport::setPersonValue(PPSPerson *person, QString field, QString value)
 			case PPSPerson::PlankWalker: person->setType(PPSPerson::PlankWalker); break;
 			case PPSPerson::FleetPirate: person->setType(PPSPerson::FleetPirate); break;
 			default: person->setType(PPSPerson::UnknownType); break;
+		}
+
+	} else if (field == "ppspreferrednotificationmethod") {
+		switch (value.toInt()) {
+			case PPSPerson::SnailMail: person->setNotify(PPSPerson::SnailMail); break;
+			case PPSPerson::EMail: person->setNotify(PPSPerson::EMail); break;
+			default: person->setNotify(PPSPerson::SnailMail); break;
 		}
 	}
 }
