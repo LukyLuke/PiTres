@@ -49,30 +49,32 @@ private:
 		float   members_growth_percent;
 		qint32  paid_num;
 		qint32  paid_inc;
+		float   amount_requested;
+		float   amount_paid;
 		float   paid_growth_percent;
 		qint32  invoiced;
 		qint32  invoiced_success;
 		qint32  reminded;
 		qint32  reminded_success;
 	};
-	
+
 	QSqlDatabase db;
 	QLocale locale;
 	int searchTimer;
 	QGraphicsScene scene;
 	float currentY;
-	
+
 	void loadSections();
 	void updateStatistic();
 	void printData(StatisticData data);
-	
+
 public:
 	Statistics(QWidget * parent = 0);
 	virtual ~Statistics();
-	
+
 protected:
 	void timerEvent(QTimerEvent *event);
-	
+
 private slots:
 	void startUpdateStatistic();
 	void exportStatistic();
