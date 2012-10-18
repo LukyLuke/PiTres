@@ -105,12 +105,12 @@ void SentBills::loadData() {
 	tableView->setModel(tableModel);
 }
 
-void SentBills::timerEvent(QTimerEvent *event) {
+void SentBills::timerEvent(QTimerEvent * /*event*/) {
 	killTimer(searchTimer);
 	searchData();
 }
 
-void SentBills::searchDataTimeout(QString data) {
+void SentBills::searchDataTimeout(QString /*data*/) {
 	killTimer(searchTimer);
 	searchTimer = startTimer(1000);
 }

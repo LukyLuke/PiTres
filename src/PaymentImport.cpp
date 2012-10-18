@@ -53,7 +53,7 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 PaymentImport::~PaymentImport() {
 }
 
-void PaymentImport::timerEvent(QTimerEvent *event) {
+void PaymentImport::timerEvent(QTimerEvent * /*event*/) {
 	killTimer(searchTimer);
 	searchData();
 }
@@ -113,7 +113,7 @@ void PaymentImport::searchData() {
 	}
 }
 
-void PaymentImport::searchDataTimeout(QString data) {
+void PaymentImport::searchDataTimeout(QString /*data*/) {
 	killTimer(searchTimer);
 	searchTimer = startTimer(1000);
 }
