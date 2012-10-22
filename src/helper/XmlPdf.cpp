@@ -110,7 +110,7 @@ bool XmlPdf::print(QString file) {
 	printer.setPaperSize(paperSize);
 	printer.setOrientation(paperOrientation);
 	printer.setOutputFormat(QPrinter::PdfFormat);
-	printer.setPageMargins(3.53, 3.53, 3.53, 3.53, QPrinter::Millimeter);
+	printer.setPageMargins(8.53, 8.53, 3.53, 3.53, QPrinter::Millimeter);
 	
 	if (file.isEmpty()) {
 		QPrintDialog *dialog = new QPrintDialog(&printer);

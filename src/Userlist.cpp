@@ -239,12 +239,12 @@ void Userlist::exportData() {
 	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Paid\n");
 	while (query.next()) {
 		// "SELECT uid,paid_due_date,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
-		csv.append( query.value(0).toString().remove(re) ).append(",");
-		csv.append( query.value(2).toString().remove(re) ).append(",");
-		csv.append( query.value(3).toString().remove(re) ).append(",");
-		csv.append( query.value(4).toString().remove(re) ).append(",");
-		csv.append( query.value(5).toString().remove(re) ).append(",");
-		csv.append( query.value(7).toString().remove(re) ).append(",");
+		csv.append( query.value(0).toString().remove(re) ).append(";");
+		csv.append( query.value(2).toString().remove(re) ).append(";");
+		csv.append( query.value(3).toString().remove(re) ).append(";");
+		csv.append( query.value(4).toString().remove(re) ).append(";");
+		csv.append( query.value(5).toString().remove(re) ).append(";");
+		csv.append( query.value(7).toString().remove(re) ).append(";");
 		csv.append( query.value(1).toString().remove(re) ).append("\n");
 	}
 

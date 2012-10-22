@@ -34,6 +34,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QGraphicsTextItem>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QPrintDialog>
 
 #include <QDebug>
 
@@ -49,13 +52,16 @@ private:
 		float   members_growth_percent;
 		qint32  paid_num;
 		qint32  paid_inc;
+		float   paid_percent;
 		float   amount_requested;
 		float   amount_paid;
 		float   paid_growth_percent;
 		qint32  invoiced;
 		qint32  invoiced_success;
+		float   invoiced_percent;
 		qint32  reminded;
 		qint32  reminded_success;
+		float   reminded_percent;
 	};
 
 	QSqlDatabase db;
@@ -63,9 +69,11 @@ private:
 	int searchTimer;
 	QGraphicsScene scene;
 	float currentY;
-
+	QList<StatisticData> list;
+	
 	void loadSections();
 	void updateStatistic();
+	
 	void printData(StatisticData data);
 
 public:
@@ -78,6 +86,7 @@ protected:
 private slots:
 	void startUpdateStatistic();
 	void exportStatistic();
+	void exportStatisticAsCsv();
 	void printStatistic();
 };
 
