@@ -84,7 +84,7 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}]]></text>
 
-			<text x="256" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="254" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 
@@ -98,11 +98,8 @@ Ti invitiamo ad occupartene al più presto per poter usufruire di tutti i tuoi d
 I responsabili della tua sezione di Partito sono a tua completa disposizione per qualsiasi informazione.
 
 Grazie per la tua partecipazione, sia essa personale sia fininziaria!
-Il Comitato del Partito Pirata Svizzero
 
-PS: non scordarti che abbiamo fissato l’Assemblea Pirata estiva per i gg. 9 e 10 giugno ad Arau.
-Se non ti sei ancora iscritto: https://my.piratenpartei.ch/pvreg/index.php 
-Troverai maggiori info qui: http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
+Il Comitato del Partito Pirata Svizzero]]></content>
 	</email>
 	
 	<email type="html">
@@ -181,10 +178,6 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 			<p>I responsabili della tua sezione di Partito sono a tua completa disposizione per qualsiasi informazione.</p>
 			<p>Grazie per la tua partecipazione, sia essa personale sia fininziaria!
 				<br/>Il Comitato del Partito Pirata Svizzero
-			</p>
-			<p>PS: non scordarti che abbiamo fissato l’Assemblea Pirata estiva per i gg. 9 e 10 giugno ad Arau.
-				<br/>Se non ti sei ancora iscritto: <a href="https://my.piratenpartei.ch/pvreg/index.php">https://my.piratenpartei.ch/pvreg/index.php</a>
-				<br/>Troverai maggiori info qui: <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
 			</p>
 		</div>
 	</div>

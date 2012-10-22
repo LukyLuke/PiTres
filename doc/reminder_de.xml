@@ -17,6 +17,7 @@ info@piratenpartei.ch]]></text>
 Piratenpartei Schweiz
 CH-1337 Vallorbe]]></text>
 			<line x1="400" y1="174" x2="698" y2="174" stroke="0.2" />
+			<line x1="415" y1="189" x2="713" y2="189" stroke="0.2" />
 		</g>
 
 		<g part="address">
@@ -83,7 +84,7 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}]]></text>
 
-			<text x="256" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="254" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 
@@ -95,11 +96,7 @@ im Anhang findest Du deine Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit 
 Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
 Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
 
-Der Vorstand der Piratenpartei Schweiz
-
-PS: Nicht vergessen, am 9/10 Juni ist der Piraten-Sommerkongress in Aarau!
-Wenn du dich noch nicht angemeldet hast: https://my.piratenpartei.ch/pvreg/index.php
-Mehr Informaitonen findest du unter http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
+Der Vorstand der Piratenpartei Schweiz]]></content>
 	</email>
 	
 	<email type="html">
@@ -179,10 +176,6 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 				<br/>Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
 			</p>
 			<p><strong>Der Vorstand der Piratenpartei Schweiz</strong></p>
-			<p>PS: Nicht vergessen, am 9/10 Juni ist der Piraten-Sommerkongress in Aarau!
-				<br/>Wenn du dich noch nicht angemeldet hast: <a href="https://my.piratenpartei.ch/pvreg/index.php">PV-Anmeldung</a>
-				<br/>Mehr Informaitonen findest du unter <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
-			</p>
 		</div>
 	</div>
 </body></html>]]></content>

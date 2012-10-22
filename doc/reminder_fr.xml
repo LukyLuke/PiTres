@@ -84,7 +84,7 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}]]></text>
 
-			<text x="256" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="254" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 
@@ -97,11 +97,7 @@ Occupe t'en rapidement pour pouvoir profiter pleinement de ton statut de Pirate 
 Les responsables de ta section ou du parti national sont à ta disposition en cas de questions,
 Merci de ta participation, aussi bien financière que personnelle!
 
-Le commité du Parti Pirate Suisse
-
-PS: n'oublie pas l'Assemblée Pirate d'été le 9 et 10 juin à Aarau.
-Si tu n'es pas encore inscrit : https://my.piratenpartei.ch/pvreg/index.php
-Et tu trouveras plus d'informations sous http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
+Le commité du Parti Pirate Suisse]]></content>
 	</email>
 	
 	<email type="html">
@@ -179,10 +175,6 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 			<p>Tu trouveras en pièce jointe ta facture de cotisation {PRINT_YEAR}. Occupe t'en rapidement pour pouvoir profiter pleinement de ton statut de Pirate au sein du PPS: toutes les informations requises sont présentes dans le PDF.</p>
 			<p>Les responsables de ta section ou du parti national sont à ta disposition en cas de questions, Merci de ta participation, aussi bien financière que personnelle!</p>
 			<p>Le commité du Parti Pirate Suisse</p>
-			<p>PS: n'oublie pas l'Assemblée Pirate d'été le 9 et 10 juin à Aarau.
-				<br/>Si tu n'es pas encore inscrit: <a href="https://my.piratenpartei.ch/pvreg/index.php">https://my.piratenpartei.ch/pvreg/index.php</a>
-				<br/>Et tu trouveras plus d'informations sous <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
-			</p>
 		</div>
 	</div>
 </body></html>]]></content>

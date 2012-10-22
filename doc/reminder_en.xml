@@ -82,7 +82,7 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}]]></text>
 
-			<text x="256" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
+			<text x="254" y="1013" width="480" height="10" wordwrap="false" size="11.5" font="OCRB" halign="right"><![CDATA[{INVOICE_ESR}]]></text>
 		</g>
 	</template>
 
@@ -94,11 +94,7 @@ attached you'l find your personal Membership-Invoice for {PRINT_YEAR}. To fully 
 If you have any questions, just ask your regional board or the national one as well.
 Thanks for your contribution, financially and personally...
 
-The Board from Piratenpartei Schweiz
-
-NB: Dont forget the Pirate Summercongress in Aarau on 9/10 of June!
-If you aren't registered yet: https://my.piratenpartei.ch/pvreg/index.php
-More information you will find on http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
+The Board from Piratenpartei Schweiz]]></content>
 	</email>
 	
 	<email type="html">
@@ -178,10 +174,6 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 				<br/>Thanks for your contribution, financially and personally...
 			</p>
 			<p>The Board from Piratenpartei Schweiz</p>
-			<p>NB: Dont forget the Pirate Summercongress in Aarau on 9/10 of June!
-				<br/>If you aren't registered yet: <a href="https://my.piratenpartei.ch/pvreg/index.php">PV-Anmeldung</a>
-				<br/>More information you will find on <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
-			</p>
 		</div>
 	</div>
 </body></html>]]></content>
