@@ -20,11 +20,24 @@
 #define HELPER_XMLPDF_H
 
 #include "PdfElement.h"
+#include "Smtp.h"
 
 #include <QObject>
 #include <QHash>
+#include <QList>
 #include <QPrinter>
 #include <QString>
+#include <QDomDocument>
+#include <QDomNode>
+#include <QDomNodeList>
+#include <QFile>
+#include <QFileInfo>
+#include <QIODevice>
+#include <QFontDatabase>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QMetaEnum>
+#include <QSettings>
 
 struct StaticQtMetaObject : public QObject {
 	static inline const QMetaObject& get() {
@@ -32,24 +45,44 @@ struct StaticQtMetaObject : public QObject {
 	}
 };
 
+class XmlPdfEntry; // See below XmlPdf for declaration
+
 class XmlPdf {
 public:
 	XmlPdf(QObject *parent = 0);
 	virtual ~XmlPdf();
 	void loadTemplate(QString file);
 	void setVar(QString name, QString value);
+	XmlPdfEntry* addEntry(QString name);
+	XmlPdfEntry* getEntry(QString name, int num);
+	void clearEntries();
 	bool print(QString file);
 	bool send(QString email);
 
 private:
 	QHash<QString, PdfElement> elements;
 	QHash<QString, QString> variables;
+	QHash<QString, QList<XmlPdfEntry *> > repeatingEntries;
 	QString templatePath;
 	QPrinter::PageSize paperSize;
 	QPrinter::Orientation paperOrientation;
 	QDomDocument doc;
 	
 	void loadFonts();
+};
+
+/**
+ * The XmlPdfEntry Class is for repeating sections inside a XmlPdf
+ */
+class XmlPdfEntry {
+public:
+	XmlPdfEntry(QObject *parent = 0);
+	virtual ~XmlPdfEntry();
+	void setVar(QString key, QString value);
+	QString getValue(QString key);
+	
+private:
+	QHash<QString, QString> variables;
 };
 
 #endif // HELPER_XMLPDF_H

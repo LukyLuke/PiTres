@@ -17,29 +17,17 @@
 */
 
 #include "XmlPdf.h"
-#include "PdfElement.h"
-#include "Smtp.h"
 
-#include <QDomDocument>
-#include <QDomNode>
-#include <QDomNodeList>
-#include <QFile>
-#include <QFileInfo>
-#include <QIODevice>
-#include <QFontDatabase>
-#include <QPainter>
-#include <QPrinter>
-#include <QPrintDialog>
-#include <QMetaEnum>
 #include <QDebug>
-#include <QSettings>
 
 XmlPdf::XmlPdf(QObject *parent) {
 	doc = QDomDocument("template");
 	paperSize = QPrinter::A4;
 }
 
-XmlPdf::~XmlPdf() { }
+XmlPdf::~XmlPdf() {
+	clearEntries();
+}
 
 void XmlPdf::loadFonts() {
 	QFontDatabase::addApplicationFont(QString::fromUtf8(":/resources/ocrb.ttf"));
@@ -205,3 +193,51 @@ bool XmlPdf::send(QString email) {
 	// Send the Mail
 	return mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject);
 }
+
+void XmlPdf::clearEntries() {
+	QHash<QString, QList<XmlPdfEntry*> >::iterator it;
+	for (it = repeatingEntries.begin(); it != repeatingEntries.end(); it++) {
+		while (!(it.value()).isEmpty()) {
+			delete (it.value()).takeFirst();
+		}
+	}
+	repeatingEntries.clear();
+}
+
+XmlPdfEntry* XmlPdf::addEntry(QString name) {
+	if (!repeatingEntries.contains(name)) {
+		QList<XmlPdfEntry *> list;
+		repeatingEntries.insert(name, list);
+	}
+	repeatingEntries[name].append(new XmlPdfEntry);
+	return repeatingEntries[name].last();
+}
+
+XmlPdfEntry* XmlPdf::getEntry(QString name, int num) {
+	if (num < 0 || !repeatingEntries.contains(name) || num >= repeatingEntries[name].size()) {
+		return 0;
+	}
+	return repeatingEntries[name].at(num);
+}
+
+
+/**
+ * The XmlPdfEntry Class is for repeating sections inside a XmlPdf
+ */
+XmlPdfEntry::XmlPdfEntry(QObject *parent) { }
+XmlPdfEntry::~XmlPdfEntry() { }
+
+void XmlPdfEntry::setVar(QString key, QString value) {
+	variables.insert(key, value);
+}
+
+QString XmlPdfEntry::getValue(QString key) {
+	QHash<QString, QString>::const_iterator it = variables.find(key);
+	if (it != variables.end()) {
+		return it.value();
+	}
+	return QString("");
+}
+
+
+
