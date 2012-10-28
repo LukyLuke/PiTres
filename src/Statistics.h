@@ -37,6 +37,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QPrintDialog>
+#include <QSettings>
 
 #include <QDebug>
 

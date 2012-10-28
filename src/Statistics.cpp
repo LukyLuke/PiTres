@@ -182,11 +182,46 @@ void Statistics::printStatistic() {
 }
 
 void Statistics::exportStatistic() {
-
+	QSettings settings;
+	XmlPdf pdf;
+	XmlPdfEntry *entry;
+	QString fileName;
+	
+	fileName = QFileDialog::getSaveFileName(this, tr("Save Statistics as PDF"), "", tr("PDF (*.pdf)"));
+	if (fileName.isEmpty()) {
+		return;
+	}
+	
+	QString templateFile = settings.value(QString("pdf/statistic_template"), "data/statistic_de.xml").toString();
+	templateFile.replace(QRegExp("^(.*_)([a-zA-Z]{2})(\\.xml)$"), "\\1de\\3"); // TODO: Use short language of the user settings here and not only german...
+	pdf.loadTemplate(templateFile);
+	
+	QList<StatisticData>::const_iterator it;
+	for (it = list.constBegin(); it != list.constEnd(); it++) {
+		entry = pdf.addEntry("entry");
+		entry->setVar("section", it->section);
+		entry->setVar("year", it->year);
+		entry->setVar("members_num", it->members_num);
+		entry->setVar("members_growth", it->members_growth);
+		entry->setVar("members_growth_percent", it->members_growth_percent);
+		entry->setVar("paid_num", it->paid_num);
+		entry->setVar("paid_inc", it->paid_inc);
+		entry->setVar("paid_percent", it->paid_percent);
+		entry->setVar("amount_requested", it->amount_requested);
+		entry->setVar("amount_paid", it->amount_paid);
+		entry->setVar("paid_growth_percent", it->paid_growth_percent);
+		entry->setVar("invoiced", it->invoiced);
+		entry->setVar("invoiced_success", it->invoiced_success);
+		entry->setVar("invoiced_percent", it->invoiced_percent);
+		entry->setVar("reminded", it->reminded);
+		entry->setVar("reminded_success", it->reminded_success);
+		entry->setVar("reminded_percent", it->reminded_percent);
+	}
+	pdf.print(fileName);
 }
 
 void Statistics::exportStatisticAsCsv() {
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save the Userlist"), "", tr("CSV (*.csv);;Plaintext (*.txt)"));
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Statistics as CSV"), "", tr("CSV (*.csv);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
 		QFile f(fileName);
 		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -194,7 +229,7 @@ void Statistics::exportStatisticAsCsv() {
 			
 			QList<StatisticData>::const_iterator it;
 			for (it = list.constBegin(); it != list.constEnd(); it++) {
-				out << tr("Section") << ";" << it->section << "\n";
+				out << tr("Section") << ";" << it->section << ";" << it->year << "\n";
 				out << tr("Members number/growth") << ";" << it->members_num << ";" << it->members_growth << ";" << it->members_growth_percent/100 << "\n";
 				out << tr("Amount requested/paid") << ";" << it->amount_requested << ";" << it->amount_paid << ";" << it->paid_percent/100 << "\n";
 				out << tr("Payments number/growth") << ";" << it->paid_num << ";" << it->paid_inc << ";" << it->paid_growth_percent/100 << "\n";
