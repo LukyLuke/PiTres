@@ -46,6 +46,9 @@ Smtp::~Smtp() {
 }
 
 bool Smtp::send(const QString & from, const QString & to, const QString & subject) {
+	qDebug() << "SMTP-DEBUG: I do not send an Email! This is a DEBUG-BUILD without sending Emails!";
+	return false;
+	
 	int timeout = 5000;
 	
 	socket = new QTcpSocket(this);
