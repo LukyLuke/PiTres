@@ -67,8 +67,11 @@ private:
 	QPrinter::PageSize paperSize;
 	QPrinter::Orientation paperOrientation;
 	QDomDocument doc;
+	qint32 currentPage;
 	
 	void loadFonts();
+	void addStatics(QPainter *painter);
+	void addDynamics(QPainter *painter, QPrinter *printer);
 };
 
 /**

@@ -35,7 +35,8 @@
 #include <QDebug>
 
 PdfElement::PdfElement() {
-	offset = 0;
+	_offset = 0;
+	_top = 0;
 }
 
 PdfElement::PdfElement(const PdfElement &newPdfElement) {
@@ -43,9 +44,10 @@ PdfElement::PdfElement(const PdfElement &newPdfElement) {
 	_attributes = newPdfElement.attributes();
 	_nodes = newPdfElement.nodes();
 	_templatePath = newPdfElement.templatePath();
-	offset = newPdfElement.offset;
-	top = newPdfElement.top;
-	offsetBegin = newPdfElement.offsetBegin;
+	_offset = newPdfElement._offset;
+	_top = newPdfElement._top;
+	_bottomSpace = newPdfElement._bottomSpace;
+	_offsetY = newPdfElement._offsetY;
 }
 
 PdfElement::~PdfElement() {}
@@ -64,7 +66,7 @@ qreal PdfElement::paint(QPainter *painter) {
 	for (int i = 0; i < _nodes.size(); i++) {
 		PdfElement e = _nodes.at(i);
 		e.setVars(_variables, _repeating);
-		e.setTop(offsetBegin);
+		e.setTop(_offsetY);
 		switch (e.type()) {
 			case PdfLine:
 				_line = (PdfElementLine *)&e;
@@ -101,7 +103,7 @@ qreal PdfElement::paint(QPainter *painter) {
 		}
 		bottom = back > bottom ? back : bottom;
 	}
-	return bottom + offset;
+	return bottom + _offset;
 }
 
 PdfElement PdfElement::fromElement(QDomElement element, QString templatePath) {
@@ -113,8 +115,9 @@ PdfElement PdfElement::fromElement(QDomElement element, QString templatePath) {
 
 void PdfElement::setElement(QDomElement element) {
 	_nodes.clear();
-	offset = element.hasAttribute("offset") ? toQReal(element.attribute("offset")) : 0;
-	top = element.hasAttribute("top") ? toQReal(element.attribute("top")) : 0;
+	_offset = element.hasAttribute("offset") ? toQReal(element.attribute("offset")) : 0;
+	_top = element.hasAttribute("top") ? toQReal(element.attribute("top")) : 0;
+	_bottomSpace = element.hasAttribute("bottom") ? toQReal(element.attribute("bottom")) : 0;
 	
 	for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling()) {
 		parse(n);
@@ -140,10 +143,10 @@ void PdfElement::setVars(QHash<QString, QString> *variables, QHash<QString, QStr
 }
 
 void PdfElement::setTop(qreal top) {
-	if (top > this->top) {
-		offsetBegin = top;
+	if (top > _top) {
+		_offsetY = top;
 	} else {
-		offsetBegin = this->top;
+		_offsetY = _top;
 	}
 }
 
@@ -218,9 +221,9 @@ qreal PdfElementLine::paint(QPainter *painter) {
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	qreal x1 = toQReal(_attributes.value("x1", "0"));
-	qreal y1 = toQReal(_attributes.value("y1", "0")) + offsetBegin;
+	qreal y1 = toQReal(_attributes.value("y1", "0")) + _offsetY;
 	qreal x2 = toQReal(_attributes.value("x2", "0"));
-	qreal y2 = toQReal(_attributes.value("y2", "0")) + offsetBegin;
+	qreal y2 = toQReal(_attributes.value("y2", "0")) + _offsetY;
 	if (x1 != x2 || x2 != y2) {
 		painter->setPen(QPen(QBrush(QColor(strokeColor)), width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 		painter->setBrush(Qt::NoBrush);
@@ -237,7 +240,7 @@ qreal PdfElementCircle::paint(QPainter *painter) {
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	qreal cx = toQReal(_attributes.value("cx", "0"));
-	qreal cy = toQReal(_attributes.value("cy", "0")) + offsetBegin;
+	qreal cy = toQReal(_attributes.value("cy", "0")) + _offsetY;
 	qreal rx = toQReal(_attributes.value("r", "0"));
 	qreal ry = toQReal(_attributes.value("r", "0"));
 	if (rx > 0 && ry > 0) {
@@ -260,7 +263,7 @@ qreal PdfElementEllipse::paint(QPainter *painter) {
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	qreal cx = toQReal(_attributes.value("cx", "0"));
-	qreal cy = toQReal(_attributes.value("cy", "0")) + offsetBegin;
+	qreal cy = toQReal(_attributes.value("cy", "0")) + _offsetY;
 	qreal rx = toQReal(_attributes.value("rx", "0"));
 	qreal ry = toQReal(_attributes.value("ry", "0"));
 	if (rx > 0 && ry > 0) {
@@ -280,7 +283,7 @@ PdfElementArc::PdfElementArc() : PdfElement() {}
 PdfElementArc::~PdfElementArc() {}
 qreal PdfElementArc::paint(QPainter *painter) {
 	// TODO: Implement, see also Chord and Pie
-	return offsetBegin;
+	return _offsetY;
 }
 
 // Rectangle
@@ -291,7 +294,7 @@ qreal PdfElementRectangle::paint(QPainter *painter) {
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	qreal x = toQReal(_attributes.value("x", "0"));
-	qreal y = toQReal(_attributes.value("y", "0")) + offsetBegin;
+	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
 	qreal w = toQReal(_attributes.value("width", "0"));
 	qreal h = toQReal(_attributes.value("height", "0"));
 	if (w > 0 && h > 0) {
@@ -326,7 +329,7 @@ qreal PdfElementPolygon::paint(QPainter *painter) {
 		}
 		QPolygonF polygon;
 		for (int i = 0; i < xl.size(); i++) {
-			polygon << QPointF(toQReal(xl.at(i)), toQReal(yl.at(i)) + offsetBegin);
+			polygon << QPointF(toQReal(xl.at(i)), toQReal(yl.at(i)) + _offsetY);
 			back = polygon.last().y() > back ? polygon.last().y() : back;
 		}
 		if (close) {
@@ -355,7 +358,7 @@ qreal PdfElementText::paint(QPainter *painter) {
 	bool underline = _attributes.value("underline", "false").toLower() == "true";
 	bool wordwrap = _attributes.value("wordwrap", "true").toLower() == "true";
 	qreal x = toQReal(_attributes.value("x", "0"));
-	qreal y = toQReal(_attributes.value("y", "0")) + offsetBegin;
+	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
 	qreal w = toQReal(_attributes.value("width", "0"));
 	qreal h = toQReal(_attributes.value("height", "0"));
 	qreal s = toQReal(_attributes.value("spacing", "0"));
@@ -432,7 +435,7 @@ PdfElementImage::~PdfElementImage() {}
 qreal PdfElementImage::paint(QPainter *painter) {
 	QString image = _templatePath.append("/").append(_attributes.value("file", ""));
 	qreal x = toQReal(_attributes.value("x", "0"));
-	qreal y = toQReal(_attributes.value("y", "0")) + offsetBegin;
+	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
 	qreal w = toQReal(_attributes.value("width", "0"));
 	qreal h = toQReal(_attributes.value("height", "0"));
 	if (w > 0 && h > 0) {

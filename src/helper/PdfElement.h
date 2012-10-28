@@ -48,6 +48,8 @@ public:
 	PdfElementType type() const { return _type; };
 	QList<PdfElement> nodes() const { return _nodes; };
 	QString templatePath() const { return _templatePath; };
+	qreal top() const { return _offsetY; };
+	qreal bottomSpace() const { return _bottomSpace; };
 	
 	static PdfElement fromElement(QDomElement element, QString fromElement);
 
@@ -58,12 +60,14 @@ protected:
 	QHash<QString, QString> *_variables;
 	QHash<QString, QString> *_repeating;
 	QString _templatePath;
+	qreal _offset;
+	qreal _bottomSpace;
+	qreal _top;
+	qreal _offsetY;
+	
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
 	qreal toQReal(QString value);
-	qreal offset;
-	qreal top;
-	qreal offsetBegin;
 };
 
 class PdfElementLine : public PdfElement {

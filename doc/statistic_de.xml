@@ -29,7 +29,7 @@ CH-1337 Vallorbe
 info@piratenpartei.ch]]></text>
 		</g>
 
-		<g part="entry" offset="10" top="200">
+		<g part="entry" offset="10" top="200" bottom="20">
 			<text x="10" y="5" width="300" height="10" wordwrap="false" size="10" weight="bold"><![CDATA[Sektion:]]></text>
 			<text x="130" y="5" width="300" height="10" wordwrap="false" size="10" weight="bold"><![CDATA[{section}]]></text>
 			<line x1="5" y1="20" x2="525" y2="20" stroke="0.2" />

@@ -20,9 +20,10 @@
 
 #include <QDebug>
 
-XmlPdf::XmlPdf(QObject *parent) {
+XmlPdf::XmlPdf(QObject * /*parent*/) {
 	doc = QDomDocument("template");
 	paperSize = QPrinter::A4;
+	currentPage = 1;
 }
 
 XmlPdf::~XmlPdf() {
@@ -118,7 +119,15 @@ bool XmlPdf::print(QString file) {
 	}
 	
 	// Add all repeated parts and create as many sites as needed
-	qreal bottom;
+	addDynamics(painter, &printer);
+	addStatics(painter);
+	painter->end();
+	return true;
+}
+
+void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
+	qreal bottom, nextBottom;
+	qreal paperHeight = printer->pageRect(QPrinter::DevicePixel).height();
 	QHash<QString, PdfElement>::const_iterator it;
 	QHash<QString, QList<XmlPdfEntry*> >::const_iterator rit;
 	for (rit = repeatingEntries.constBegin(); rit != repeatingEntries.constEnd(); rit++) {
@@ -130,27 +139,35 @@ bool XmlPdf::print(QString file) {
 		it = elements.find(rit.key());
 		if (it != elements.constEnd()) {
 			bottom = 0;
+			nextBottom = 0;
 			for (int i = 0; i < list.size(); i++) {
+				if (nextBottom >= paperHeight) {
+					addStatics(painter);
+					printer->newPage();
+					bottom = 0;
+				}
+				
 				PdfElement elem = it.value();
 				elem.setVars(&variables, (list.at(i))->getVariables());
 				elem.setTop(bottom);
 				bottom = elem.paint(painter);
+				nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
 			}
 		}
 	}
-	
+}
+
+void XmlPdf::addStatics(QPainter *painter) {
+	QHash<QString, PdfElement>::const_iterator it;
 	// Add all static elements an all pages they are positioned - no repeating parts
 	for (it = elements.constBegin(); it != elements.constEnd(); it++) {
 		if (repeatingEntries.contains(it.key())) {
 			continue;
 		}
-		
 		PdfElement elem = it.value();
 		elem.setVars(&variables);
 		elem.paint(painter);
 	}
-	painter->end();
-	return true;
 }
 
 bool XmlPdf::send(QString email) {
@@ -248,7 +265,7 @@ XmlPdfEntry* XmlPdf::getEntry(QString name, int num) {
 /**
  * The XmlPdfEntry Class is for repeating sections inside a XmlPdf
  */
-XmlPdfEntry::XmlPdfEntry(QObject *parent) { }
+XmlPdfEntry::XmlPdfEntry(QObject * /*parent*/) { }
 XmlPdfEntry::~XmlPdfEntry() { }
 
 void XmlPdfEntry::setVar(QString key, QString value) {
