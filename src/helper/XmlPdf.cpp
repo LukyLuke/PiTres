@@ -117,12 +117,37 @@ bool XmlPdf::print(QString file) {
 		return false;
 	}
 	
-	QHash<QString, PdfElement>::const_iterator it = elements.constBegin();
-	while (it != elements.constEnd()) {
+	// Add all repeated parts and create as many sites as needed
+	qreal bottom;
+	QHash<QString, PdfElement>::const_iterator it;
+	QHash<QString, QList<XmlPdfEntry*> >::const_iterator rit;
+	for (rit = repeatingEntries.constBegin(); rit != repeatingEntries.constEnd(); rit++) {
+		if (!elements.contains(rit.key())) {
+			continue;
+		}
+		
+		QList<XmlPdfEntry*> list = rit.value();
+		it = elements.find(rit.key());
+		if (it != elements.constEnd()) {
+			bottom = 0;
+			for (int i = 0; i < list.size(); i++) {
+				PdfElement elem = it.value();
+				elem.setVars(&variables, (list.at(i))->getVariables());
+				elem.setTop(bottom);
+				bottom = elem.paint(painter);
+			}
+		}
+	}
+	
+	// Add all static elements an all pages they are positioned - no repeating parts
+	for (it = elements.constBegin(); it != elements.constEnd(); it++) {
+		if (repeatingEntries.contains(it.key())) {
+			continue;
+		}
+		
 		PdfElement elem = it.value();
 		elem.setVars(&variables);
 		elem.paint(painter);
-		it++;
 	}
 	painter->end();
 	return true;
@@ -180,12 +205,11 @@ bool XmlPdf::send(QString email) {
 	}
 	
 	// Replace variables in Email-Texts
-	QHash<QString, QString>::const_iterator it = variables.constBegin();
-	while (it != variables.constEnd()) {
+	QHash<QString, QString>::const_iterator it;
+	for (it = variables.constBegin(); it != variables.constEnd(); it++) {
 		subject.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
 		textMessage.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
 		htmlMessage.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
-		it++;
 	}
 	mail.setTextMessage(textMessage);
 	mail.setHtmlMessage(htmlMessage);
@@ -231,6 +255,15 @@ void XmlPdfEntry::setVar(QString key, QString value) {
 	variables.insert(key, value);
 }
 
+void XmlPdfEntry::setVar(QString key, qint32 value) {
+	variables.insert(key, QString::number(value));
+}
+
+void XmlPdfEntry::setVar(QString key, float value) {
+	QLocale locale;
+	variables.insert(key, locale.toString(value, 'f', 2));
+}
+
 QString XmlPdfEntry::getValue(QString key) {
 	QHash<QString, QString>::const_iterator it = variables.find(key);
 	if (it != variables.end()) {
@@ -239,5 +272,7 @@ QString XmlPdfEntry::getValue(QString key) {
 	return QString("");
 }
 
-
+QHash<QString, QString> *XmlPdfEntry::getVariables() {
+	return &variables;
+}
 

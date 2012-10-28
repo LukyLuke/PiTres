@@ -79,7 +79,10 @@ public:
 	XmlPdfEntry(QObject *parent = 0);
 	virtual ~XmlPdfEntry();
 	void setVar(QString key, QString value);
+	void setVar(QString key, qint32 value);
+	void setVar(QString key, float value);
 	QString getValue(QString key);
+	QHash<QString, QString> *getVariables();
 	
 private:
 	QHash<QString, QString> variables;

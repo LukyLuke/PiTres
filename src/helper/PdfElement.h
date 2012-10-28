@@ -35,12 +35,14 @@ public:
 	PdfElement();
 	PdfElement(const PdfElement &newPdfElement);
 	virtual ~PdfElement();
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 	void setElement(QDomElement element);
 	void setAttributes(const QDomNamedNodeMap attr, const QString cdata);
 	void setType(PdfElementType type);
 	void setTemplatePath(QString templatePath);
 	void setVars(QHash<QString, QString> *variables);
+	void setVars(QHash<QString, QString> *variables, QHash<QString, QString> *repeating);
+	void setTop(qreal top);
 	
 	QHash<QString, QString> attributes() const { return _attributes; };
 	PdfElementType type() const { return _type; };
@@ -54,12 +56,14 @@ protected:
 	QList<PdfElement> _nodes;
 	QHash<QString, QString> _attributes;
 	QHash<QString, QString> *_variables;
+	QHash<QString, QString> *_repeating;
 	QString _templatePath;
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
 	qreal toQReal(QString value);
-	qreal offsetX;
-	qreal offsetY;
+	qreal offset;
+	qreal top;
+	qreal offsetBegin;
 };
 
 class PdfElementLine : public PdfElement {
@@ -67,7 +71,7 @@ public:
 	PdfElementLine();
 	virtual ~PdfElementLine();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementCircle : public PdfElement {
@@ -75,7 +79,7 @@ public:
 	PdfElementCircle();
 	virtual ~PdfElementCircle();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementArc : public PdfElement {
@@ -83,7 +87,7 @@ public:
 	PdfElementArc();
 	virtual ~PdfElementArc();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementEllipse : public PdfElement {
@@ -91,7 +95,7 @@ public:
 	PdfElementEllipse();
 	virtual ~PdfElementEllipse();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementRectangle : public PdfElement {
@@ -99,7 +103,7 @@ public:
 	PdfElementRectangle();
 	virtual ~PdfElementRectangle();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementPolygon : public PdfElement {
@@ -107,7 +111,7 @@ public:
 	PdfElementPolygon();
 	virtual ~PdfElementPolygon();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementText : public PdfElement {
@@ -115,7 +119,7 @@ public:
 	PdfElementText();
 	virtual ~PdfElementText();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 class PdfElementImage : public PdfElement {
@@ -123,7 +127,7 @@ public:
 	PdfElementImage();
 	virtual ~PdfElementImage();
 	void setType(PdfElementType type);
-	void paint(QPainter *painter);
+	qreal paint(QPainter *painter);
 };
 
 #endif // HELPER_PDFELEMENT_H
