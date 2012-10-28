@@ -322,6 +322,7 @@ bool Invoice::pay(float amount, QDate *date) {
 }
 
 XmlPdf *Invoice::createPdf(QString tpl) {
+	QLocale locale;
 	QSettings settings;
 	XmlPdf *pdf = new XmlPdf;
 	PPSPerson person;
@@ -345,8 +346,8 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("invoice_number", reference());
 	pdf->setVar("invoice_date", issueDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("invoice_payable_due", payableDue().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
-	pdf->setVar("invoice_amount", QString("%1").arg(amount()));
-	pdf->setVar("invoice_pay_amount", QString("%1").arg(amount() - amountPaid()));
+	pdf->setVar("invoice_amount", locale.toString(amount(), 'f', 2));
+	pdf->setVar("invoice_pay_amount", locale.toString(amount() - amountPaid(), 'f', 2));
 	pdf->setVar("invoice_esr", getEsr());
 
 	pdf->setVar("member_number", QString::number(memberUid()));
