@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlpdf>
+	<!--
+		You can use following Variables in a repeated Section
+		=====================================================
+		QString section;
+		qint32  year;
+		qint32  members_num;
+		qint32  members_growth;
+		float   members_growth_percent;
+		qint32  paid_num;
+		qint32  paid_inc;
+		float   paid_percent;
+		float   amount_requested;
+		float   amount_paid;
+		float   paid_growth_percent;
+		qint32  invoiced;
+		qint32  invoiced_success;
+		float   invoiced_percent;
+		qint32  reminded;
+		qint32  reminded_success;
+		float   reminded_percent;
+	-->
+	<template size="a4">
+		<g part="header">
+			<image x="5" y="5" width="220" height="50" file="logo_german.png" />
+			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[Piratenpartei Schweiz
+CH-1337 Vallorbe
+info@piratenpartei.ch]]></text>
+		</g>
+
+		<g part="entry" offset="10" top="200">
+			<text x="10" y="5" width="300" height="10" wordwrap="false" size="10" weight="bold"><![CDATA[Sektion:]]></text>
+			<text x="130" y="5" width="300" height="10" wordwrap="false" size="10" weight="bold"><![CDATA[{section}]]></text>
+			<line x1="5" y1="20" x2="525" y2="20" stroke="0.2" />
+
+			<text x="10" y="20" width="300" height="10" wordwrap="false" size="9"><![CDATA[Jahr:]]></text>
+			<text x="130" y="20" width="300" height="10" wordwrap="false" size="9"><![CDATA[{year}]]></text>
+
+			<text x="10" y="35" width="300" height="10" wordwrap="false" size="9"><![CDATA[Anzahl Mitglieder:]]></text>
+			<text x="130" y="35" width="300" height="10" wordwrap="false" size="9"><![CDATA[{members_num}]]></text>
+
+			<text x="10" y="50" width="300" height="10" wordwrap="false" size="9"><![CDATA[Bezahlt:]]></text>
+			<text x="130" y="50" width="300" height="10" wordwrap="false" size="9"><![CDATA[{paid_num}]]></text>
+		</g>
+
+	</template>
+</xmlpdf>
