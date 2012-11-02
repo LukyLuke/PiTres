@@ -63,6 +63,7 @@ private slots:
 	void wizardBack();
 	void wizardNext();
 	void showFileDialog();
+	void reloadImport();
 	
 private:
 	QSqlDatabase db;

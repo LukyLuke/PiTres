@@ -212,11 +212,64 @@
          <widget class="QWidget" name="pageFileImport">
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_19">
+               <property name="text">
+                <string>Use Separator:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="importSeparator">
+               <property name="minimumSize">
+                <size>
+                 <width>30</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>;</string>
+               </property>
+               <property name="maxLength">
+                <number>3</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkFirstLineHeader">
+               <property name="text">
+                <string>First line is header</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_9">
              <item>
               <widget class="QLabel" name="label_13">
                <property name="text">
-                <string>Search for the value in column</string>
+                <string>Value in Column</string>
                </property>
               </widget>
              </item>
@@ -225,12 +278,15 @@
                <property name="minimum">
                 <number>1</number>
                </property>
+               <property name="maximum">
+                <number>9999</number>
+               </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_14">
                <property name="text">
-                <string>in Memberfields</string>
+                <string>complies with</string>
                </property>
               </widget>
              </item>
@@ -274,45 +330,58 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
              <item>
-              <widget class="QLabel" name="label_19">
+              <widget class="QLabel" name="label_20">
                <property name="text">
-                <string>Use Separator:</string>
+                <string>Search-Value match</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="editSeparator">
-               <property name="minimumSize">
-                <size>
-                 <width>30</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>30</width>
-                 <height>16777215</height>
-                </size>
-               </property>
+              <widget class="QLineEdit" name="importRegexMatch">
                <property name="text">
-                <string>;</string>
-               </property>
-               <property name="maxLength">
-                <number>3</number>
+                <string>.*(\d+).*</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkFirstLineHeader">
+              <widget class="QLabel" name="label_21">
                <property name="text">
-                <string>First line is header</string>
+                <string>is replaced by</string>
                </property>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_6">
+              <widget class="QLineEdit" name="importRegexReplace">
+               <property name="text">
+                <string>00\1</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QLabel" name="label_22">
+               <property name="text">
+                <string>Amount is in Column</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="importAmountColumn">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>9999</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_7">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -851,9 +920,127 @@
     </widget>
    </item>
   </layout>
+  <action name="actionReloadImportfile">
+   <property name="text">
+    <string>Reload Importfile</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../PiTres.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>importSeparator</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkFirstLineHeader</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>220</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>importColumnMaster</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>149</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>importColumnMemberfields</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>387</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>importRegexMatch</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>importRegexReplace</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>562</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>importAmountColumn</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>actionReloadImportfile</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -34,6 +34,8 @@ Donations::Donations(QWidget *parent) : QWidget(parent) {
 	connect(sectionList, SIGNAL(currentIndexChanged(int)), this, SLOT(selectSection()));
 	connect(yearList, SIGNAL(itemSelectionChanged()), this, SLOT(selectYear()));
 	
+	connect(actionReloadImportfile, SIGNAL(triggered()), this, SLOT(reloadImport()));
+	
 	tableModel = new QSqlQueryModel(tableView);
 	donationsModel = new QSqlQueryModel(donationsTable);
 	
@@ -146,31 +148,60 @@ void Donations::wizardPrepareImport() {
 		tablePreviewImport->setItem(0, 10, new QTableWidgetItem(editMemo->text()));
 		
 	} else {
-		QFile file(editImportFile->text());
-		if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-			return;
-		}
-		
-		QStringList list;
-		QByteArray line;
-		int row = 0;
-		while (!file.atEnd()) {
-			if (row == 0 && checkFirstLineHeader->checkState() == Qt::Checked) {
-				row++;
+		reloadImport();
+	}
+}
+
+void Donations::reloadImport() {
+	QFile file(editImportFile->text());
+	if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
+		return;
+	}
+	
+	QStringList list;
+	QByteArray line;
+	QString val;
+	bool firstLine(true);
+	qint32 row = 0, col = 0, pos = 0;
+	qint32 amountColum = importAmountColumn->value();
+	qint32 column = importColumnMaster->value();
+	qint32 dbField = importColumnMemberfields->currentIndex();
+	QRegExp match(importRegexMatch->text(), Qt::CaseInsensitive);
+	QString repl(importRegexReplace->text());
+	QString sep((importSeparator->text().size() > 0) ? importSeparator->text().at(0) : ';');
+	QRegExp split(QString("(\"([^\"]*)\"%1?)|(([^%1]*)%1?)").arg(sep));
+	
+	while (!file.atEnd()) {
+		if (firstLine) {
+			firstLine = false;
+			if (checkFirstLineHeader->checkState() == Qt::Checked) {
+				line = file.readLine();
 				continue;
 			}
-			
-			if (tablePreviewImport->rowCount() < row) {
-				tablePreviewImport->insertRow(tablePreviewImport->rowCount()-1);
-			}
-			
-			line = file.readLine();
-			list = QString(line).trimmed().split(editSeparator->text());
-			for (int col = 0; col < list.size(); col++) {
-				tablePreviewImport->setItem(row, col, new QTableWidgetItem(list.at(col)));
-			}
-			row++;
 		}
+		
+		if (tablePreviewImport->rowCount() <= row) {
+			tablePreviewImport->insertRow(tablePreviewImport->rowCount());
+		}
+		
+		pos = 0;
+		col = 0;
+		line = file.readLine();
+		while ( (line.size() > pos) && ((pos = split.indexIn(line, pos)) != -1) ) {
+			val = split.cap(2);
+			if (val.size() <= 0) {
+				val = split.cap(4);
+			}
+			pos += split.matchedLength();
+			
+			if (col == column) {
+				val.replace(match, repl);
+			}
+			
+			tablePreviewImport->setItem(row, col, new QTableWidgetItem(val));
+			col++;
+		}
+		row++;
 	}
 }
 

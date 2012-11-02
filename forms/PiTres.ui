@@ -94,7 +94,6 @@
    </attribute>
    <addaction name="actionFrom_LDAP"/>
    <addaction name="actionImport_Payments"/>
-   <addaction name="actionDonations"/>
    <addaction name="actionInvoiceWizard"/>
    <addaction name="actionEditSections"/>
    <addaction name="actionStatistics"/>
@@ -201,6 +200,32 @@
        <property name="icon">
         <iconset resource="../PiTres.qrc">
          <normaloff>:/icons/resources/icons/chest.png</normaloff>:/icons/resources/icons/chest.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>48</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="donationButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Donations</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/goldbars.png</normaloff>:/icons/resources/icons/goldbars.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -458,7 +483,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>66</x>
-     <y>310</y>
+     <y>303</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
@@ -506,6 +531,22 @@
    <hints>
     <hint type="sourcelabel">
      <x>80</x>
+     <y>451</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>donationButton</sender>
+   <signal>clicked()</signal>
+   <receiver>actionDonations</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
      <y>342</y>
     </hint>
     <hint type="destinationlabel">
