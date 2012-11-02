@@ -118,7 +118,6 @@ bool XmlPdf::print(QString file) {
 		return false;
 	}
 	
-	// Add all repeated parts and create as many sites as needed
 	addDynamics(painter, &printer);
 	addStatics(painter);
 	painter->end();
@@ -130,6 +129,35 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 	qreal paperHeight = printer->pageRect(QPrinter::DevicePixel).height();
 	QHash<QString, PdfElement>::const_iterator it;
 	QHash<QString, QList<XmlPdfEntry*> >::const_iterator rit;
+	
+	// Set the pagenumber and calculate number of pages
+	qint32 num_pages = 1;
+	for (rit = repeatingEntries.constBegin(); rit != repeatingEntries.constEnd(); rit++) {
+		if (!elements.contains(rit.key())) {
+			continue;
+		}
+		
+		QList<XmlPdfEntry*> list = rit.value();
+		it = elements.find(rit.key());
+		if (it != elements.constEnd()) {
+			bottom = 0;
+			nextBottom = 0;
+			for (int i = 0; i < list.size(); i++) {
+				if (nextBottom >= paperHeight) {
+					num_pages++;
+					bottom = 0;
+				}
+				PdfElement elem = it.value();
+				elem.setTop(bottom);
+				bottom = elem.bottom();
+				nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
+			}
+		}
+	}
+	variables["current_page"] = QString::number(currentPage);
+	variables["num_pages"] = QString::number(num_pages);
+	
+	// Same as above, but this time we print the PDF
 	for (rit = repeatingEntries.constBegin(); rit != repeatingEntries.constEnd(); rit++) {
 		if (!elements.contains(rit.key())) {
 			continue;
@@ -145,6 +173,8 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 					addStatics(painter);
 					printer->newPage();
 					bottom = 0;
+					currentPage++;
+					variables["current_page"] = QString::number(currentPage);
 				}
 				
 				PdfElement elem = it.value();
@@ -159,7 +189,6 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 
 void XmlPdf::addStatics(QPainter *painter) {
 	QHash<QString, PdfElement>::const_iterator it;
-	// Add all static elements an all pages they are positioned - no repeating parts
 	for (it = elements.constBegin(); it != elements.constEnd(); it++) {
 		if (repeatingEntries.contains(it.key())) {
 			continue;

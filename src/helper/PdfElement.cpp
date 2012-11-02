@@ -106,6 +106,60 @@ qreal PdfElement::paint(QPainter *painter) {
 	return bottom + _offset;
 }
 
+qreal PdfElement::bottom() {
+	PdfElementLine *_line;
+	PdfElementCircle *_circle;
+	PdfElementArc *_arc;
+	PdfElementEllipse *_ellipse;
+	PdfElementRectangle *_rectangle;
+	PdfElementPolygon *_polygon;
+	PdfElementText *_text;
+	PdfElementImage *_image;
+	qreal back = 0, _bottom = 0;
+	
+	for (int i = 0; i < _nodes.size(); i++) {
+		PdfElement e = _nodes.at(i);
+		e.setVars(_variables, _repeating);
+		e.setTop(_offsetY);
+		switch (e.type()) {
+			case PdfLine:
+				_line = (PdfElementLine *)&e;
+				back = _line->bottom();
+				break;
+			case PdfCircle:
+				_circle = (PdfElementCircle *)&e;
+				back = _circle->bottom();
+				break;
+			case PdfArc:
+				_arc = (PdfElementArc *)&e;
+				back = _arc->bottom();
+				break;
+			case PdfEllipse:
+				_ellipse = (PdfElementEllipse *)&e;
+				back = _ellipse->bottom();
+				break;
+			case PdfRectangle:
+				_rectangle = (PdfElementRectangle *)&e;
+				back = _rectangle->bottom();
+				break;
+			case PdfPolygon:
+				_polygon = (PdfElementPolygon *)&e;
+				back = _polygon->bottom();
+				break;
+			case PdfText:
+				_text = (PdfElementText *)&e;
+				back = _text->bottom();
+				break;
+			case PdfImage:
+				_image = (PdfElementImage *)&e;
+				back = _image->bottom();
+				break;
+		}
+		_bottom = back > _bottom ? back : _bottom;
+	}
+	return _bottom + _offset;
+}
+
 PdfElement PdfElement::fromElement(QDomElement element, QString templatePath) {
 	PdfElement e;
 	e.setTemplatePath(templatePath);
@@ -229,6 +283,11 @@ qreal PdfElementLine::paint(QPainter *painter) {
 		painter->setBrush(Qt::NoBrush);
 		painter->drawLine( QPointF(x1, y1), QPointF(x2, y2) );
 	}
+	return bottom();
+}
+qreal PdfElementLine::bottom() {
+	qreal y1 = toQReal(_attributes.value("y1", "0")) + _offsetY;
+	qreal y2 = toQReal(_attributes.value("y2", "0")) + _offsetY;
 	return y1 > y2 ? y1 : y2;
 }
 
@@ -252,6 +311,11 @@ qreal PdfElementCircle::paint(QPainter *painter) {
 		}
 		painter->drawEllipse( QPointF(cx, cy), rx, ry );
 	}
+	return bottom();
+}
+qreal PdfElementCircle::bottom() {
+	qreal cy = toQReal(_attributes.value("cy", "0")) + _offsetY;
+	qreal ry = toQReal(_attributes.value("r", "0"));
 	return cy + ry;
 }
 
@@ -275,6 +339,11 @@ qreal PdfElementEllipse::paint(QPainter *painter) {
 		}
 		painter->drawEllipse( QPointF(cx, cy), rx, ry );
 	}
+	return bottom();
+}
+qreal PdfElementEllipse::bottom() {
+	qreal cy = toQReal(_attributes.value("cy", "0")) + _offsetY;
+	qreal ry = toQReal(_attributes.value("ry", "0"));
 	return cy + ry;
 }
 
@@ -283,6 +352,9 @@ PdfElementArc::PdfElementArc() : PdfElement() {}
 PdfElementArc::~PdfElementArc() {}
 qreal PdfElementArc::paint(QPainter *painter) {
 	// TODO: Implement, see also Chord and Pie
+	return bottom();
+}
+qreal PdfElementArc::bottom() {
 	return _offsetY;
 }
 
@@ -306,6 +378,11 @@ qreal PdfElementRectangle::paint(QPainter *painter) {
 		}
 		painter->drawRect( QRectF(QPointF(x, y), QSizeF(w, h)) );
 	}
+	return bottom();
+}
+qreal PdfElementRectangle::bottom() {
+	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
+	qreal h = toQReal(_attributes.value("height", "0"));
 	return y + h;
 }
 
@@ -313,7 +390,6 @@ qreal PdfElementRectangle::paint(QPainter *painter) {
 PdfElementPolygon::PdfElementPolygon() : PdfElement() {}
 PdfElementPolygon::~PdfElementPolygon() {}
 qreal PdfElementPolygon::paint(QPainter *painter) {
-	qreal back = -1;
 	qreal width = _attributes.value("stroke", "2").toFloat();
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
@@ -330,12 +406,22 @@ qreal PdfElementPolygon::paint(QPainter *painter) {
 		QPolygonF polygon;
 		for (int i = 0; i < xl.size(); i++) {
 			polygon << QPointF(toQReal(xl.at(i)), toQReal(yl.at(i)) + _offsetY);
-			back = polygon.last().y() > back ? polygon.last().y() : back;
 		}
 		if (close) {
 			painter->drawPolygon(polygon);
 		} else {
 			painter->drawPolyline(polygon);
+		}
+	}
+	return bottom();
+}
+qreal PdfElementPolygon::bottom() {
+	qreal back = -1, current = 0;
+	QStringList yl = _attributes.value("y", "").split(",", QString::SkipEmptyParts);
+	if (!yl.isEmpty()) {
+		for (int i = 0; i < yl.size(); i++) {
+			current = toQReal(yl.at(i)) + _offsetY;
+			back = current > back ? current : back;
 		}
 	}
 	return back;
@@ -345,7 +431,6 @@ qreal PdfElementPolygon::paint(QPainter *painter) {
 PdfElementText::PdfElementText() : PdfElement() {}
 PdfElementText::~PdfElementText() {}
 qreal PdfElementText::paint(QPainter *painter) {
-	qreal back = -1;
 	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
@@ -424,9 +509,15 @@ qreal PdfElementText::paint(QPainter *painter) {
 			painter->drawText(rect, flags, paragraphs.at(i).trimmed(), bounding);
 			rect.adjust(0, bounding->height() + s, 0, 0);
 		}
-		back = y + (paragraphs.size() * ((size * 12.5) + s));
 	}
-	return back;
+	return bottom();
+}
+qreal PdfElementText::bottom() {
+	qreal size = _attributes.value("size", "12").toFloat();
+	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
+	qreal s = toQReal(_attributes.value("spacing", "0"));
+	qint32 num = _attributes.value("cdata", "").count(QRegExp("(\r|\n)"));
+	return y + (num * ((size * 12.5) + s));
 }
 
 // Image
@@ -446,5 +537,10 @@ qreal PdfElementImage::paint(QPainter *painter) {
 			painter->drawImage( QRectF(QPointF(x, y), QSizeF(w, h)), picture, QRectF(picture.rect()) );
 		}
 	}
+	return bottom();
+}
+qreal PdfElementImage::bottom() {
+	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
+	qreal h = toQReal(_attributes.value("height", "0"));
 	return y + h;
 }
