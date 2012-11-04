@@ -32,6 +32,7 @@
 #include "BudgetView.h"
 #include "SectionEdit.h"
 #include "Donations.h"
+#include "DonationWizard.h"
 #include "Statistics.h"
 
 #include "data/Person.h"
@@ -88,6 +89,7 @@ public slots:
 	void showBudget();
 	void showSectionEdit();
 	void showDonations();
+	void showDonationWizard();
 	void showStatistics();
 };
 

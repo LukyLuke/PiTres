@@ -66,6 +66,10 @@ public:
 	void save();
 	void clear();
 	bool load(int uid);
+	bool loadByPersonsFields(QString uid);
+	bool loadByTelephone(QString uid);
+	bool loadByEmail(QString uid);
+	bool loadByAnyField(QString uid);
 	Invoice *getInvoice();
 	QList<Invoice *> getInvoices();
 	static void createTables();

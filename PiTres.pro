@@ -10,9 +10,9 @@ DEBUG = 1
 
 # Main sources
 HEADERS += src/PiTres.h src/Userlist.h src/SentBills.h src/PaymentImport.h src/LDAPImport.h src/InvoiceWizard.h \
-           src/PaymentWizard.h src/Contributions.h src/BudgetView.h src/SectionEdit.h src/Donations.h src/Statistics.h
+           src/PaymentWizard.h src/Contributions.h src/BudgetView.h src/SectionEdit.h src/Donations.h src/DonationWizard.h src/Statistics.h
 SOURCES += main.cpp src/PiTres.cpp src/Userlist.cpp src/SentBills.cpp src/PaymentImport.cpp src/LDAPImport.cpp src/InvoiceWizard.cpp \
-           src/PaymentWizard.cpp src/Contributions.cpp src/BudgetView.cpp src/SectionEdit.cpp src/Donations.cpp src/Statistics.cpp
+           src/PaymentWizard.cpp src/Contributions.cpp src/BudgetView.cpp src/SectionEdit.cpp src/Donations.cpp src/DonationWizard.cpp src/Statistics.cpp
 
 # Data Objects
 HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Section.h src/data/BudgetEntity.h src/data/Donation.h
@@ -41,7 +41,7 @@ QT = core gui network sql xml
 FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
         forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
         forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui \
-        forms/donations.ui forms/statistics.ui
+        forms/donations.ui forms/donation_import.ui forms/statistics.ui
 OUT_PWD = build
 
 # Translations

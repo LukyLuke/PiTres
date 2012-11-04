@@ -21,19 +21,45 @@
 #include <QString>
 #include <QRegExp>
 #include <QLocale>
+#include <QDebug>
 
 QString Formatter::telephone(QString number) {
 	return Formatter::telephone(number, QLocale::Switzerland);
 }
 
 QString Formatter::telephone(QString number, QLocale::Country country) {
-	number = number.replace(QRegExp("[^0-9]+"), "").trimmed();
-	if (!number.startsWith("0")) {
-		number.prepend("++");
+	QRegExp rx("^(\\+\\+?|00)*\\s*(\\((\\d+)\\))?(\\d\\s\\-)+$");
+	QString back("");
+	
+	if (rx.indexIn(number) >= 0) {
+		// with international prefix
+		if (rx.cap(1).length() > 0) {
+			back.append(rx.cap(1).replace("+", "00").replace("++", "00"));
+		} else {
+			back.append("0041");
+		}
+		
+		// with national prefix in brackets
+		if (rx.cap(3).length() > 0) {
+			if (rx.cap(3).at(0) == '0') {
+				back.append(rx.cap(3).remove(0, 1));
+			} else {
+				back.append(rx.cap(3));
+			}
+		}
+		
+		// with international prefix
+		if (rx.cap(4).length() > 0) {
+			back.append(rx.cap(4).replace(QRegExp("[^\\d]"), ""));
+		}
+		
+		return back;
 	}
-	/*switch (country) {
-		default:  break;
-	}*/
-	return number;
+	qDebug() << "Invalid Telephone Number: " << number << " - Unknown Format...";
+	return back;
 }
 
+QString Formatter::email(QString email) {
+	//QRegExp rx("^$");
+	return email;
+}

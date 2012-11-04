@@ -48,6 +48,7 @@ public:
 	Section *parent();
 	static void createTables();
 	static void getNameParentHash(QHash<QString, QString> *hash);
+	static void getSectionList(QList<QString> *list);
 	
 	// enums
 	enum AmountType { AmountPercent=0, AmountMoney=1 };

@@ -26,6 +26,7 @@ class Formatter {
 public:
 	static QString telephone(QString number);
 	static QString telephone(QString number, QLocale::Country country);
+	static QString email(QString email);
 };
 
 #endif // Helper_Formatter_H 

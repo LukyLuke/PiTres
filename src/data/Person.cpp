@@ -250,6 +250,52 @@ bool PPSPerson::load(int uid) {
 	return isLoaded();
 }
 
+bool PPSPerson::loadByPersonsFields(QString uid) {
+	QSqlQuery query(db);
+	
+	query.prepare("SELECT uid FROM ldap_persons WHERE uid=:val OR nickname=:val OR familyname=:val OR givenname=:val OR (givenname||' '||familyname)=:val OR (familyname||' '||givenname)=:val;");
+	query.bindValue(":val", uid);
+	if (query.exec() && query.first()) {
+		return load(query.value(0).toInt());
+	}
+	
+	return load(0);
+}
+
+bool PPSPerson::loadByTelephone(QString uid) {
+	QSqlQuery query(db);
+	
+	query.prepare("SELECT uid FROM ldap_persons_mobile WHERE number LIKE :val;");
+	query.bindValue(":val", "%" + uid + "%");
+	if (query.exec() && query.first()) {
+		return load(query.value(0).toInt());
+	}
+	
+	query.prepare("SELECT uid FROM ldap_persons_telephone WHERE number LIKE :val;");
+	query.bindValue(":val", "%" + uid + "%");
+	if (query.exec() && query.first()) {
+		return load(query.value(0).toInt());
+	}
+	
+	return load(0);
+}
+
+bool PPSPerson::loadByEmail(QString uid) {
+	QSqlQuery query(db);
+	
+	query.prepare("SELECT uid FROM ldap_persons_email WHERE mail=:val;");
+	query.bindValue(":val", uid);
+	if (query.exec() && query.first()) {
+		return load(query.value(0).toInt());
+	}
+	
+	return load(0);
+}
+
+bool PPSPerson::loadByAnyField(QString uid) {
+	return loadByPersonsFields(uid) || loadByEmail(uid) || loadByTelephone(uid);
+}
+
 Invoice *PPSPerson::getInvoice() {
 	return &_invoice;
 }
@@ -319,11 +365,13 @@ void PPSPerson::setState(QString state) {
 }
 
 void PPSPerson::addTelephone(QString number) {
+	number = Formatter::telephone(number);
 	l_telephone.append(number);
 	emit telephoneAdded(number);
 }
 
 void PPSPerson::removeTelephone(QString number) {
+	number = Formatter::telephone(number);
 	int pos = l_telephone.indexOf(number);
 	if (pos >= 0 && pos < l_telephone.size()) {
 		l_telephone.removeAt(pos);
@@ -332,6 +380,8 @@ void PPSPerson::removeTelephone(QString number) {
 }
 
 void PPSPerson::updateTelephone(QString oldNumber, QString newNumber) {
+	oldNumber = Formatter::telephone(oldNumber);
+	newNumber = Formatter::telephone(newNumber);
 	int pos = l_telephone.indexOf(oldNumber);
 	if (pos >= 0 && pos < l_telephone.size()) {
 		l_telephone.replace(pos, newNumber);
@@ -340,17 +390,22 @@ void PPSPerson::updateTelephone(QString oldNumber, QString newNumber) {
 }
 
 void PPSPerson::setTelephone(QList<QString> numbers) {
+	for (int i = 0; i < numbers.size(); i++) {
+		numbers[i] = Formatter::telephone(numbers[i]);
+	}
 	l_telephone.clear();
 	l_telephone.append(numbers);
 	emit telephoneChanged(l_telephone);
 }
 
 void PPSPerson::addMobile(QString number) {
+	number = Formatter::telephone(number);
 	l_mobile.append(number);
 	emit mobileAdded(number);
 }
 
 void PPSPerson::removeMobile(QString number) {
+	number = Formatter::telephone(number);
 	int pos = l_mobile.indexOf(number);
 	if (pos >= 0 && pos < l_mobile.size()) {
 		l_mobile.removeAt(pos);
@@ -359,6 +414,8 @@ void PPSPerson::removeMobile(QString number) {
 }
 
 void PPSPerson::updateMobile(QString oldNumber, QString newNumber) {
+	oldNumber = Formatter::telephone(oldNumber);
+	newNumber = Formatter::telephone(newNumber);
 	int pos = l_mobile.indexOf(oldNumber);
 	if (pos >= 0 && pos < l_mobile.size()) {
 		l_mobile.replace(pos, newNumber);
@@ -367,17 +424,22 @@ void PPSPerson::updateMobile(QString oldNumber, QString newNumber) {
 }
 
 void PPSPerson::setMobile(QList<QString> numbers) {
+	for (int i = 0; i < numbers.size(); i++) {
+		numbers[i] = Formatter::telephone(numbers[i]);
+	}
 	l_mobile.clear();
 	l_mobile.append(numbers);
 	emit mobileChanged(l_mobile);
 }
 
 void PPSPerson::addEmail(QString address) {
+	address = Formatter::email(address);
 	l_email.append(address);
 	emit emailAdded(address);
 }
 
 void PPSPerson::removeEmail(QString address) {
+	address = Formatter::email(address);
 	int pos = l_email.indexOf(address);
 	if (pos >= 0 && pos < l_email.size()) {
 		l_email.removeAt(pos);
@@ -386,6 +448,8 @@ void PPSPerson::removeEmail(QString address) {
 }
 
 void PPSPerson::updateEmail(QString oldAddress, QString newAddress) {
+	oldAddress = Formatter::email(oldAddress);
+	newAddress = Formatter::email(newAddress);
 	int pos = l_email.indexOf(oldAddress);
 	if (pos >= 0 && pos < l_email.size()) {
 		l_email.replace(pos, newAddress);
@@ -394,6 +458,9 @@ void PPSPerson::updateEmail(QString oldAddress, QString newAddress) {
 }
 
 void PPSPerson::setEmail(QList<QString> addresses) {
+	for (int i = 0; i < addresses.size(); i++) {
+		addresses[i] = Formatter::telephone(addresses[i]);
+	}
 	l_email.clear();
 	l_email.append(addresses);
 	emit emailChanged(l_email);

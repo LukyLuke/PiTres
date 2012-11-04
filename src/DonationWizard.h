@@ -1,5 +1,5 @@
 /*
-	The Donaitions Widget is for managing all Donaitions
+	The DonaitionWizard is for importing and adding Donations
 	Copyright (C) 2012  Lukas Zurschmiede <l.zurschmiede@delightsoftware.com>
 
 	This program is free software: you can redistribute it and/or modify
@@ -16,65 +16,54 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef Donations_H
-#define Donations_H
+#ifndef DonationWizard_H
+#define DonationWizard_H
 
-#include "ui_donations.h"
+#include "ui_donation_import.h"
 #include "data/Donation.h"
 #include "data/Section.h"
 #include "data/Person.h"
-#include "helper/Smtp.h"
 
 #include <cstdlib>
 #include <cstdio>
 
 #include <QWidget>
-#include <QSqlDatabase>
-#include <QSqlQueryModel>
-#include <QSqlQuery>
-#include <QSqlError>
+#include <QDialog>
+#include <QComboBox>
+#include <QSettings>
 #include <QString>
-#include <QVariant>
 #include <QCompleter>
 #include <QFileDialog>
 #include <QFile>
 #include <QIODevice>
 #include <QByteArray>
 #include <QList>
-#include <QSettings>
 #include <QHash>
-#include <QFileDialog>
+#include <QMap>
 #include <QDebug>
 
-class Donations : public QWidget, private Ui::DonationsForm {
+class DonationWizard : public QDialog, private Ui::DonationImportForm {
 Q_OBJECT
 
 public:
-	Donations(QWidget *parent = 0);
-	virtual ~Donations();
+	DonationWizard(QWidget *parent = 0);
+	virtual ~DonationWizard();
 
 private slots:
-	void searchData();
-	void exportData();
-	void sendEmail();
-	void selectSection();
-	void selectYear();
-	void searchDonations();
+	void wizardBack();
+	void wizardNext();
+	void showFileDialog();
+	void reloadImport();
 	
 private:
-	QSqlDatabase db;
-	QSqlQueryModel *tableModel;
-	QSqlQueryModel *donationsModel;
-	QHash<QString, QString> sectionQif;
-	bool fileImport;
+	QMap<QString, QString> loadedSections;
+	QList<QString> sectionsList;
 	
-	QSqlQuery createQuery();
-	void loadData();
-	void showOverview();
-	void createQif();
-	void loadSectionDonations();
-	QSqlQuery createDonationsQuery();
-	void showDonationsDetails();
+	void enableWizardButtons();
+	void wizardPrepareRecord();
+	void wizardImport();
+	void createSectionMapping();
+	void previewImport();
 };
 
-#endif // Donations_H
+#endif // DonationWizard_H

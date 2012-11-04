@@ -99,6 +99,7 @@ void PiTres::connectActions() {
 	connect(actionEditSections, SIGNAL(triggered()), this, SLOT(showSectionEdit()));
 	connect(actionDonations, SIGNAL(triggered()), this, SLOT(showDonations()));
 	connect(actionStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
+	connect(actionDonationWizard, SIGNAL(triggered()), this, SLOT(showDonationWizard()));
 }
 
 void PiTres::debugAction(QString sender) {
@@ -165,6 +166,11 @@ void PiTres::showSectionEdit() {
 void PiTres::showDonations() {
 	Donations *widget = new Donations;
 	setContent(widget);
+}
+
+void PiTres::showDonationWizard() {
+	DonationWizard *wizard = new DonationWizard(this);
+	wizard->show();
 }
 
 void PiTres::showStatistics() {

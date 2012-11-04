@@ -21,20 +21,13 @@
 Donations::Donations(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	
-	connect(btnImportBack, SIGNAL(clicked()), this, SLOT(wizardBack()));
-	connect(btnImportNext, SIGNAL(clicked()), this, SLOT(wizardNext()));
-	connect(btnImportSave, SIGNAL(clicked()), this, SLOT(wizardNext()));
-	
 	connect(dateFrom, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(dateUntil, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	connect(btnEmail, SIGNAL(clicked()), this, SLOT(sendEmail()));
-	connect(btnChooseDonationImport, SIGNAL(clicked()), this, SLOT(showFileDialog()));
 	
 	connect(sectionList, SIGNAL(currentIndexChanged(int)), this, SLOT(selectSection()));
 	connect(yearList, SIGNAL(itemSelectionChanged()), this, SLOT(selectYear()));
-	
-	connect(actionReloadImportfile, SIGNAL(triggered()), this, SLOT(reloadImport()));
 	
 	tableModel = new QSqlQueryModel(tableView);
 	donationsModel = new QSqlQueryModel(donationsTable);
@@ -43,7 +36,6 @@ Donations::Donations(QWidget *parent) : QWidget(parent) {
 	
 	loadData();
 	loadSectionDonations();
-	enableWizardButtons();
 }
 
 Donations::~Donations() {}
@@ -89,130 +81,6 @@ void Donations::loadSectionDonations() {
 	while (sections.next()) {
 		sectionList->addItem(sections.value(0).toString());
 	}
-}
-
-void Donations::wizardBack() {
-	if (stackedWidget->currentIndex() >= 0) {
-		stackedWidget->setCurrentIndex(stackedWidget->currentIndex()-1);
-	}
-	enableWizardButtons();
-}
-
-void Donations::wizardNext() {
-	if (stackedWidget->currentIndex() < (stackedWidget->count()-1)) {
-		stackedWidget->setCurrentIndex(stackedWidget->currentIndex()+1);
-	}
-	enableWizardButtons();
-}
-
-void Donations::enableWizardButtons() {
-	switch (stackedWidget->currentIndex()) {
-		case 0: // init page
-			btnImportBack->setEnabled(false);
-			btnImportNext->setEnabled(true);
-			btnImportSave->setEnabled(false);
-			break;
-		case 1: // preview
-			btnImportBack->setEnabled(true);
-			btnImportNext->setEnabled(false);
-			btnImportSave->setEnabled(true);
-			
-			wizardPrepareImport();
-			break;
-		case 2: // import/save
-			btnImportBack->setEnabled(true);
-			btnImportNext->setEnabled(false);
-			btnImportSave->setEnabled(false);
-			
-			wizardImport();
-			break;
-	}
-}
-
-void Donations::wizardPrepareImport() {
-	fileImport = !(editImportFile->text().isEmpty());
-	tablePreviewImport->clear();
-	
-	if (!fileImport) {
-		tablePreviewImport->setRowCount(1);
-		tablePreviewImport->setItem(0, 0,  new QTableWidgetItem(editMember->text()));
-		tablePreviewImport->setItem(0, 1,  new QTableWidgetItem(editCompany->text()));
-		tablePreviewImport->setItem(0, 2,  new QTableWidgetItem(editAddress->text()));
-		tablePreviewImport->setItem(0, 3,  new QTableWidgetItem(editCity->text()));
-		tablePreviewImport->setItem(0, 4,  new QTableWidgetItem(editCountry->text()));
-		tablePreviewImport->setItem(0, 5,  new QTableWidgetItem(editPhone->text()));
-		tablePreviewImport->setItem(0, 6,  new QTableWidgetItem(editMobile->text()));
-		tablePreviewImport->setItem(0, 7,  new QTableWidgetItem(editEmail->text()));
-		tablePreviewImport->setItem(0, 8,  new QTableWidgetItem(QString::number(editAmount->value())));
-		tablePreviewImport->setItem(0, 9,  new QTableWidgetItem(editObjective->text()));
-		tablePreviewImport->setItem(0, 10, new QTableWidgetItem(editMemo->text()));
-		
-	} else {
-		reloadImport();
-	}
-}
-
-void Donations::reloadImport() {
-	QFile file(editImportFile->text());
-	if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-		return;
-	}
-	
-	QStringList list;
-	QByteArray line;
-	QString val;
-	bool firstLine(true);
-	qint32 row = 0, col = 0, pos = 0;
-	qint32 amountColum = importAmountColumn->value();
-	qint32 column = importColumnMaster->value();
-	qint32 dbField = importColumnMemberfields->currentIndex();
-	QRegExp match(importRegexMatch->text(), Qt::CaseInsensitive);
-	QString repl(importRegexReplace->text());
-	QString sep((importSeparator->text().size() > 0) ? importSeparator->text().at(0) : ';');
-	QRegExp split(QString("(\"([^\"]*)\"%1?)|(([^%1]*)%1?)").arg(sep));
-	
-	while (!file.atEnd()) {
-		if (firstLine) {
-			firstLine = false;
-			if (checkFirstLineHeader->checkState() == Qt::Checked) {
-				line = file.readLine();
-				continue;
-			}
-		}
-		
-		if (tablePreviewImport->rowCount() <= row) {
-			tablePreviewImport->insertRow(tablePreviewImport->rowCount());
-		}
-		
-		pos = 0;
-		col = 0;
-		line = file.readLine();
-		while ( (line.size() > pos) && ((pos = split.indexIn(line, pos)) != -1) ) {
-			val = split.cap(2);
-			if (val.size() <= 0) {
-				val = split.cap(4);
-			}
-			pos += split.matchedLength();
-			
-			if (col == column) {
-				val.replace(match, repl);
-			}
-			
-			tablePreviewImport->setItem(row, col, new QTableWidgetItem(val));
-			col++;
-		}
-		row++;
-	}
-}
-
-void Donations::wizardImport() {
-	
-}
-
-void Donations::showFileDialog() {
-	editImportFile->setText(
-		QFileDialog::getOpenFileName(this, tr("Load Donations-File"), "", tr("Comma seperated File (*.csv);;Quicken Interchange Format (*.qif)"))
-	);
 }
 
 QSqlQuery Donations::createQuery() {

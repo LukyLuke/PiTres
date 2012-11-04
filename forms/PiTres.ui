@@ -60,8 +60,10 @@
     <addaction name="actionShow_Bills"/>
     <addaction name="actionInvoiceWizard"/>
     <addaction name="actionImport_Payments"/>
+    <addaction name="actionDonationWizard"/>
     <addaction name="separator"/>
     <addaction name="actionContribution"/>
+    <addaction name="actionDonations"/>
     <addaction name="actionBudget"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
@@ -94,6 +96,7 @@
    </attribute>
    <addaction name="actionFrom_LDAP"/>
    <addaction name="actionImport_Payments"/>
+   <addaction name="actionDonationWizard"/>
    <addaction name="actionInvoiceWizard"/>
    <addaction name="actionEditSections"/>
    <addaction name="actionStatistics"/>
@@ -452,6 +455,18 @@
    </property>
    <property name="text">
     <string>Statistics</string>
+   </property>
+  </action>
+  <action name="actionDonationWizard">
+   <property name="icon">
+    <iconset resource="../PiTres.qrc">
+     <normaloff>:/icons/resources/icons/goldbars.png</normaloff>:/icons/resources/icons/goldbars.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Donations</string>
+   </property>
+   <property name="toolTip">
+    <string>Show a Wizard to import or record new Donations</string>
    </property>
   </action>
  </widget>

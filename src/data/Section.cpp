@@ -75,6 +75,21 @@ void Section::getNameParentHash(QHash<QString, QString> *hash) {
 	}
 }
 
+void Section::getSectionList(QList<QString> *list) {
+	if (list) {
+		QString section;
+		QSqlDatabase db;
+		QSqlQuery query(db);
+		query.exec("SELECT name FROM pps_sections ORDER BY name,parent ASC;");
+		while (query.next()) {
+			section = query.value(0).toString();
+			if (!section.isEmpty()) {
+				list->append(section);
+			}
+		}
+	}
+}
+
 void Section::load(const QString name) {
 	QSqlDatabase db;
 	QSqlQuery query(db);
