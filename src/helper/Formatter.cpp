@@ -28,7 +28,7 @@ QString Formatter::telephone(QString number) {
 }
 
 QString Formatter::telephone(QString number, QLocale::Country country) {
-	QRegExp rx("^(\\+\\+?|00)*\\s*(\\((\\d+)\\))?(\\d\\s\\-)+$");
+	QRegExp rx("^(\\+\\+?|00)?\\s*(\\d+\\((\\d+)\\))?([\\d\\s\\-\\.\\/\\']+)$");
 	QString back("");
 	
 	if (rx.indexIn(number) >= 0) {
