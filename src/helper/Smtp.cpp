@@ -46,9 +46,6 @@ Smtp::~Smtp() {
 }
 
 bool Smtp::send(const QString & from, const QString & to, const QString & subject) {
-	qDebug() << "SMTP-DEBUG: I do not send an Email! This is a DEBUG-BUILD without sending Emails!";
-	return false;
-	
 	int timeout = 5000;
 	
 	socket = new QTcpSocket(this);
@@ -56,7 +53,7 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	connect(socket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorReceived(QAbstractSocket::SocketError)));
 	connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(stateChanged(QAbstractSocket::SocketState)));
-	connect(socket, SIGNAL(disconnectedFromHost()), this, SLOT(disconnected()));
+	connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 	
 	QString msgBoundary = generateBoundary();
 	QString bodyBoundary = generateBoundary();
@@ -107,6 +104,12 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	
 	isConnected = false;
 	textStream = new QTextStream(socket);
+	
+#ifdef SMTP_DEBUG
+	qDebug() << "SMTP_DEBUG: I do not send an Email! This is a DEBUG-BUILD without sending Emails!";
+	qDebug() << "SMTP_DEBUG: Remove the 'SMTP_DEBUG' in PiTres.pro and recompile with 'qmake && make'...";
+	return false;
+#else
 	socket->connectToHost(host, port);
 	if (socket->waitForConnected(timeout)) {
 		qDebug() << "Smtp: Connected on " << host << ":" << QString::number(port);
@@ -117,6 +120,7 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 	}
 	
 	return socket->waitForDisconnected(-1);
+#endif
 }
 
 QString Smtp::chuckSplit(const QString &data, bool wordwise, bool isHtml) {
@@ -191,7 +195,9 @@ void Smtp::errorReceived(QAbstractSocket::SocketError socketError) {
 
 void Smtp::disconnected() {
 	qWarning() << "Smtp: Disconnected";
-	qWarning() << "Smtp: Error: "  << socket->errorString();
+	if (socket->error() != QAbstractSocket::UnknownSocketError) {
+		qWarning() << "Smtp: Error: "  << socket->errorString();
+	}
 }
 
 void Smtp::connected() {
