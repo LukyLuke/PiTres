@@ -47,7 +47,7 @@ SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.
 # Config
 CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
-QT = core gui network sql xml
+QT = core gui network sql xml svg
 FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
         forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
         forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui \

@@ -26,6 +26,8 @@
 #include <QHash>
 #include <QString>
 #include <QPainter>
+#include <QtSvg/QtSvg>
+#include <QtSvg/QSvgRenderer>
 #include <QList>
 
 enum PdfElementType { PdfUnknown=-1, PdfLine=0, PdfCircle=1, PdfArc=2, PdfEllipse=3, PdfRectangle=5, PdfPolygon=6, PdfText=7, PdfImage=8 };

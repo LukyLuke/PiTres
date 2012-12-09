@@ -32,6 +32,8 @@
 #include <QFont>
 #include <QImage>
 #include <QApplication>
+#include <QtSvg/QtSvg>
+#include <QtSvg/QSvgRenderer>
 #include <QDebug>
 
 PdfElement::PdfElement() {
@@ -550,17 +552,35 @@ qreal PdfElementText::bottom() {
 PdfElementImage::PdfElementImage() : PdfElement() {}
 PdfElementImage::~PdfElementImage() {}
 qreal PdfElementImage::paint(QPainter *painter) {
-	QString image = _templatePath.append("/").append(_attributes.value("file", ""));
 	qreal x = toQReal(_attributes.value("x", "0"));
 	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
 	qreal w = toQReal(_attributes.value("width", "0"));
 	qreal h = toQReal(_attributes.value("height", "0"));
 	if (w > 0 && h > 0) {
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(Qt::NoBrush);
+		
+		QRectF box(QPointF(x, y), QSizeF(w, h));
 		QImage picture;
-		if (picture.load(image)) {
-			painter->setPen(Qt::NoPen);
-			painter->setBrush(Qt::NoBrush);
-			painter->drawImage( QRectF(QPointF(x, y), QSizeF(w, h)), picture, QRectF(picture.rect()) );
+		QString var = _attributes.value("file", ".");
+		if (var == ".") {
+			QString img = _templatePath.append("/").append(_attributes.value("file", ""));
+			if (picture.load(img)) {
+				painter->drawImage( box, picture, QRectF(picture.rect()) );
+			}
+			
+		} else {
+			// if an attribute exists with the addition "_file" the string in the attribute should be iinterpreted as a file, otherwise as SVG-Content
+			bool imageIsFile = _attributes.contains(var) && !_attributes.value(var.append("_file"), "").isEmpty();
+			
+			// Try to render a normal pixel image or as an SVG Image / Content
+			QSvgRenderer svg;
+			if (imageIsFile && picture.load(_attributes.value(var))) {
+				painter->drawImage( box, picture, QRectF(picture.rect()) );
+				
+			} else if ( (imageIsFile && svg.load(_attributes.value(var))) || (!imageIsFile && svg.load(_attributes.value(var).toUtf8())) ) {
+				svg.render(painter, box);
+			}
 		}
 	}
 	return bottom();

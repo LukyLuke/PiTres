@@ -458,7 +458,7 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("member_nick", person.nickname());
 	pdf->setVar("section_text", section.invoiceText(lang));
 	pdf->setVar("section_logo", section.invoiceLogo());
-	pdf->setVar("section_logo_is_file", section.logoIsFile() ? "1" : "");
+	pdf->setVar("section_logo_file", section.logoIsFile() ? "1" : "");
 	
 	return pdf;
 }
