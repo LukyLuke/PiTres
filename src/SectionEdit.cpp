@@ -21,14 +21,15 @@
 SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	i_index = 0;
+	_loading = TRUE;
 	
-	connect(btnSave, SIGNAL(clicked()), this, SLOT(saveSection()));
-	connect(btnCancel, SIGNAL(clicked()), this, SLOT(resetSectionData()));
+	connect(actionSave, SIGNAL(triggered()), this, SLOT(saveSectionTrigger()));
 	connect(sectionList, SIGNAL(clicked(QModelIndex)), this, SLOT(showData(QModelIndex)));
 	connect(btnReassign, SIGNAL(clicked()), this, SLOT(reassignInvoices()));
 	
 	QSqlQuery query(db);
-	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections ORDER BY parent,name ASC;");
+	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL OR parent IS '' THEN '' ELSE ' (' || parent || ')' END AS label,"
+	           "name FROM pps_sections ORDER BY parent,name ASC;");
 	listModel = new QSqlQueryModel;
 	listModel->setQuery(query);
 	sectionList->setModel(listModel);
@@ -86,6 +87,7 @@ void SectionEdit::initComboBoxes() {
 	QSqlQuery query(db);
 	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections "
 	           "ORDER BY parent,name ASC;");
+	editParent->addItem(tr("No Member section"), "");
 	while (query.next()) {
 		editParent->addItem(query.value(0).toString(), query.value(1).toString());
 	}
@@ -108,20 +110,36 @@ void SectionEdit::initComboBoxes() {
 }
 
 void SectionEdit::showData(QModelIndex index) {
+	_loading = TRUE;
 	i_index = index.row();
 	resetSectionData();
 	setReassignQuery();
 }
 
 void SectionEdit::resetSectionData() {
-	Section s(listModel->index(i_index, 1).data().toString());
+	QString sname = listModel->index(i_index, 1).data().toString();
+	Section s(sname);
 	labelName->setText( s.name() );
 	editAmount->setValue( s.amount() );
 	editDescription->setPlainText( s.description() );
 	editBankAccountNumber->setText( s.account() );
 	editAddress->setPlainText( s.address() );
 	editFoundingDate->setDate( s.founded() );
-	editParent->setCurrentIndex( editParent->findData( s.parent()->name() ) );
+	editParent->setCurrentIndex( editParent->findData( s.parent() ? s.parent()->name() : "" ) );
+	invoiceText_de->setPlainText( s.invoiceText("de") );
+	invoiceText_en->setPlainText( s.invoiceText("en") );
+	invoiceText_fr->setPlainText( s.invoiceText("fr") );
+	invoiceText_it->setPlainText( s.invoiceText("it") );
+	
+	if (s.logoIsFile()) {
+		logoType->setCurrentIndex(0);
+		invoiceLogoFile->setText(s.invoiceLogo());
+		invoiceLogoContent->setPlainText("");
+	} else {
+		logoType->setCurrentIndex(1);
+		invoiceLogoFile->setText("");
+		invoiceLogoContent->setPlainText(s.invoiceLogo());
+	}
 	
 	QModelIndexList list = userModel->match(userModel->index(0, 1), Qt::DisplayRole, QString::number(s.treasurer()), 1, Qt::MatchExactly);
 	if (list.size() > 0) {
@@ -129,6 +147,20 @@ void SectionEdit::resetSectionData() {
 	} else {
 		editTreasurer->setCurrentIndex(-1);
 	}
+}
+
+void SectionEdit::timerEvent(QTimerEvent * /*event*/) {
+	killTimer(saveTimer);
+	if (_loading) {
+		_loading = FALSE;
+		return;
+	}
+	saveSection();
+}
+
+void SectionEdit::saveSectionTrigger() {
+	killTimer(saveTimer);
+	saveTimer = startTimer(1000);
 }
 
 void SectionEdit::saveSection() {
@@ -139,6 +171,19 @@ void SectionEdit::saveSection() {
 	s.setAddress(editAddress->toPlainText());
 	s.setFoundingDate(editFoundingDate->date());
 	s.setParent( editParent->itemData(editParent->currentIndex()).toString() );
+	s.setInvoiceText(invoiceText_de->toPlainText(), "de");
+	s.setInvoiceText(invoiceText_en->toPlainText(), "en");
+	s.setInvoiceText(invoiceText_fr->toPlainText(), "fr");
+	s.setInvoiceText(invoiceText_it->toPlainText(), "it");
+	
+	switch (logoType->currentIndex()) {
+		case 0:
+			s.setInvoiceLogo(invoiceLogoFile->text());
+			break;
+		case 1:
+			s.setInvoiceLogo(invoiceLogoContent->toPlainText());
+			break;
+	}
 	
 	QModelIndexList list = userModel->match(userModel->index(0, 0), Qt::DisplayRole, editTreasurer->itemText(editTreasurer->currentIndex()), 1, Qt::MatchExactly);
 	if (list.size() > 0) {

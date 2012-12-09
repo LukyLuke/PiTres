@@ -30,6 +30,7 @@
 #include <QString>
 #include <QVariant>
 #include <QCompleter>
+#include <QTimerEvent>
 #include <QDebug>
 
 class SectionEdit : public QWidget, private Ui::sectionEditForm {
@@ -41,12 +42,15 @@ public:
 
 private slots:
 	void saveSection();
+	void saveSectionTrigger();
 	void resetSectionData();
 	void showData(QModelIndex index);
 	void reassignInvoices();
 	
 private:
 	quint32 i_index;
+	bool _loading;
+	int saveTimer;
 	QSqlDatabase db;
 	QSqlQueryModel *listModel;
 	QSqlQueryModel *userModel;
@@ -55,6 +59,9 @@ private:
 	
 	void initComboBoxes();
 	void setReassignQuery();
+	
+protected:
+	void timerEvent(QTimerEvent *event);
 };
 
 #endif // SectionEdit_H

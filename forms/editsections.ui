@@ -34,11 +34,14 @@
        </property>
        <widget class="QWidget" name="edit">
         <attribute name="title">
-         <string>Edit Details</string>
+         <string>Details</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <layout class="QFormLayout" name="formLayout_2">
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::ExpandingFieldsGrow</enum>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
@@ -60,82 +63,17 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Amount:</string>
-             </property>
-            </widget>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="editParent"/>
            </item>
-           <item row="3" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_4">
              <property name="text">
               <string>Description:</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Bank Account:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Address:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Treasurer:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>Founding Date:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="1">
-            <widget class="QDateEdit" name="editFoundingDate">
-             <property name="displayFormat">
-              <string>yyyy-MM-dd</string>
-             </property>
-             <property name="calendarPopup">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QComboBox" name="editTreasurer">
-             <property name="editable">
-              <bool>true</bool>
-             </property>
-             <property name="insertPolicy">
-              <enum>QComboBox::NoInsert</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QPlainTextEdit" name="editAddress">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>100</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="editBankAccountNumber"/>
-           </item>
-           <item row="3" column="1">
+           <item row="2" column="1">
             <widget class="QPlainTextEdit" name="editDescription">
              <property name="maximumSize">
               <size>
@@ -145,67 +83,252 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="editAmount">
-             <property name="maximum">
-              <double>9999.000000000000000</double>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Bank Account:</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="editParent"/>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="editBankAccountNumber"/>
            </item>
-           <item row="8" column="1">
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Address:</string>
              </property>
-             <property name="sizeHint" stdset="0">
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QPlainTextEdit" name="editAddress">
+             <property name="maximumSize">
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>16777215</width>
+               <height>100</height>
               </size>
              </property>
-            </spacer>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Treasurer:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QComboBox" name="editTreasurer">
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Founding Date:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QDateEdit" name="editFoundingDate">
+             <property name="displayFormat">
+              <string>yyyy-MM-dd</string>
+             </property>
+             <property name="calendarPopup">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnCancel">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="invoice">
+        <attribute name="title">
+         <string>Invoice Settings</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_10">
              <property name="text">
-              <string>Reset</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../PiTres.qrc">
-               <normaloff>:/icons/resources/icons/delete.png</normaloff>:/icons/resources/icons/delete.png</iconset>
+              <string>Amount:</string>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="btnSave">
-             <property name="text">
-              <string>Save</string>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="editAmount">
+             <property name="minimum">
+              <double>1.000000000000000</double>
              </property>
-             <property name="icon">
-              <iconset resource="../PiTres.qrc">
-               <normaloff>:/icons/resources/icons/disk_blue.png</normaloff>:/icons/resources/icons/disk_blue.png</iconset>
+             <property name="maximum">
+              <double>9999.989999999999782</double>
              </property>
             </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Specialized Text:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Logo:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QTabWidget" name="tabWidget_2">
+             <property name="tabPosition">
+              <enum>QTabWidget::South</enum>
+             </property>
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tab">
+              <attribute name="title">
+               <string>German</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPlainTextEdit" name="invoiceText_de"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_2">
+              <attribute name="title">
+               <string>English</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_7">
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPlainTextEdit" name="invoiceText_en"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_3">
+              <attribute name="title">
+               <string>French</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPlainTextEdit" name="invoiceText_fr"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_4">
+              <attribute name="title">
+               <string>Italian</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPlainTextEdit" name="invoiceText_it"/>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <widget class="QComboBox" name="logoType">
+               <item>
+                <property name="text">
+                 <string>File</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>SVG Data</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QStackedWidget" name="logoTypeStack">
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="pageFileChoose">
+                <layout class="QVBoxLayout" name="verticalLayout_11">
+                 <property name="margin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <item>
+                    <widget class="QLineEdit" name="invoiceLogoFile"/>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="btnInvoiceLogo">
+                     <property name="text">
+                      <string>Choose</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_2">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="pageSvgData">
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="margin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPlainTextEdit" name="invoiceLogoContent"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -264,9 +387,239 @@
     </layout>
    </item>
   </layout>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../PiTres.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>editParent</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editDescription</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>527</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editBankAccountNumber</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>527</x>
+     <y>143</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editAddress</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>527</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editTreasurer</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>273</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editFoundingDate</sender>
+   <signal>dateChanged(QDate)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>406</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editAmount</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>397</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invoiceText_de</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>529</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invoiceText_en</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invoiceText_fr</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invoiceText_it</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invoiceLogoFile</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>491</x>
+     <y>302</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>invoiceLogoContent</sender>
+   <signal>textChanged()</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>529</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>logoType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>logoTypeStack</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>388</x>
+     <y>270</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>396</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -48,15 +48,17 @@ void Section::clear() {
 	s_account = "";
 	i_treasurer = 0;
 	d_founded = QDate::currentDate();
+	s_invoiceLogo = "";
+	m_invoiceLanguage.clear();
 	_loaded = FALSE;
 }
 
 void Section::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.prepare("CREATE TABLE IF NOT EXISTS pps_sections (name TEXT, parent TEXT, amount FLOAT, description TEXT,"
-	              "bank_account TEXT, address TEXT, treasurer INTEGER, founded DATE);");
-	query.exec();
+	query.exec("CREATE TABLE IF NOT EXISTS pps_sections (name TEXT, parent TEXT, amount FLOAT, description TEXT,"
+	           "bank_account TEXT, address TEXT, treasurer INTEGER, founded DATE, invoice_logo TEXT);");
+	query.exec("CREATE TABLE IF NOT EXISTS pps_sections_texts (section TEXT, language TEXT, invoice_text TEXT);");
 }
 
 void Section::getNameParentHash(QHash<QString, QString> *hash) {
@@ -109,13 +111,23 @@ void Section::load(const QString name) {
 		s_account = query.value( record.indexOf("bank_account") ).toString();
 		i_treasurer = query.value( record.indexOf("treasurer") ).toInt();
 		d_founded = query.value( record.indexOf("founded") ).toDate();
+		s_invoiceLogo = query.value( record.indexOf("invoice_logo") ).toString();
+		
+		// Load section invoice texts
+		query.prepare("SELECT language, invoice_text FROM pps_sections_texts WHERE section=?;");
+		query.bindValue(0, name);
+		query.exec();
+		while (query.next()) {
+			m_invoiceLanguage.insert( query.value(0).toString(), query.value(1).toString() );
+		}
+		
 	} else {
 		qWarning() << "Error while loading Section with name " << name << "; Error: " << query.lastError();
 	}
 }
 
 Section *Section::parent() {
-	if (loaded()) {
+	if (loaded() && !s_parent.isEmpty()) {
 		return new Section(s_parent);
 	}
 	return NULL;
@@ -147,11 +159,12 @@ void Section::save() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	if (loaded()) {
-		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address,bank_account=:account,treasurer=:treasurer,founded=:founded"
+		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address,"
+		              "bank_account=:account,treasurer=:treasurer,founded=:founded,invoice_text=:text,invoice_logo=:logo"
 		              " WHERE name=:name;");
 	} else {
-		query.prepare("INSERT INTO pps_sections (name,description,amount,parent,address,bank_account,treasurer,founded)"
-		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded);");
+		query.prepare("INSERT INTO pps_sections (name,description,amount,parent,address,bank_account,treasurer,founded,invoice_logo)"
+		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded,:logo);");
 	}
 	query.bindValue(":name", s_name);
 	query.bindValue(":description", s_description);
@@ -161,6 +174,7 @@ void Section::save() {
 	query.bindValue(":account", s_account);
 	query.bindValue(":treasurer", i_treasurer);
 	query.bindValue(":founded", d_founded);
+	query.bindValue(":logo", s_invoiceLogo);
 	query.exec();
 	
 	if (query.lastError().type() != QSqlError::NoError) {
@@ -169,7 +183,24 @@ void Section::save() {
 		_loaded = FALSE;
 	} else {
 		_loaded = TRUE;
+		
+		// Update/Insert Section-Invoice texts
+		query.prepare("DELETE * FROM pps_sections_texts WHERE section=?;");
+		query.bindValue(0, s_name);
+		
+		QMap<QString, QString>::const_iterator it;
+		query.prepare("INSERT INTO pps_sections_texts (section,language,invoice_text) VALUES (?,?,?);");
+		for (it = m_invoiceLanguage.constBegin(); it != m_invoiceLanguage.constEnd(); it++) {
+			query.bindValue(0, s_name);
+			query.bindValue(1, it.key());
+			query.bindValue(2, it.value());
+			query.exec();
+		}
 	}
+}
+
+bool Section::logoIsFile() {
+	return !s_invoiceLogo.contains('\n') && !s_invoiceLogo.contains('\r') && QFile::exists(s_invoiceLogo);
 }
 
 void Section::setParent(QString parent) {
@@ -210,4 +241,14 @@ void Section::setTreasurer(int treasurer) {
 void Section::setFoundingDate(QDate date) {
 	d_founded = date;
 	emit foundedChanged(date);
+}
+
+void Section::setInvoiceText(QString text, QString language) {
+	m_invoiceLanguage.insert(language, text);
+	emit invoiceTextChanged(text, language);
+}
+
+void Section::setInvoiceLogo(QString logo) {
+	s_invoiceLogo = logo;
+	emit invoiceLogoChanged(logo);
 }

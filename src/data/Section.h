@@ -22,8 +22,10 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QMap>
 #include <QHash>
 #include <QDate>
+#include <QFile>
 #include <QSqlDatabase>
 
 class Section : public QObject {
@@ -35,6 +37,7 @@ Q_PROPERTY(QString address READ address WRITE setAddress NOTIFY addressChanged)
 Q_PROPERTY(QString account READ account WRITE setAccount NOTIFY accountChanged)
 Q_PROPERTY(int treasurer READ treasurer WRITE setTreasurer NOTIFY treasurerChanged)
 Q_PROPERTY(QDate founded READ founded WRITE setFoundingDate NOTIFY foundedChanged)
+Q_PROPERTY(QString invoiceLogo READ invoiceLogo WRITE setInvoiceLogo NOTIFY invoiceLogoChanged)
 
 Q_ENUMS(AmountType)
 
@@ -46,6 +49,7 @@ public:
 	void save();
 	QList<Section *> children();
 	Section *parent();
+	bool logoIsFile();
 	static void createTables();
 	static void getNameParentHash(QHash<QString, QString> *hash);
 	static void getSectionList(QList<QString> *list);
@@ -62,6 +66,8 @@ public:
 	void setAccount(QString account);
 	void setTreasurer(int treasurer);
 	void setFoundingDate(QDate date);
+	void setInvoiceLogo(QString logo);
+	void setInvoiceText(QString text, QString language);
 	
 	// Getter
 	bool loaded() { return _loaded; };
@@ -72,6 +78,8 @@ public:
 	QString account() const { return s_account; }
 	int treasurer() const { return i_treasurer; }
 	QDate founded() const { return d_founded; }
+	QString invoiceLogo() const { return s_invoiceLogo; }
+	QString invoiceText(QString language) const { return m_invoiceLanguage.value(language, ""); }
 	
 signals:
 	void parentChanged(QString);
@@ -82,6 +90,8 @@ signals:
 	void accountChanged(QString);
 	void treasurerChanged(int);
 	void foundedChanged(QDate);
+	void invoiceLogoChanged(QString);
+	void invoiceTextChanged(QString, QString);
 	
 private:
 	QSqlDatabase db;
@@ -94,6 +104,8 @@ private:
 	QString s_account;
 	int i_treasurer;
 	QDate d_founded;
+	QString s_invoiceLogo;
+	QMap<QString, QString> m_invoiceLanguage;
 	
 	void clear();
 };
