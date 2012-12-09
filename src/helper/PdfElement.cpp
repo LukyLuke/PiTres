@@ -37,6 +37,9 @@
 PdfElement::PdfElement() {
 	_offset = 0;
 	_top = 0;
+	_onlyOnFirst= false;
+	_onlyOnLast = false;
+	_onlyOnNth = 0;
 }
 
 PdfElement::PdfElement(const PdfElement &newPdfElement) {
@@ -48,11 +51,14 @@ PdfElement::PdfElement(const PdfElement &newPdfElement) {
 	_top = newPdfElement._top;
 	_bottomSpace = newPdfElement._bottomSpace;
 	_offsetY = newPdfElement._offsetY;
+	_onlyOnFirst= newPdfElement._onlyOnFirst;
+	_onlyOnLast = newPdfElement._onlyOnLast;
+	_onlyOnNth = newPdfElement._onlyOnNth;
 }
 
 PdfElement::~PdfElement() {}
 
-qreal PdfElement::paint(QPainter *painter) {
+qreal PdfElement::paint(QPainter *painter, const qint32 row, const qint32 maxrows) {
 	PdfElementLine *_line;
 	PdfElementCircle *_circle;
 	PdfElementArc *_arc;
@@ -65,6 +71,9 @@ qreal PdfElement::paint(QPainter *painter) {
 	
 	for (int i = 0; i < _nodes.size(); i++) {
 		PdfElement e = _nodes.at(i);
+		if ((row > 0) && !e.checkShow(row, maxrows)) {
+			continue;
+		}
 		e.setVars(_variables, _repeating);
 		e.setTop(_offsetY);
 		switch (e.type()) {
@@ -106,7 +115,7 @@ qreal PdfElement::paint(QPainter *painter) {
 	return bottom + _offset;
 }
 
-qreal PdfElement::bottom() {
+qreal PdfElement::bottom(const qint32 row, const qint32 maxrows) {
 	PdfElementLine *_line;
 	PdfElementCircle *_circle;
 	PdfElementArc *_arc;
@@ -119,6 +128,9 @@ qreal PdfElement::bottom() {
 	
 	for (int i = 0; i < _nodes.size(); i++) {
 		PdfElement e = _nodes.at(i);
+		if ((row > 0) && !e.checkShow(row, maxrows)) {
+			continue;
+		}
 		e.setVars(_variables, _repeating);
 		e.setTop(_offsetY);
 		switch (e.type()) {
@@ -196,6 +208,15 @@ void PdfElement::setVars(QHash<QString, QString> *variables, QHash<QString, QStr
 	_repeating = repeating;
 }
 
+bool PdfElement::checkShow(const qint32 row, const qint32 maxrows) const {
+	return (
+		(_onlyOnLast && (row == maxrows)) ||
+		(_onlyOnFirst && (row == 1)) ||
+		(!_onlyOnLast && !_onlyOnFirst && (_onlyOnNth > 0) && (row % _onlyOnNth == 0)) ||
+		(_onlyOnNth <= 0)
+	);
+}
+
 void PdfElement::setTop(qreal top) {
 	if (top > _top) {
 		_offsetY = top;
@@ -258,6 +279,11 @@ void PdfElement::setAttributes(const QDomNamedNodeMap attr, const QString cdata)
 	for (uint i = 0; i < attr.length(); i++) {
 		QDomAttr a = attr.item(i).toAttr();
 		if (!a.isNull()) {
+			if (a.name().toLower() == "nth") {
+				_onlyOnLast = a.value().toLower() == "last";
+				_onlyOnFirst = a.value().toLower() == "first";
+				_onlyOnNth = _onlyOnLast || _onlyOnFirst ? 1 : a.value().toInt();
+			}
 			_attributes.insert(a.name().toLower(), a.value());
 		}
 	}
@@ -272,7 +298,7 @@ qreal PdfElement::toQReal(QString value) {
 PdfElementLine::PdfElementLine() : PdfElement() {}
 PdfElementLine::~PdfElementLine() {}
 qreal PdfElementLine::paint(QPainter *painter) {
-	qreal width = _attributes.value("stroke", "2").toFloat();
+	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	qreal x1 = toQReal(_attributes.value("x1", "0"));
 	qreal y1 = toQReal(_attributes.value("y1", "0")) + _offsetY;
@@ -295,7 +321,7 @@ qreal PdfElementLine::bottom() {
 PdfElementCircle::PdfElementCircle() : PdfElement() {}
 PdfElementCircle::~PdfElementCircle() {}
 qreal PdfElementCircle::paint(QPainter *painter) {
-	qreal width = _attributes.value("stroke", "2").toFloat();
+	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	qreal cx = toQReal(_attributes.value("cx", "0"));
@@ -323,7 +349,7 @@ qreal PdfElementCircle::bottom() {
 PdfElementEllipse::PdfElementEllipse() : PdfElement() {}
 PdfElementEllipse::~PdfElementEllipse() {}
 qreal PdfElementEllipse::paint(QPainter *painter) {
-	qreal width = _attributes.value("stroke", "2").toFloat();
+	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	qreal cx = toQReal(_attributes.value("cx", "0"));
@@ -362,7 +388,7 @@ qreal PdfElementArc::bottom() {
 PdfElementRectangle::PdfElementRectangle() : PdfElement() {}
 PdfElementRectangle::~PdfElementRectangle() {}
 qreal PdfElementRectangle::paint(QPainter *painter) {
-	qreal width = _attributes.value("stroke", "2").toFloat();
+	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	qreal x = toQReal(_attributes.value("x", "0"));
@@ -390,7 +416,7 @@ qreal PdfElementRectangle::bottom() {
 PdfElementPolygon::PdfElementPolygon() : PdfElement() {}
 PdfElementPolygon::~PdfElementPolygon() {}
 qreal PdfElementPolygon::paint(QPainter *painter) {
-	qreal width = _attributes.value("stroke", "2").toFloat();
+	qreal width = toQReal(_attributes.value("stroke", "2"));
 	QString strokeColor = _attributes.value("strokecolor", "black");
 	QString fillColor = _attributes.value("fillcolor", "");
 	bool close = _attributes.value("close", "true").toLower() == "true";

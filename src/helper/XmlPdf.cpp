@@ -148,9 +148,11 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 					bottom = 0;
 				}
 				PdfElement elem = it.value();
-				elem.setTop(bottom);
-				bottom = elem.bottom();
-				nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
+				if (elem.checkShow(i+1, list.size())) {
+					elem.setTop(bottom);
+					bottom = elem.bottom(i+1, list.size());
+					nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
+				}
 			}
 		}
 	}
@@ -178,10 +180,12 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 				}
 				
 				PdfElement elem = it.value();
-				elem.setVars(&variables, (list.at(i))->getVariables());
-				elem.setTop(bottom);
-				bottom = elem.paint(painter);
-				nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
+				if (elem.checkShow(i+1, list.size())) {
+					elem.setVars(&variables, (list.at(i))->getVariables());
+					elem.setTop(bottom);
+					bottom = elem.paint(painter, i+1, list.size());
+					nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
+				}
 			}
 		}
 	}

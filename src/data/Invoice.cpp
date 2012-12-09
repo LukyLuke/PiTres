@@ -18,6 +18,7 @@
 
 #include "Invoice.h"
 #include "Person.h"
+#include "Section.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -61,6 +62,9 @@ void Invoice::clear() {
 	s_addressCountry = "";
 	s_addressEmail = "";
 	s_forSection = "";
+#ifdef FIO
+	l_recom.clear();
+#endif
 }
 
 void Invoice::setIsLoaded(bool loaded) {
@@ -71,13 +75,9 @@ void Invoice::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS pps_invoice (member_uid INTEGER, reference TEXT, issue_date DATE, payable_date DATE, paid_date DATE, "
-				  "amount FLOAT, amount_paid FLOAT, state INTEGER, address_prefix TEXT, address_company TEXT, address_name TEXT, address_street1 TEXT, "
-				  "address_street2 TEXT, address_city TEXT, address_email TEXT, for_section TEXT, reminded INTEGER, last_reminder DATE);");
+	              "amount FLOAT, amount_paid FLOAT, state INTEGER, address_prefix TEXT, address_company TEXT, address_name TEXT, address_street1 TEXT, "
+	              "address_street2 TEXT, address_city TEXT, address_email TEXT, for_section TEXT, reminded INTEGER, last_reminder DATE, recommendations TEXT);");
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 }
 
 void Invoice::setContributed(QString reference) {
@@ -94,15 +94,15 @@ void Invoice::save() {
 	QSqlQuery query(db);
 	if (_loaded) {
 		query.prepare("UPDATE pps_invoice SET member_uid=:member,reference=:reference,issue_date=:issued,payable_date=:payable,paid_date=:paid,"
-					  "amount=:amount,amount_paid=:amount_paid,state=:state,address_prefix=:prefix,address_company=:company,address_name=:name,"
-					  "address_street1=:street1,address_street2=:street2,address_city=:city,address_email=:email,for_section=:section,"
-					  "reminded=:reminded,last_reminder=:last_reminder WHERE reference=:reference_where;");
+		              "amount=:amount,amount_paid=:amount_paid,state=:state,address_prefix=:prefix,address_company=:company,address_name=:name,"
+		              "address_street1=:street1,address_street2=:street2,address_city=:city,address_email=:email,for_section=:section,"
+		              "reminded=:reminded,last_reminder=:last_reminder,recommendations=:recommendations WHERE reference=:reference_where;");
 		query.bindValue(":reference_where", s_reference);
 	} else {
 		query.prepare("INSERT INTO pps_invoice (member_uid,reference,issue_date,payable_date,paid_date,amount,amount_paid,state,"
-					  "address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section,"
-					  "reminded,last_reminder) VALUES (:member,:reference,:issued,:payable,:paid,:amount,:amount_paid,:state,:prefix,:company,:name,"
-					  ":street1,:street2,:city,:email,:section,:reminded,:last_reminder);");
+		              "address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section,"
+		              "reminded,last_reminder,recommendations) VALUES (:member,:reference,:issued,:payable,:paid,:amount,:amount_paid,:state,:prefix,:company,:name,"
+		              ":street1,:street2,:city,:email,:section,:reminded,:last_reminder,:recommendations);");
 	}
 
 	// This is for all old References
@@ -131,6 +131,20 @@ void Invoice::save() {
 	query.bindValue(":section", s_forSection);
 	query.bindValue(":reminded", i_reminded);
 	query.bindValue(":last_reminder", d_last_reminded);
+#ifndef FIO
+	query.bindValue(":recommendations", "");
+#else
+	QString rec;
+	QHash<QString, float>::const_iterator it = l_recom.constBegin();
+	while (it != l_recom.constEnd()) {
+		if (!rec.isEmpty()) {
+			rec += ";";
+		}
+		rec += it.key() + ":" + QString::number(it.value());
+		it++;
+	}
+	query.bindValue(":recommendations", rec);
+#endif
 	query.exec();
 
 	if (query.lastError().type() != QSqlError::NoError) {
@@ -170,6 +184,17 @@ void Invoice::loadLast(int member) {
 		s_addressCity = query.value(record.indexOf("address_city")).toString();
 		s_addressEmail = query.value(record.indexOf("address_email")).toString();
 		s_forSection = query.value(record.indexOf("for_section")).toString();
+#ifdef FIO
+		QStringList sl,l = query.value(record.indexOf("recommendations")).toString().split(';', QString::SkipEmptyParts);
+		for (int i = 0; i < l.length(); i++) {
+			sl = l.at(i).split(':');
+			if (sl.length() == 2) {
+				l_recom.insert(sl[0], sl[1].toFloat());
+			} else {
+				qDebug() << "Invoice: Error while parsing recommendations, wrong format: '" << l.at(i) << "' should be 'Section name:amount'";
+			}
+		}
+#endif
 	}
 }
 
@@ -218,6 +243,17 @@ void Invoice::loadByReference(QString reference) {
 		s_addressCity = query.value(record.indexOf("address_city")).toString();
 		s_addressEmail = query.value(record.indexOf("address_email")).toString();
 		s_forSection = query.value(record.indexOf("for_section")).toString();
+#ifdef FIO
+		QStringList sl,l = query.value(record.indexOf("recommendations")).toString().split(';', QString::SkipEmptyParts);
+		for (int i = 0; i < l.length(); i++) {
+			sl = l.at(i).split(':');
+			if (sl.length() == 2) {
+				l_recom.insert(sl[0], sl[1].toFloat());
+			} else {
+				qDebug() << "Invoice: Error while parsing recommendations, wrong format: '" << l.at(i) << "' should be 'Section name:amount'";
+			}
+		}
+#endif
 	}
 }
 
@@ -250,6 +286,19 @@ QList<Invoice *> Invoice::getInvoicesForMember(int member) {
 		invoice->setAddressCity(query.value(record.indexOf("address_city")).toString());
 		invoice->setAddressEmail(query.value(record.indexOf("address_email")).toString());
 		invoice->setForSection(query.value(record.indexOf("for_section")).toString());
+#ifdef FIO
+		QStringList sl,l = query.value(record.indexOf("recommendations")).toString().split(';', QString::SkipEmptyParts);
+		QHash<QString, float> hash;
+		for (int i = 0; i < l.length(); i++) {
+			sl = l.at(i).split(':');
+			if (sl.length() == 2) {
+				hash.insert(sl[0], sl[1].toFloat());
+			} else {
+				qDebug() << "Invoice: Error while parsing recommendations, wrong format: '" << l.at(i) << "' should be 'Section name:amount'";
+			}
+		}
+		invoice->setRecommendations(hash);
+#endif
 		invoice->setIsLoaded(TRUE);
 		back.append(invoice);
 	}
@@ -263,17 +312,21 @@ void Invoice::create(PPSPerson *person) {
 
 	setMemberUid(person->uid());
 	setReference(createReference(person->uid()));
-	qDebug() << reference();
 	setIssueDate(QDate::currentDate());
 	setPayableDue(QDate::currentDate().addMonths(1));
 	setPaidDate(QDate(1970, 1, 1));
 	setReminded(0);
 	setLastReminded(QDate(1970, 1, 1));
+#ifndef FIO
 	if (person->contributionClass() == PPSPerson::ContributeFull) {
 		setAmount(settings.value("invoice/amount_default", 60).toFloat());
 	} else {
 		setAmount(settings.value("invoice/amount_limited", 30).toFloat());
 	}
+#else
+	float a = setRecommendations(person->section());
+	setAmount(a);
+#endif
 	setAmountPaid(0);
 	setState(Invoice::StateOpen);
 	switch (person->gender()) {
@@ -301,6 +354,24 @@ void Invoice::create(PPSPerson *person) {
 	save();
 }
 
+#ifdef FIO
+float Invoice::setRecommendations(QString section) {
+	float back = 0.0;
+	if (!l_recom.isEmpty()) {
+		l_recom.clear();
+	}
+	Section sec(section);
+	Section *s = sec.parent();
+	if (s->loaded()) {
+		back += setRecommendations(s->name());
+	}
+	l_recom.insert(sec.description().replace(QRegExp(";:"), ""), sec.amount());
+	back += sec.amount();
+	delete s;
+	return back;
+}
+#endif
+
 bool Invoice::pay(QDate *date) {
 	return pay(amount(), date);
 }
@@ -322,16 +393,19 @@ bool Invoice::pay(float amount, QDate *date) {
 }
 
 XmlPdf *Invoice::createPdf(QString tpl) {
-	QLocale locale;
-	QSettings settings;
-	XmlPdf *pdf = new XmlPdf;
-	PPSPerson person;
-	person.load(memberUid());
 	if (tpl == NULL || tpl.isEmpty()) {
 		tpl = QString("invoice");
 	}
+	
+	QLocale locale;
+	QSettings settings;
+	XmlPdf *pdf = new XmlPdf;
+	Section section(s_forSection);
+	PPSPerson person;
+	person.load(memberUid());
+	QString lang = getLanguageString((Language)person.language());
 	QString templateFile = settings.value(QString("pdf/%1_template").arg(tpl), "data/invoice_de.xml").toString();
-	templateFile.replace(QRegExp("^(.*_)([a-zA-Z]{2})(\\.xml)$"), "\\1" + getLanguageString((Language)person.language()) + "\\3");
+	templateFile.replace(QRegExp("^(.*_)([a-zA-Z]{2})(\\.xml)$"), "\\1" + lang + "\\3");
 	pdf->loadTemplate(templateFile);
 
 	pdf->setVar("pp_country", settings.value("pdf/var_pp_country", "CH").toString());
@@ -339,6 +413,7 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("pp_city", settings.value("pdf/var_pp_city", "Vallorbe").toString());
 	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Vallorbe").toString());
 	pdf->setVar("print_date", QDate::currentDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
+	pdf->setVar("print_date_extended", QDate::currentDate().toString( settings.value("pdf/date_format_extended", "dd. MMMM yyyy").toString() ));
 	pdf->setVar("print_year", QDate::currentDate().toString("yyyy"));
 	pdf->setVar("account_number", settings.value("pdf/bank_account_number", "01-84038-2").toString());
 
@@ -346,10 +421,30 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("invoice_number", reference());
 	pdf->setVar("invoice_date", issueDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("invoice_payable_due", payableDue().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
+	pdf->setVar("invoice_esr", getEsr());
+#ifndef FIO
 	pdf->setVar("invoice_amount", locale.toString(amount(), 'f', 2));
 	pdf->setVar("invoice_pay_amount", locale.toString(amount() - amountPaid(), 'f', 2));
-	pdf->setVar("invoice_esr", getEsr());
-
+#else
+	pdf->setVar("invoice_amount", locale.toString(amount(), 'f', 2));
+	pdf->setVar("invoice_pay_amount", locale.toString(amount() - amountPaid(), 'f', 2));
+	
+	// Add all recommendations from all Sections the user is in
+	XmlPdfEntry *entry;
+	QHash<QString, float>::const_iterator it = l_recom.constBegin();
+	while (it != l_recom.constEnd()) {
+		entry = pdf->addEntry("recommendations");
+		entry->setVar("section", it.key());
+		entry->setVar("amount", locale.toString(it.value(), 'f', 2));
+		it++;
+	}
+	
+	// Add the total as last entry
+	entry = pdf->addEntry("recommendations");
+	entry->setVar("section", tr("Total"));
+	entry->setVar("amount", locale.toString(amount(), 'f', 2));
+#endif
+	
 	pdf->setVar("member_number", QString::number(memberUid()));
 	pdf->setVar("member_prefix", addressPrefix());
 	pdf->setVar("member_company", addressCompany());
@@ -360,9 +455,11 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("member_country", addressCountry());
 	pdf->setVar("member_email", addressEmail());
 	pdf->setVar("member_section", forSection());
-
 	pdf->setVar("member_nick", person.nickname());
-
+	pdf->setVar("section_text", section.invoiceText(lang));
+	pdf->setVar("section_logo", section.invoiceLogo());
+	pdf->setVar("section_logo_is_file", section.logoIsFile() ? "1" : "");
+	
 	return pdf;
 }
 
@@ -544,3 +641,15 @@ void Invoice::setLanguage(Language language) {
 	m_language = language;
 	emit languageChanged(language);
 }
+
+#ifdef FIO
+void Invoice::setRecommendations(QHash<QString, float> recommendations) {
+	l_recom.clear();
+	QHash<QString, float>::iterator it = recommendations.begin();
+	while (it != recommendations.end()) {
+		l_recom.insert(it.key(), it.value());
+		it++;
+	}
+	emit recommendationsChanged(recommendations);
+}
+#endif

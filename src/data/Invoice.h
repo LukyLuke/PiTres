@@ -25,6 +25,7 @@
 #include <QString>
 #include <QDate>
 #include <QList>
+#include <QHash>
 #include <QSqlDatabase>
 
 class PPSPerson;
@@ -99,6 +100,9 @@ public:
 	void setAddressEmail(QString addressEmail);
 	void setForSection(QString forSection);
 	void setLanguage(Language language);
+#ifdef FIO
+	void setRecommendations(QHash<QString, float> recommendations);
+#endif
 
 	// Getter
 	int memberUid() const { return i_memberUid; };
@@ -122,6 +126,9 @@ public:
 	QString addressEmail() const { return s_addressEmail; };
 	QString forSection() const { return s_forSection; };
 	Language language() const { return m_language; };
+#ifdef FIO
+	QHash<QString, float> recommendations() const { return l_recom; };
+#endif
 
 signals:
 	void memberUidChanged(int);
@@ -144,6 +151,9 @@ signals:
 	void addressEmailChanged(QString);
 	void forSectionChanged(QString);
 	void languageChanged(Language);
+#ifdef FIO
+	void recommendationsChanged(QHash<QString, float>);
+#endif
 
 private:
 	QSqlDatabase db;
@@ -168,7 +178,11 @@ private:
 	QString s_addressEmail;
 	QString s_forSection;
 	Language m_language;
-
+#ifdef FIO
+	QHash<QString, float> l_recom;
+	float setRecommendations(QString section);
+#endif
+	
 	int esrChecksum(QString num);
 	QString createReference(int memberUid);
 	QString getLanguageString(Language lang);

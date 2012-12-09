@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>377</height>
+    <width>799</width>
+    <height>525</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,13 +44,6 @@
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Enter Member-ID:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="memberUid">
-         <property name="placeholderText">
-          <string>Insert Member UID and press Enter</string>
          </property>
         </widget>
        </item>
@@ -100,6 +93,28 @@
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLineEdit" name="memberUid">
+           <property name="placeholderText">
+            <string>Insert Member UID and press Enter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAddMember">
+           <property name="text">
+            <string>Add</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../PiTres.qrc">
+             <normaloff>:/icons/resources/icons/businessman.png</normaloff>:/icons/resources/icons/businessman.png</iconset>
            </property>
           </widget>
          </item>

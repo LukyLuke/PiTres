@@ -19,6 +19,14 @@
 #include "PiTres.h"
 
 PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
+#ifdef SMTP_DEBUG
+	qDebug() << "Compiled with SMTP_DEBUG: No EMails are sent out.";
+#endif
+#ifdef FIO
+	qDebug() << "Compiled with FIO: The Financial Regulation Membership fee calculation is used with individual recommendatins for each section.";
+#else
+	qDebug() << "Compiled without FIO: The standard Membershipfee calculation is used with two Membership fee amounts.";
+#endif
 	QSettings settings;
 	setupUi(this);
 	
@@ -182,9 +190,19 @@ void PiTres::showSettings() {
 	QSettings settings;
 	
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_limited", 30.0).toFloat());
-	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_default", 60.0).toFloat());
 	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-12-31").toString());
+#ifndef FIO
+	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_default", 30.0).toFloat());
+	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_limited", 60.0).toFloat());
+	delete settingsForm.labelrecommendationsMaxSections;
+	delete settingsForm.maxNumSections;
+#else
+	settingsForm.memberAmountFull->setValue(settings.value("invoice/recommendation_maximum", 125.0).toFloat());
+	settingsForm.memberAmountLimited->setValue(settings.value("invoice/recommendation_none", 15.0).toFloat());
+	settingsForm.maxNumSections->setValue(settings.value("invoice/recommendation_numsections", 4).toInt());
+	settingsForm.labelMemberAmountFull->setText(tr("Maximum recommendation per Section"));
+	settingsForm.labelMemberAmountLimited->setText(tr("Default recommendation"));
+#endif
 	
 	settingsForm.pdfInvoice->setText(settings.value("pdf/invoice_template", "data/invoice.xml").toString());
 	settingsForm.pdfReminder->setText(settings.value("pdf/reminder_template", "data/reminder.xml").toString());
@@ -256,9 +274,15 @@ void PiTres::doSaveSettings() {
 	settingsDialog->hide();
 	
 	settings.setValue("database/sqlite", settingsForm.sqliteFile->text());
-	settings.setValue("invoice/amount_limited", settingsForm.memberAmountFull->value());
-	settings.setValue("invoice/amount_default", settingsForm.memberAmountLimited->value());
 	settings.setValue("invoice/member_due_format", settingsForm.memberDueDate->text());
+#ifndef FIO
+	settings.setValue("invoice/amount_default", settingsForm.memberAmountFull->value());
+	settings.setValue("invoice/amount_limited", settingsForm.memberAmountLimited->value());
+#else
+	settings.setValue("invoice/recommendation_maximum", settingsForm.memberAmountFull->value());
+	settings.setValue("invoice/recommendation_none", settingsForm.memberAmountLimited->value());
+	settings.setValue("invoice/recommendation_numsections", settingsForm.maxNumSections->value());
+#endif
 	
 	settings.setValue("pdf/invoice_template", settingsForm.pdfInvoice->text());
 	settings.setValue("pdf/reminder_template", settingsForm.pdfReminder->text());

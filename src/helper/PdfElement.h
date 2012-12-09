@@ -35,8 +35,8 @@ public:
 	PdfElement();
 	PdfElement(const PdfElement &newPdfElement);
 	virtual ~PdfElement();
-	qreal paint(QPainter *painter);
-	qreal bottom();
+	qreal paint(QPainter *painter, const qint32 row = 0, const qint32 maxrows = 0);
+	qreal bottom(const qint32 row = 0, const qint32 maxrows = 0);
 	void setElement(QDomElement element);
 	void setAttributes(const QDomNamedNodeMap attr, const QString cdata);
 	void setType(PdfElementType type);
@@ -51,6 +51,7 @@ public:
 	QString templatePath() const { return _templatePath; };
 	qreal top() const { return _offsetY; };
 	qreal bottomSpace() const { return _bottomSpace; };
+	bool checkShow(const qint32 row, const qint32 maxrows) const;
 	
 	static PdfElement fromElement(QDomElement element, QString fromElement);
 
@@ -65,6 +66,9 @@ protected:
 	qreal _bottomSpace;
 	qreal _top;
 	qreal _offsetY;
+	bool _onlyOnLast;
+	bool _onlyOnFirst;
+	qint32 _onlyOnNth;
 	
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);

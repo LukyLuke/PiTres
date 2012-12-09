@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xmlpdf>
 	<template size="a4">
 		<g part="header">
@@ -25,43 +25,61 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}
 {MEMBER_COUNTRY}]]></text>
-			<text x="400" y="300" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="205" x2="5" y2="265" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
-			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
+			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Associato numero:]]></text>
+			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenz:]]></text>
-			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
+			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenza:]]></text>
+			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
 
-			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
-			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
+			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
+			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nomignolo:]]></text>
+			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+
+			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Anno quota:]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_YEAR}]]></text>
+
+			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Suggerimento:]]></text>
+			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
+
+			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Località, Data:]]></text>
+			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bolder" size="12"><![CDATA[Quota Iscrizione {PRINT_YEAR}]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Quota Iscrizione {PRINT_YEAR}]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Per sfruttare a pieno il tuo status da Pirata nel Partito Pirata Svizzero nel {PRINT_YEAR}, ti chiediamo di versare i tuoi 60.- di quota sul conto specificato di seguito.
-			Se non pagherai la quota, manterrai lo stato di Simpatizzante: come tale, non hai il diritto di voto all’Assemblea Pirata o su PiVote, né tantomeno potrai essere attivo politicamente a nome del Partito.
-			Pagando la quota, hai la possibilità di avere un posto in una sezione cantonale o nel Partito nazionale, cosa impossibile come Simpatizzante.
-			La politica come sai ha sempre bisogno di risorse quindi le donazioni di qualsiasi cifra sono le benvenute. Pensa se vuoi/puoi aumentare la tua iscrizione di {INVOICE_AMOUNT}.00 CHF con un ammontare a tua scelta. Se superarai i 500.- sarai citato sul nostro sito web.
-			Sempre nell’ambito dell’amministrazione ti ricordiamo di aggiornare il tuo indirizzo fisico. Puoi farlo inviando eventuali modifiche inserendo il tuo numero identificativo {MEMBER_NUMBER} a info@partitopirata.ch
-			Il Partito Pirata Svizzero e la tua sezione ti ringraziano per la partecipazione, in modo particolare se avrai deciso di fare una donazione supplementare!]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du deinen Mitgliederbeitrag anhand der untenstehenden Daten begleichen.
+			Der Mitgliederbetrag setzt sich dieses Jahr aus folgenden Empfehlungen zusammen:]]></text>
 		</g>
-
+		<g part="recommendations" offset="12" top="495" bottom="100">
+			<text x="240" y="3" width="200" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[{section}]]></text>
+			<text x="390" y="3" width="100" height="10" wordwrap="false" size="8" halign="right"><![CDATA[{amount} CHF]]></text>
+			<line x1="230" y1="0" x2="495" y2="0" stroke="0.4" nth="first" />
+			<line x1="230" y1="1" x2="495" y2="1" stroke="0.4" nth="last" />
+			<line x1="230" y1="16" x2="495" y2="16" stroke="1" nth="last" />
+			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Wichtig:]]></text>
+			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Das ist eine Empfehlung, wie viel du bezahlst liegt bei Dir. Der Mindestbeitrag ist 30.00 CHF, alles über 500.00 CHF wird als Spende verbucht. Egal was du zahlst, es wird gerecht auf alle Deine Sektionen aufgeteilt.]]></text>
+		</g>
+		<g part="text2">
+			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text.]]></text>
+			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
+			La tua sezione e il Partito Pirata Svizzero ti ringraziano per la partecipazione!]]></text>
+		</g>
+		
 		<g part="invoiceinfo">
-			<line x1="20" y1="745" x2="715" y2="745" stroke="0.5" />
-			<line x1="20" y1="925" x2="710" y2="925" stroke="0.5" />
-			<text x="30" y="725" width="300" height="10" wordwrap="false" weight="bolder" size="10"><![CDATA[Informazioni di pagamento:]]></text>
+			<rect x="24" y="718" width="682" height="205" fillcolor="#F2B400" stroke="1.2" strokecolor="#DC7204" />
+			<line x1="25" y1="745" x2="705" y2="745" stroke="1.2" strokecolor="#DC7204" />
+			<text x="30" y="725" width="300" height="10" wordwrap="false" weight="black" size="10"><![CDATA[Informazioni di pagamento:]]></text>
 
 			<text x="60" y="755" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Pagamento per:]]></text>
-			<text x="170" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="170" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[Pirate Party Switzerland]]></text>
 			<text x="170" y="770" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
 			<text x="60" y="785" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Instituto di finanza:]]></text>
@@ -76,15 +94,19 @@ CH-1337 Vallorbe]]></text>
 			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[BIC/SWIFT:]]></text>
 			<text x="170" y="830" width="300" height="10" wordwrap="false" size="9"><![CDATA[POFICHBEXXX]]></text>
 
-			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Ammonto:]]></text>
-			<text x="170" y="845" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_AMOUNT}.00 CHF]]></text>
+			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[quantità consigliata:]]></text>
+			<text x="170" y="845" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_AMOUNT} CHF]]></text>
 
 			<text x="60" y="860" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Referenza:]]></text>
 			<text x="170" y="860" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[Utilizzare la ricevuta di pagamento con IBAN rossa e la casella di commento.]]></text>
+			<text x="170" y="875" width="300" height="10" wordwrap="true" italic="true" size="7"><![CDATA[Si prega di utilizzare un arancio/ESR slittamento fattura!]]></text>
 
 			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Commento:]]></text>
-			<text x="170" y="890" width="400" height="10" wordwrap="true" size="9"><![CDATA[Il tuo numero di membro, il numero di referenza o qualsiasi altra cosa tu voglia comunicare al nostro tesoriere ;-)]]></text>
+			<text x="170" y="890" width="500" height="10" wordwrap="true" size="8" halign="justify"><![CDATA[Se non si utilizza una fattura arancione slittamento/ESR, si prega di inserire il numero di riferimento in tutto il commento.]]></text>
+		</g>
+		<g part="footer">
+			<image x="-35" y="1040" width="800" height="50" file="welle_grau.png" />
+			<text x="20" y="1040" width="690" height="10" wordwrap="false" size="7"><![CDATA[Pirate Party Switzerland | Lukas Zurschmiede | {PRINT_DATE_EXTENDED}]]></text>
 		</g>
 	</template>
 

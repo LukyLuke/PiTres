@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xmlpdf>
 	<template size="a4">
 		<g part="header">
@@ -25,48 +25,66 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}
 {MEMBER_COUNTRY}]]></text>
-			<text x="400" y="300" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="205" x2="5" y2="265" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Membernumber:]]></text>
-			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
+			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Membernumber:]]></text>
+			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[Reference:]]></text>
-			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
+			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Reference:]]></text>
+			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
 
-			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[EMail:]]></text>
-			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
+			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
+			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
+			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+
+			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Year of contribution:]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_YEAR}]]></text>
+
+			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Recommendation:]]></text>
+			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
+
+			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Location, Date:]]></text>
+			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bolder" size="12"><![CDATA[Members invoice for year {PRINT_YEAR}]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Membership fee for {PRINT_YEAR}]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in {PRINT_YEAR}, you have to pay your membership fee of {INVOICE_AMOUNT}.00 CHF within below data.
-			Without paying you are only a sympathizer and you don't have any rights to vote on Pirate-Meetings, you'r not allowed to vote or proclaim vour opinion by PiVote nor can you officially politicize as a Pirate. With the Membership, you can fill also regional politics or national ones, which you can't as a sympathizer.
-			Because politics isn't for free, we and your regional section will welcome every small donation, just adjust the amount below to your wants. Please note, that all donations above 500.00 CHF will be printed with names on the Website of the Pirateparty Switzerland.
-			By the way, do we still have your correct data? If not, please send us your new ones, inclusive your Membernumber '{MEMBER_NUMBER}' to info@piratenpartei.ch
-			The Pirateparty Switzerland and your Section give thanks for your due, and specially for your donation...]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in {PRINT_YEAR}, you have to pay your membership fee based on the data below.
+			Your Membership fee is composed as follow:]]></text>
+		</g>
+		<g part="recommendations" offset="12" top="495" bottom="100">
+			<text x="240" y="3" width="200" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[{section}]]></text>
+			<text x="390" y="3" width="100" height="10" wordwrap="false" size="8" halign="right"><![CDATA[{amount} CHF]]></text>
+			<line x1="230" y1="0" x2="495" y2="0" stroke="0.4" nth="first" />
+			<line x1="230" y1="1" x2="495" y2="1" stroke="0.4" nth="last" />
+			<line x1="230" y1="16" x2="495" y2="16" stroke="1" nth="last" />
+			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Important:]]></text>
+			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[This is just a Recommendation, how much you are willing and able to pay is up to you. The minimum is 30.00 CH, all above 500.00 CH will be booked as a Donation. However much you pay, all is partitioned fair to all your sections.]]></text>
+		</g>
+		<g part="text2">
+			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section.]]></text>
+			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Your section and the PirateParty Switzerland give thanks to your for your submission!]]></text>
 		</g>
 
 		<g part="invoiceinfo">
-			<line x1="20" y1="745" x2="715" y2="745" stroke="0.5" />
-			<line x1="20" y1="925" x2="710" y2="925" stroke="0.5" />
-			<text x="30" y="725" width="300" height="10" wordwrap="false" weight="bolder" size="10"><![CDATA[Paymentinformation:]]></text>
+			<rect x="24" y="718" width="682" height="205" fillcolor="#F2B400" stroke="1.2" strokecolor="#DC7204" />
+			<line x1="25" y1="745" x2="705" y2="745" stroke="1.2" strokecolor="#DC7204" />
+			<text x="30" y="725" width="300" height="10" wordwrap="false" weight="black" size="10"><![CDATA[Payment information:]]></text>
 
-			<text x="60" y="755" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Payment for:]]></text>
-			<text x="170" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="60" y="755" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Deposit for:]]></text>
+			<text x="170" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[Pirate Party Switzerland]]></text>
 			<text x="170" y="770" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
-			<text x="60" y="785" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Financial Institution:]]></text>
+			<text x="60" y="785" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Financial institute:]]></text>
 			<text x="170" y="785" width="300" height="10" wordwrap="false" size="9"><![CDATA[Schweizerische Post / Postfinance]]></text>
 			
-			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Banc Account Number:]]></text>
+			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Account number:]]></text>
 			<text x="170" y="800" width="300" height="10" wordwrap="false" size="9"><![CDATA[{ACCOUNT_NUMBER}]]></text>
 
 			<text x="60" y="815" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[IBAN:]]></text>
@@ -75,15 +93,19 @@ CH-1337 Vallorbe]]></text>
 			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[BIC/SWIFT:]]></text>
 			<text x="170" y="830" width="300" height="10" wordwrap="false" size="9"><![CDATA[POFICHBEXXX]]></text>
 
-			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Amount:]]></text>
-			<text x="170" y="845" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_AMOUNT}.00 CHF]]></text>
+			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Recommended amount:]]></text>
+			<text x="170" y="845" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_AMOUNT} CHF]]></text>
 
 			<text x="60" y="860" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Reference:]]></text>
 			<text x="170" y="860" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[With IBAN please use a red credit slip and the comment field]]></text>
+			<text x="170" y="875" width="300" height="10" wordwrap="true" italic="true" size="7"><![CDATA[Please use an orange/ESR invoiceslip!]]></text>
 
 			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Comment:]]></text>
-			<text x="170" y="890" width="400" height="10" wordwrap="true" size="9"><![CDATA[Your Membernumber, Reference or whatever you want to say our treasurer ;-)]]></text>
+			<text x="170" y="890" width="500" height="10" wordwrap="true" size="8" halign="justify"><![CDATA[If you are not using an orange invoice slip/ESR, please enter the whole Reference number into the comment.]]></text>
+		</g>
+		<g part="footer">
+			<image x="-35" y="1040" width="800" height="50" file="welle_grau.png" />
+			<text x="20" y="1040" width="690" height="10" wordwrap="false" size="7"><![CDATA[Pirate Party Switzerland | Lukas Zurschmiede | {PRINT_DATE_EXTENDED}]]></text>
 		</g>
 	</template>
 
@@ -95,11 +117,7 @@ attached you'l find your personal Membership-Invoice for {PRINT_YEAR}. To fully 
 If you have any questions, just ask your regional board or the national one as well.
 Thanks for your contribution, financially and personally...
 
-The Board from Piratenpartei Schweiz
-
-NB: Dont forget the Pirate Summercongress in Aarau on 9/10 of June!
-If you aren't registered yet: https://my.piratenpartei.ch/pvreg/index.php
-More information you will find on http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
+The Board from Piratenpartei Schweiz]]></content>
 	</email>
 	
 	<email type="html">
@@ -179,10 +197,6 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 				<br/>Thanks for your contribution, financially and personally...
 			</p>
 			<p>The Board from Piratenpartei Schweiz</p>
-			<p>NB: Dont forget the Pirate Summercongress in Aarau on 9/10 of June!
-				<br/>If you aren't registered yet: <a href="https://my.piratenpartei.ch/pvreg/index.php">PV-Anmeldung</a>
-				<br/>More information you will find on <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
-			</p>
 		</div>
 	</div>
 </body></html>]]></content>

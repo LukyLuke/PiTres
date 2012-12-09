@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xmlpdf>
 	<template size="a4">
 		<g part="header">
@@ -25,49 +25,66 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}
 {MEMBER_COUNTRY}]]></text>
-			<text x="400" y="300" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="205" x2="5" y2="265" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
-			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
+			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Numéro membre:]]></text>
+			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenz:]]></text>
-			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
+			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Référence:]]></text>
+			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
 
-			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
-			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
+			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
+			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[Petit nom:]]></text>
+			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+
+			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Pour l'année:]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_YEAR}]]></text>
+
+			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Recommendation:]]></text>
+			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
+
+			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Lieu, Date:]]></text>
+			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bolder" size="12"><![CDATA[Cotisation pour l'année {PRINT_YEAR}]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Cotisation pour l'année {PRINT_YEAR}]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Pour profiter pleinement de ton statut de Pirate au sein du Parti Pirate Suisse en {PRINT_YEAR}, il faut que tu verses tes {INVOICE_AMOUNT}.00 CHF de cotisation sur le compte référencé ci-après. 
-			Si tu ne cotises pas, tu garderas le statut de Sympathisant: en tant que tel, tu n'as pas le droit de vote lors d'Assemblées Pirates ou sur PiVote, ni d'être actif politiquement au nom du parti.  
-			En cotisant, tu as la possibilité d'assumer un poste au sein d'une section cantonale ou au sein du parti national, ce qui ne t'est pas possible en tant que Sympathisant.
-			La politique éxigeant des ressources non-négligeable, les dons sont plus que bienvenus, qu'importe le montant. Ainsi, tu peux sans-autres augmenter ta cotisation de {INVOICE_AMOUNT}.00 CHF d'une participation personnelle. A ce sujet, nous te rappelons que tout don dépassant 500.00 CHF sera cité nommément sur le site web.
-			Toujours pour l'administratif: ton adresse postale est-elle encore correcte? Si non, envoie-nous les nouvelles informations, en incluant le numnéro de membre {MEMBER_NUMBER}, à info@piratenpartei.ch
-			Le Parti Pirate Suisse et ta section te remercient pour ta participation. Et tout spécialement si tu choisis de faire un don supplémentaire!]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in {PRINT_YEAR}, you have to pay your membership fee based on the data below.
+			Your Membership fee is composed as follow:]]></text>
+		</g>
+		<g part="recommendations" offset="12" top="495" bottom="100">
+			<text x="240" y="3" width="200" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[{section}]]></text>
+			<text x="390" y="3" width="100" height="10" wordwrap="false" size="8" halign="right"><![CDATA[{amount} CHF]]></text>
+			<line x1="230" y1="0" x2="495" y2="0" stroke="0.4" nth="first" />
+			<line x1="230" y1="1" x2="495" y2="1" stroke="0.4" nth="last" />
+			<line x1="230" y1="16" x2="495" y2="16" stroke="1" nth="last" />
+			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Important:]]></text>
+			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[This is just a Recommendation, how much you are willing and able to pay is up to you. The minimum is 30.00 CH, all above 500.00 CH will be booked as a Donation. However much you pay, all is partitioned fair to all your sections.]]></text>
+		</g>
+		<g part="text2">
+			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section.]]></text>
+			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Your section and the PirateParty Switzerland give thanks to your for your submission!]]></text>
 		</g>
 
 		<g part="invoiceinfo">
-			<line x1="20" y1="745" x2="715" y2="745" stroke="0.5" />
-			<line x1="20" y1="925" x2="710" y2="925" stroke="0.5" />
-			<text x="30" y="725" width="300" height="10" wordwrap="false" weight="bolder" size="10"><![CDATA[Informations de paiement:]]></text>
+			<rect x="24" y="718" width="682" height="205" fillcolor="#F2B400" stroke="1.2" strokecolor="#DC7204" />
+			<line x1="25" y1="745" x2="705" y2="745" stroke="1.2" strokecolor="#DC7204" />
+			<text x="30" y="725" width="300" height="10" wordwrap="false" weight="black" size="10"><![CDATA[Informations de paiment:]]></text>
 
-			<text x="60" y="755" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Paiement pour:]]></text>
-			<text x="170" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
+			<text x="60" y="755" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Dépôt pour:]]></text>
+			<text x="170" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[Party Pirate Suisse]]></text>
 			<text x="170" y="770" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
 			<text x="60" y="785" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Institut financier:]]></text>
 			<text x="170" y="785" width="300" height="10" wordwrap="false" size="9"><![CDATA[Schweizerische Post / Postfinance]]></text>
 			
-			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Numéro de compte:]]></text>
+			<text x="60" y="800" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Numére de compet:]]></text>
 			<text x="170" y="800" width="300" height="10" wordwrap="false" size="9"><![CDATA[{ACCOUNT_NUMBER}]]></text>
 
 			<text x="60" y="815" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[IBAN:]]></text>
@@ -76,15 +93,19 @@ CH-1337 Vallorbe]]></text>
 			<text x="60" y="830" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[BIC/SWIFT:]]></text>
 			<text x="170" y="830" width="300" height="10" wordwrap="false" size="9"><![CDATA[POFICHBEXXX]]></text>
 
-			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Somme:]]></text>
-			<text x="170" y="845" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_AMOUNT}.00 CHF]]></text>
+			<text x="60" y="845" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Recommandée:]]></text>
+			<text x="170" y="845" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_AMOUNT} CHF]]></text>
 
 			<text x="60" y="860" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Référence:]]></text>
 			<text x="170" y="860" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_REFERENCE}]]></text>
-			<text x="170" y="875" width="100" height="10" wordwrap="false" italic="true" size="7"><![CDATA[Utilisez le bulletin de versement rouge avec IBAN et la boîte de commentaire.]]></text>
+			<text x="170" y="875" width="300" height="10" wordwrap="true" italic="true" size="7"><![CDATA[S'il vous plaît utilisez un feuillet facture orange/ESR!]]></text>
 
-			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Commentaire:]]></text>
-			<text x="170" y="890" width="400" height="10" wordwrap="true" size="9"><![CDATA[Le numnéro de membre, la Référence ou tout d'autres vous voulez communiquer la trésoirer ;-)]]></text>
+			<text x="60" y="890" width="300" height="10" wordwrap="false" weight="bold" size="9"><![CDATA[Commenter:]]></text>
+			<text x="170" y="890" width="500" height="10" wordwrap="true" size="8" halign="justify"><![CDATA[Si vous n'utilisez pas une facture d'orange glissment/ESR, s'il vous plaît entrez le numéro de référence dans le commentaire.]]></text>
+		</g>
+		<g part="footer">
+			<image x="-35" y="1040" width="800" height="50" file="welle_grau.png" />
+			<text x="20" y="1040" width="690" height="10" wordwrap="false" size="7"><![CDATA[Pirate Party Switzerland | Lukas Zurschmiede | {PRINT_DATE_EXTENDED}]]></text>
 		</g>
 	</template>
 
@@ -97,11 +118,7 @@ Occupe t'en rapidement pour pouvoir profiter pleinement de ton statut de Pirate 
 Les responsables de ta section ou du parti national sont à ta disposition en cas de questions,
 Merci de ta participation, aussi bien financière que personnelle!
 
-Le commité du Parti Pirate Suisse
-
-PS: n'oublie pas l'Assemblée Pirate d'été le 9 et 10 juin à Aarau.
-Si tu n'es pas encore inscrit : https://my.piratenpartei.ch/pvreg/index.php
-Et tu trouveras plus d'informations sous http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/]]></content>
+Le commité du Parti Pirate Suisse]]></content>
 	</email>
 	
 	<email type="html">
@@ -179,10 +196,6 @@ SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGj
 			<p>Tu trouveras en pièce jointe ta facture de cotisation {PRINT_YEAR}. Occupe t'en rapidement pour pouvoir profiter pleinement de ton statut de Pirate au sein du PPS: toutes les informations requises sont présentes dans le PDF.</p>
 			<p>Les responsables de ta section ou du parti national sont à ta disposition en cas de questions, Merci de ta participation, aussi bien financière que personnelle!</p>
 			<p>Le commité du Parti Pirate Suisse</p>
-			<p>PS: n'oublie pas l'Assemblée Pirate d'été le 9 et 10 juin à Aarau.
-				<br/>Si tu n'es pas encore inscrit: <a href="https://my.piratenpartei.ch/pvreg/index.php">https://my.piratenpartei.ch/pvreg/index.php</a>
-				<br/>Et tu trouveras plus d'informations sous <a href="http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/">http://www.piraten-aargau.ch/2012/04/03/piraten-sommerkongress/</a>
-			</p>
 		</div>
 	</div>
 </body></html>]]></content>

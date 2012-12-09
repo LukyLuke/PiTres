@@ -39,6 +39,7 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	memberUntil->setDate(QDate::currentDate());
 
 	connect(memberUid, SIGNAL(returnPressed()), this, SLOT(insertMemberUid()));
+	connect(btnAddMember, SIGNAL(clicked()), this, SLOT(insertMemberUid()));
 	connect(btnUidInvoice, SIGNAL(clicked()), this, SLOT(invoiceMembers()));
 	connect(btnInvoiceNew, SIGNAL(clicked()), this, SLOT(invoiceNewMembers()));
 	connect(btnInvoiceUntil, SIGNAL(clicked()), this, SLOT(invoiceUntilDate()));

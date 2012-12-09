@@ -17,7 +17,6 @@ info@piratenpartei.ch]]></text>
 Piratenpartei Schweiz
 CH-1337 Vallorbe]]></text>
 			<line x1="400" y1="174" x2="698" y2="174" stroke="0.2" />
-			<line x1="415" y1="189" x2="713" y2="189" stroke="0.2" />
 		</g>
 
 		<g part="address">
@@ -26,33 +25,52 @@ CH-1337 Vallorbe]]></text>
 {MEMBER_STREET}
 {MEMBER_CITY}
 {MEMBER_COUNTRY}]]></text>
-			<text x="400" y="300" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="205" x2="5" y2="265" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
-			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
+			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
+			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenz:]]></text>
-			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
+			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenz:]]></text>
+			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
 
-			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
-			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
+			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
+			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_EMAIL}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
+			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
+
+			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Beitragsjahr:]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_YEAR}]]></text>
+
+			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Total Empfehlungen:]]></text>
+			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
+
+			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
+			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="text1">
 			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, musst Du deinen Mitgliederbeitrag von {INVOICE_AMOUNT}.00 CHF anhand der untenstehenden Daten begleichen.
-			Ohne den Mitgliederbeitrag bist Du nur ein Sympathisant und hast weder ein Stimmrecht an den Piratenversammlungen, noch kannst Du bei den PiVote Abstimmungen teilnehmen und auch nicht im Namen der Piratenpartei politisieren. Durch deine Mitgliedschaft kannst Du auch einen Posten innerhalb der Sektionen oder sogar National übernehmen, was Dir als Sympathisant leider verwehrt bleibt.
-			Da Politik nicht gratis zu machen ist, sind wir und die Sektionen dankbar für jeden noch so kleine Spende, Du darfst also auch gerne den Betrag von {INVOICE_AMOUNT}.00 CHF nach deinem Gusto erhöhen. Dabei wollen wir dich noch darauf hinweisen, dass alle Spenden, welche die 500.00 CHF Marke überschreiten, namentlich auf unserer Webseite genannt werden.
-			Apropos, haben wir eigentlich noch deine richtige Adresse? Wenn nicht, sende uns doch schnell Deine neuen Daten inkl. der Mitgliedernummer '{MEMBER_NUMBER}' an die info@piratenpartei.ch
-			Die Piratenpartei Schweiz und deine Sektion danken Dir für deinen Beitrag, insbesondere für eine zusätzliche Spende...]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Die Piratenpartei geht neue Wege, auch was die Mitgliederbeiträge betrifft. Wie du bei der untenstehenden Berechnung siehst, erhebt nun jede Ebene der PPS ihren eigenen Mitgliederbeitrag. Da wir alle ehrgeizige Ziele haben, ist der Gesamtbetrag damit deutlich angestiegen.
+			Wir wollen aber auch all jenen Personen das Engagement in unserer Partei ermöglichen, welche einen Mitgliederbeitrag in dieser Höhe nicht zahlen können. Deshalb stellt der unten genannte Betrag einen Empfehlung dar. Der Mindestbeitrag für ein Parteimitglied beträgt sFr. 30.00.
+			Dein Mitgliederbetrag setzt sich dieses Jahr wie folgt zusammen:]]></text>
+		</g>
+		<g part="recommendations" offset="12" top="565" bottom="100">
+			<text x="240" y="3" width="200" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[{section}]]></text>
+			<text x="390" y="3" width="100" height="10" wordwrap="false" size="8" halign="right"><![CDATA[{amount} CHF]]></text>
+			<line x1="230" y1="0" x2="495" y2="0" stroke="0.4" nth="first" />
+			<line x1="230" y1="1" x2="495" y2="1" stroke="0.4" nth="last" />
+			<line x1="230" y1="16" x2="495" y2="16" stroke="1" nth="last" />
+			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Wichtig:]]></text>
+			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Dein Beitrag wird, egal in welcher Höhe, gerecht auf die PPS-Ebenen verteilt. Zahlungen bis sFr. 500.00 werden als Mitgliederbeiträge, der darüber liegende Teil als Spende verbucht.]]></text>
+		</g>
+		<g part="text2">
+			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
+			Deine Sektionen und die Piratenpartei Schweiz danken Dir für deine Unterstützung!]]></text>
 		</g>
 
 		<g part="creditslip">
@@ -60,15 +78,15 @@ CH-1337 Vallorbe]]></text>
 			<text x="5" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
 			<text x="90" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="10" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
-			<text x="150" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
+			<!--text x="10" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
+			<text x="150" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text-->
 
 			<text x="220" y="740" width="300" height="10" wordwrap="false" size="9"><![CDATA[Piratenpartei Schweiz]]></text>
 			<text x="220" y="755" width="300" height="10" wordwrap="false" size="9"><![CDATA[1337 Vallorbe]]></text>
 
 			<text x="320" y="855" width="300" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[{ACCOUNT_NUMBER}]]></text>
-			<text x="238" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
-			<text x="385" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text>
+			<!--text x="238" y="888" width="115" height="10" wordwrap="false" size="8" font="Monospace" halign="right"><![CDATA[{INVOICE_PAY_AMOUNT}]]></text>
+			<text x="385" y="888" width="60" height="10" wordwrap="false" size="8" font="Monospace"><![CDATA[00]]></text-->
 
 			<text x="5" y="923" width="300" height="10" wordwrap="false" size="6" font="Monospace"><![CDATA[{INVOICE_REFERENCE}]]></text>
 
