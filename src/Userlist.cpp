@@ -124,7 +124,7 @@ QSqlQuery Userlist::createQuery() {
 
 	QSqlQuery query(db);
 	QString qs;
-	bool bindSection = (section != "All");
+	bool bindSection = (selectSection->currentIndex() == 0);
 	if (!bindSection) {
 		qs = "SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname,"
 			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)";
