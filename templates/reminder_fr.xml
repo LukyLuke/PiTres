@@ -2,7 +2,7 @@
 <xmlpdf>
 	<template size="a4">
 		<g part="header">
-			<image x="5" y="5" width="220" height="50" file="logo_german.png" />
+			<image x="5" y="5" width="220" height="50" file="section_logo" default="logos/ppLogo{MEMBER_SECTION:-pp::}{SHORT_LANGUAGE:-::de}.svg" />
 			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[Piratenpartei Schweiz
 CH-1337 Vallorbe
 info@piratenpartei.ch]]></text>
