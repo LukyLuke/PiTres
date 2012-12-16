@@ -55,20 +55,20 @@ CH-1337 Vallorbe]]></text>
 		<g part="text1">
 			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Die Piratenpartei geht neue Wege, auch was die Mitgliederbeiträge betrifft. Wie du bei der untenstehenden Berechnung siehst, erhebt nun jede Ebene der PPS ihren eigenen Mitgliederbeitrag. Da wir alle ehrgeizige Ziele haben, ist der Gesamtbetrag damit deutlich angestiegen.
-			Wir wollen aber auch all jenen Personen das Engagement in unserer Partei ermöglichen, welche einen Mitgliederbeitrag in dieser Höhe nicht zahlen können. Deshalb stellt der unten genannte Betrag einen Empfehlung dar. Der Mindestbeitrag für ein Parteimitglied beträgt sFr. 30.00.
-			Dein Mitgliederbetrag setzt sich dieses Jahr wie folgt zusammen:]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du deinen Mitgliederbeitrag anhand der untenstehenden Daten begleichen.
+			Der Mitgliederbetrag setzt sich dieses Jahr aus folgenden Empfehlungen zusammen:]]></text>
 		</g>
-		<g part="recommendations" offset="12" top="565" bottom="100">
+		<g part="recommendations" offset="12" top="495" bottom="100">
 			<text x="240" y="3" width="200" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[{section}]]></text>
 			<text x="390" y="3" width="100" height="10" wordwrap="false" size="8" halign="right"><![CDATA[{amount} CHF]]></text>
 			<line x1="230" y1="0" x2="495" y2="0" stroke="0.4" nth="first" />
 			<line x1="230" y1="1" x2="495" y2="1" stroke="0.4" nth="last" />
 			<line x1="230" y1="16" x2="495" y2="16" stroke="1" nth="last" />
 			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Wichtig:]]></text>
-			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Dein Beitrag wird, egal in welcher Höhe, gerecht auf die PPS-Ebenen verteilt. Zahlungen bis sFr. 500.00 werden als Mitgliederbeiträge, der darüber liegende Teil als Spende verbucht.]]></text>
+			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Das ist eine Empfehlung, wie viel du bezahlst liegt bei Dir. Der Mindestbeitrag ist 30.00 CHF, alles über 500.00 CHF wird als Spende verbucht. Egal was du zahlst, es wird gerecht auf alle Deine Sektionen aufgeteilt.]]></text>
 		</g>
 		<g part="text2">
+			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
 			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
 			Deine Sektionen und die Piratenpartei Schweiz danken Dir für deine Unterstützung!]]></text>
 		</g>

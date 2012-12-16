@@ -68,7 +68,7 @@ CH-1337 Vallorbe]]></text>
 			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Das ist eine Empfehlung, wie viel du bezahlst liegt bei Dir. Der Mindestbeitrag ist 30.00 CHF, alles über 500.00 CHF wird als Spende verbucht. Egal was du zahlst, es wird gerecht auf alle Deine Sektionen aufgeteilt.]]></text>
 		</g>
 		<g part="text2">
-			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text der Sektionen Text.]]></text>
+			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
 			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
 			La tua sezione e il Partito Pirata Svizzero ti ringraziano per la partecipazione!]]></text>
 		</g>

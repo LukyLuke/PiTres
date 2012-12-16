@@ -68,7 +68,7 @@ CH-1337 Vallorbe]]></text>
 			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[This is just a Recommendation, how much you are willing and able to pay is up to you. The minimum is 30.00 CH, all above 500.00 CH will be booked as a Donation. However much you pay, all is partitioned fair to all your sections.]]></text>
 		</g>
 		<g part="text2">
-			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section. Text from your Section.]]></text>
+			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
 			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Your section and the PirateParty Switzerland give thanks to your for your submission!]]></text>
 		</g>
 
