@@ -56,6 +56,7 @@ public:
 	bool checkShow(const qint32 row, const qint32 maxrows) const;
 	
 	static PdfElement fromElement(QDomElement element, QString fromElement);
+	static bool lengthDescending(const QString &a, const QString &b) { return a.length() > b.length(); };
 
 protected:
 	PdfElementType _type;
@@ -147,6 +148,8 @@ public:
 	void setType(PdfElementType type);
 	qreal paint(QPainter *painter);
 	qreal bottom();
+	QList<QString> replaceVariables(QString file);
+	void showDefaultImage(QPainter *painter, QRectF box);
 };
 
 #endif // HELPER_PDFELEMENT_H

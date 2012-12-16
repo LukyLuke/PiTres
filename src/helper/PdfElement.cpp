@@ -556,31 +556,53 @@ qreal PdfElementImage::paint(QPainter *painter) {
 	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
 	qreal w = toQReal(_attributes.value("width", "0"));
 	qreal h = toQReal(_attributes.value("height", "0"));
+	
 	if (w > 0 && h > 0) {
 		painter->setPen(Qt::NoPen);
 		painter->setBrush(Qt::NoBrush);
-		
 		QRectF box(QPointF(x, y), QSizeF(w, h));
 		QImage picture;
-		QString var = _attributes.value("file", ".");
-		if (var == ".") {
-			QString img = _templatePath.append("/").append(_attributes.value("file", ""));
-			if (picture.load(img)) {
-				painter->drawImage( box, picture, QRectF(picture.rect()) );
+		
+		// Get the variable defined in the attribute "file"
+		QString var = _attributes.value("file", "");
+		bool drawn = FALSE;
+		
+		// No variable found, the attribute "file" might point to an imagefile
+		if (_variables->value(var, "").isEmpty()) {
+			
+			// Load the image (or default image) and print it
+			QList<QString> images = replaceVariables(var);
+			QString img;
+			for (int i = 0; i < images.size(); i++) {
+				img = QString("/").prepend(_templatePath).append(images.at(i));
+				if (picture.load(img)) {
+					painter->drawImage( box, picture, QRectF(picture.rect()) );
+					drawn = TRUE;
+					break;
+				}
 			}
 			
 		} else {
 			// if an attribute exists with the addition "_file" the string in the attribute should be iinterpreted as a file, otherwise as SVG-Content
-			bool imageIsFile = _attributes.contains(var) && !_attributes.value(var.append("_file"), "").isEmpty();
+			bool imageIsFile = _variables->contains(var) && !_variables->value(var.append("_file"), "").isEmpty();
 			
 			// Try to render a normal pixel image or as an SVG Image / Content
 			QSvgRenderer svg;
-			if (imageIsFile && picture.load(_attributes.value(var))) {
+			if (imageIsFile && picture.load(_variables->value(var))) {
 				painter->drawImage( box, picture, QRectF(picture.rect()) );
+				drawn = TRUE;
 				
-			} else if ( (imageIsFile && svg.load(_attributes.value(var))) || (!imageIsFile && svg.load(_attributes.value(var).toUtf8())) ) {
+			} else if ( (imageIsFile && svg.load( _variables->value(var) )) ||
+			            (!imageIsFile && svg.load( _variables->value(var).toUtf8() ))
+			) {
 				svg.render(painter, box);
+				drawn = TRUE;
 			}
+		}
+		
+		// If the Image isn't drawn, show the default one
+		if (!drawn) {
+			showDefaultImage(painter, box);
 		}
 	}
 	return bottom();
@@ -589,4 +611,71 @@ qreal PdfElementImage::bottom() {
 	qreal y = toQReal(_attributes.value("y", "0")) + _offsetY;
 	qreal h = toQReal(_attributes.value("height", "0"));
 	return y + h;
+}
+QList<QString> PdfElementImage::replaceVariables(QString file) {
+	//              variable       prefix            suffix            default
+	QRegExp re("\\{([a-z_]+)(?:\\:([^:\\}]*))?(?:\\:([^:\\}]*))?(?:\\:([^:\\}]*))?\\}", Qt::CaseInsensitive);
+	int pos = 0, max;
+	QString var1, var2;
+	QList<QString> list;
+	list << file;
+	
+	while ((pos = re.indexIn(file, pos)) != -1) {
+		// variable and empty value
+		var1 = _variables->value( re.cap(1).toLower() );
+		var2 = re.cap(4);
+		
+		// prefix
+		if (!re.cap(2).isEmpty()) {
+			if (!var1.isEmpty()) {
+				var1.prepend(re.cap(2));
+			}
+			if (!var2.isEmpty()) {
+				var2.prepend(re.cap(2));
+			}
+		}
+		
+		// suffix
+		if (!re.cap(3).isEmpty()) {
+			if (!var1.isEmpty()) {
+				var1.append(re.cap(3));
+			}
+			if (!var2.isEmpty()) {
+				var2.append(re.cap(3));
+			}
+		}
+		
+		// Replace in files
+		max = list.size();
+		for (int i = 0; i < max; i++) {
+			// Append the current entry with the rplaced default value (var2) at the end
+			// and replace the variable itself (var1) on the current entry
+			list.append(QString(list.at(i)).replace(re.cap(0), var2));
+			list[i].replace(re.cap(0), var1);
+		}
+		pos += re.matchedLength();
+	}
+	
+	// sort the list by length and return it
+	qSort(list.begin(), list.end(), PdfElement::lengthDescending);
+	return list;
+}
+void PdfElementImage::showDefaultImage(QPainter *painter, QRectF box) {
+	QSvgRenderer svg;
+	QImage picture;
+	QString img;
+	QList<QString> images = replaceVariables(_attributes.value("default", ""));
+	
+	// Try to load the image as SVG and after as a pixel graphic
+	for (int i = 0; i < images.size(); i++) {
+		img = QString("/").prepend(_templatePath).append( images.at(i) );
+		if (svg.load(img)) {
+			painter->setPen(Qt::NoPen);
+			svg.render(painter, box);
+			break;
+		} else if (picture.load( img )) {
+			painter->drawImage( box, picture, QRectF(picture.rect()) );
+			break;
+		}
+	}
 }
