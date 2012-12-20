@@ -80,6 +80,7 @@ public:
 	QDate founded() const { return d_founded; }
 	QString invoiceLogo() const { return s_invoiceLogo; }
 	QString invoiceText(QString language) const { return m_invoiceLanguage.value(language, ""); }
+	QString email();
 	
 signals:
 	void parentChanged(QString);

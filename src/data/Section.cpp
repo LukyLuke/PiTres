@@ -203,6 +203,20 @@ bool Section::logoIsFile() {
 	return !s_invoiceLogo.contains('\n') && !s_invoiceLogo.contains('\r') && QFile::exists(s_invoiceLogo);
 }
 
+QString Section::email() {
+	// TODO: Make this configurable or at least not that static ;)
+	if (s_name.toLower() == "members") {
+		return QString("info@piratenpartei.ch");
+	}
+	
+	QString mail(s_name.toLower().prepend("info@"));
+	Section *s = this;
+	while ((s = s->parent()) != NULL && s->name() != "members") {
+		mail.append(".").append(s->name());
+	}
+	return mail.append(".piratenpartei.ch");
+}
+
 void Section::setParent(QString parent) {
 	s_parent = parent;
 	emit parentChanged(parent);
