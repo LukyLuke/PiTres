@@ -3,9 +3,8 @@
 	<template size="a4">
 		<g part="header">
 			<image x="5" y="5" width="220" height="50" file="section_logo" default="logos/ppLogo{MEMBER_SECTION:-pp::}{SHORT_LANGUAGE:-::de}.svg" />
-			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[Piratenpartei Schweiz
-CH-1337 Vallorbe
-info@piratenpartei.ch]]></text>
+			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[{SECTION_ADDRESS}
+{SECTION_EMAIL}]]></text>
 		</g>
 
 		<g part="sender">
@@ -30,10 +29,10 @@ CH-1337 Vallorbe]]></text>
 		<g part="memberinfo">
 			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
 
-			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
+			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Membernumber:]]></text>
 			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Referenz:]]></text>
+			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Reference:]]></text>
 			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_NUMBER}]]></text>
 
 			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[E-Mail:]]></text>
@@ -42,21 +41,21 @@ CH-1337 Vallorbe]]></text>
 			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[Nickname:]]></text>
 			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Beitragsjahr:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_YEAR}]]></text>
+			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Year of contribution:]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[2013]]></text>
 
-			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Total Empfehlungen:]]></text>
+			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Recommendation:]]></text>
 			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
 
-			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
+			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Location, Date:]]></text>
 			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Membership fee for 2013]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du deinen Mitgliederbeitrag anhand der untenstehenden Daten begleichen.
-			Der Mitgliederbetrag setzt sich dieses Jahr aus folgenden Empfehlungen zusammen:]]></text>
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in 2013, you have to pay your membership fee based on the data below.
+			Your Membership fee is composed as follow:]]></text>
 		</g>
 		<g part="recommendations" offset="12" top="495" bottom="100">
 			<text x="240" y="3" width="200" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[{section}]]></text>
@@ -64,13 +63,12 @@ CH-1337 Vallorbe]]></text>
 			<line x1="230" y1="0" x2="495" y2="0" stroke="0.4" nth="first" />
 			<line x1="230" y1="1" x2="495" y2="1" stroke="0.4" nth="last" />
 			<line x1="230" y1="16" x2="495" y2="16" stroke="1" nth="last" />
-			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Wichtig:]]></text>
-			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Das ist eine Empfehlung, wie viel du bezahlst liegt bei Dir. Der Mindestbeitrag ist 30.00 CHF, alles über 500.00 CHF wird als Spende verbucht. Egal was du zahlst, es wird gerecht auf alle Deine Sektionen aufgeteilt.]]></text>
+			<text x="20" y="21" width="80" height="10" wordwrap="true" size="10" halign="right" spacing="8" weight="black" nth="last"><![CDATA[Important:]]></text>
+			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[This is just a Recommendation, how much you are willing and able to pay is up to you. The minimum is 30.00 CH, all above 500.00 CH will be booked as a Donation. However much you pay, all is partitioned fair to all your sections.]]></text>
 		</g>
 		<g part="text2">
 			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
-			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
-			Deine Sektionen und die Piratenpartei Schweiz danken Dir für deine Unterstützung!]]></text>
+			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Your section and the PirateParty Switzerland give thanks to your for your submission!]]></text>
 		</g>
 
 		<g part="creditslip">
@@ -107,18 +105,31 @@ CH-1337 Vallorbe]]></text>
 	</template>
 
 	<email type="text">
-		<subject><![CDATA[Membership fee {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
+		<subject><![CDATA[Membership fee 2013, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[Ahoi {MEMBER_NAME},
-attached you'l find your personal Membership-Invoice for {PRINT_YEAR}. To fully enjoy your life as a Pirate by the PirateParty Switzerland, you shoud pay this Invoice as fast as possible. The PDF shows all Data you need for the payment.
+attached you'l find your personal Membership-Invoice for 2013. To fully enjoy your life as a Pirate by the PirateParty Switzerland, you shoud pay this Invoice as fast as possible. The PDF shows all Data you need for the payment.
 
 If you have any questions, just ask your regional board or the national one as well.
 Thanks for your contribution, financially and personally...
+
+
+_Information about the new Membership fee and the Membership in general_
+  http://projects.piratenpartei.ch/knowledgebase/categories/20
+
+
+_Invitation for the general assembly 2013_
+  The general assembly this year will take place on the 23. of february 2013. The location is the Auenhalle in Aarau-Rohr. The assembly will start around 10:00 CET, doors are open from 09:00 CET. Deadline for submitting agenda items ist the 9. of february on 10:00 CET. Any other details will be published in time on http://www.piratenpartei.ch
+
+
+_Invitation for the exceptional assembly 2013_
+  The exceptional assembly this year will take place on the 8. of june 2013. The location is the Mehrzweckhalle Teuchelweiler in Winterthur. The assembly will start around 10:30 CET, doors are open from 09:30 CET. Deadline for submitting agenda items ist the 25. of may on 10:30 CET. Any other details will be published in time on http://www.piratenpartei.ch
+
 
 The Board from Piratenpartei Schweiz]]></content>
 	</email>
 	
 	<email type="html">
-		<subject><![CDATA[Membership fee for {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
+		<subject><![CDATA[Membership fee for 2013, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <style type="text/css">
@@ -187,12 +198,25 @@ WDpU6e8Vgklu9TvUX4+QTD7un8c+eixWhDUUwDW0jqW1c+wYqttYbOcJTcJ3/XUROgqRX2Zx4K+N2P8o
 vvvB5116GnJOhEgTz35lGa0udWdduof3I5jdnSrrrxa0LEn7drahp+W9ATVSP1i7fBBY2HlVpcbQEnZJXRf/M8rwlXKB0QDJeKbmTbto4GJAjLpCqCGw/ZlstKtfYghArd0yr2X8PtKBItj/fa4uwPRRoR5x1jbiAzvOYj1Trk2+QDXSVSdJ/1+W0nX/IQYc2+suk0ErFMsZK6TFlL2Y58eImPgIV5bgBt4I724oRAgeEgOHYD7heuX9YT1PESuDf0PRft3Wl9Z2FSgUMQHnNqT1j8z9yAduBFpMKSWQmNr3B2B0UP6Uvn0eZlvDT543n4pnId8wN1aQl8hLZQx+V7CfPCjlGtSIPCeed9cl3cT5Tet82xRB67EuyRv44azzjXNISz1XJOXIqwvYAkgmGQuxIKMSthZqnhreyC8nTt2cT269XR9e/cLhksdPGCIG9h/ULDep1ffQOSx1MPjM35xEVBNDT4gAeuae18r4ENsSPf0enhqz+eKP0S7zKfdnp+p2rTr+UPRTo3TrvZ6drwx0OoMKFNjLRzkP3D8ZGErOo1xbH9SoHED90WeCOftp9qLy+E2YQd/b8Qa0SbeF5HZSrBSvgE5w0Q7qLWZaDcgL9kl2iADXjixemmYOVAIqq5YuwJVu30EGgRfErCQo1jvCmKOjw6/LsJP4yJRIGH4G77SwQINaIj4r4Soat8GKWp3STLRNtFud5nWElw9A/rQ8duNFQjPIkIBvzI+rrABJfTjraNtI4U9BRo16ZILiEEmQoJOCvgk8cWFw2/SwIhvMCwArtH6KMEaPap/VblniFfcTDTiLbZDberZ8ee+LEQ9KnOJswOMgfbIgDI53bkJjaJFn2iTScLxXqgR3rLGkpQGkWV0HOFGhJnRKn2rcJUXbcK9WqWRsT2+j1rSLH4JmyxrqKrlWu31HPKYQOOm1eLa60u0dFfPgDI8HTfwO9OSfqRwsYAbhTCkRwSiUAhhA4QbEUv8sDBRIBSNThhEFdAybUJd/
 SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBtoHA/8HB4ECl9BMC/YAAAAASUVORK5CYII=" /></div>
 		<div class="content">
-			<div class="header">Membership fee for {PRINT_YEAR}, Piratenpartei Schweiz</div>
+			<div class="header">Membership fee for 2013, Piratenpartei Schweiz</div>
 			<p><strong>Ahoi {MEMBER_NAME},</strong></p>
-			<p>attached you'l find your personal Membership-Invoice for {PRINT_YEAR}. To fully enjoy your life as a Pirate by the PirateParty Switzerland, you shoud pay this Invoice as fast as possible. The PDF shows all Data you need for the payment.</p>
+			<p>attached you'l find your personal Membership-Invoice for 2013. To fully enjoy your life as a Pirate by the PirateParty Switzerland, you shoud pay this Invoice as fast as possible. The PDF shows all Data you need for the payment.</p>
 			<p>If you have any questions, just ask your regional board or the national one as well.
 				<br/>Thanks for your contribution, financially and personally...
 			</p>
+			<hr size="1"/>
+			<p><strong>Information about the new Membership fee and the Membership in general<strong><br/>
+				<a href="http://projects.piratenpartei.ch/knowledgebase/categories/20">http://projects.piratenpartei.ch/knowledgebase/categories/20</a>
+			</p>
+			<hr size="1"/>
+			<p><strong>Invitation for the general assembly 2013</strong><br/><br>
+				The general assembly this year will take place on the 23. of february 2013. The location is the Auenhalle in Aarau-Rohr. The assembly will start around 10:00 CET, doors are open from 09:00 CET. Deadline for submitting agenda items ist the 9. of february on 10:00 CET. Any other details will be published in time on http://www.piratenpartei.ch
+			</p>
+			<hr size="1"/>
+			<p><strong>Invitation for the exceptional assembly 2013</strong><br/><br>
+				The exceptional assembly this year will take place on the 8. of june 2013. The location is the Mehrzweckhalle Teuchelweiler in Winterthur. The assembly will start around 10:30 CET, doors are open from 09:30 CET. Deadline for submitting agenda items ist the 25. of may on 10:30 CET. Any other details will be published in time on http://www.piratenpartei.ch
+			</p>
+			<hr size="1"/>
 			<p>The Board from Piratenpartei Schweiz</p>
 		</div>
 	</div>

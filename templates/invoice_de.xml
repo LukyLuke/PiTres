@@ -3,9 +3,8 @@
 	<template size="a4">
 		<g part="header">
 			<image x="5" y="5" width="220" height="50" file="section_logo" default="logos/ppLogo{MEMBER_SECTION:-pp::}{SHORT_LANGUAGE:-::de}.svg" />
-			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[Piratenpartei Schweiz
-CH-1337 Vallorbe
-info@piratenpartei.ch]]></text>
+			<text x="280" y="10" width="250" height="67" wordwrap="true" size="10"><![CDATA[{SECTION_ADDRESS}
+{SECTION_EMAIL}]]></text>
 		</g>
 
 		<g part="sender">
@@ -43,7 +42,7 @@ CH-1337 Vallorbe]]></text>
 			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NICK}]]></text>
 
 			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Beitragsjahr:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_YEAR}]]></text>
+			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[2013]]></text>
 
 			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Total Empfehlungen:]]></text>
 			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
@@ -53,9 +52,9 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr {PRINT_YEAR}]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr 2013]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
-			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr {PRINT_YEAR} vollumfänglich ausleben und geniessen kannst, solltest Du deinen Mitgliederbeitrag anhand der untenstehenden Daten begleichen.
+			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr 2013 vollumfänglich ausleben und geniessen kannst, solltest Du deinen Mitgliederbeitrag anhand der untenstehenden Daten begleichen.
 			Der Mitgliederbetrag setzt sich dieses Jahr aus folgenden Empfehlungen zusammen:]]></text>
 		</g>
 		<g part="recommendations" offset="12" top="495" bottom="100">
@@ -111,18 +110,32 @@ CH-1337 Vallorbe]]></text>
 	</template>
 	
 	<email type="text">
-		<subject><![CDATA[Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
+		<subject><![CDATA[Mitgliederbeitrag 2013, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[Ahoi {MEMBER_NAME},
-im Anhang findest Du deine Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.
+im Anhang findest Du deine Mitgliederrechnung für das Jahr 2013. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.
 
 Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
 Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
+
+_Informationen zum neuen Mitgliederbeitrag und generell zur Mitgliedschaft_
+  http://projects.piratenpartei.ch/knowledgebase/categories/20
+
+
+_Einladung zur ordentlichen PV 2013_
+
+  Die ordentliche PV findet am 23. Februar 2013 in der Auenhalle in Aarau-Rohr statt. Beginn ist um 10:00 Uhr CET, Akkreditierung ab 09:00 Uhr CET. Antragsfrist ist am 9. Februar um 10:00Uhr CET. Weitere Details werden zeitgerecht auf http://piratenpartei.ch publiziert.
+
+
+_Einladung zur ausserordentlichen PV 2013_
+
+  Die erste ausserordentliche PV findet am 8. Juni 2013 in der Mehrzeckanlage Teuchelweiher in Winterthur in der kleinen Reithalle statt. Beginn um 10:30 Uhr CEST. Akkreditierung ab 9:30 Uhr CEST. Antragsfrist ist am 25. Mai 2013 um 10:30 Uhr CEST. Weitere Details werden Zeitgerecht publiziert unter http://piratenpartei.ch
+
 
 Der Vorstand der Piratenpartei Schweiz]]></content>
 	</email>
 	
 	<email type="html">
-		<subject><![CDATA[Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz]]></subject>
+		<subject><![CDATA[Mitgliederbeitrag 2013, Piratenpartei Schweiz]]></subject>
 		<content><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <style type="text/css">
@@ -191,12 +204,25 @@ WDpU6e8Vgklu9TvUX4+QTD7un8c+eixWhDUUwDW0jqW1c+wYqttYbOcJTcJ3/XUROgqRX2Zx4K+N2P8o
 vvvB5116GnJOhEgTz35lGa0udWdduof3I5jdnSrrrxa0LEn7drahp+W9ATVSP1i7fBBY2HlVpcbQEnZJXRf/M8rwlXKB0QDJeKbmTbto4GJAjLpCqCGw/ZlstKtfYghArd0yr2X8PtKBItj/fa4uwPRRoR5x1jbiAzvOYj1Trk2+QDXSVSdJ/1+W0nX/IQYc2+suk0ErFMsZK6TFlL2Y58eImPgIV5bgBt4I724oRAgeEgOHYD7heuX9YT1PESuDf0PRft3Wl9Z2FSgUMQHnNqT1j8z9yAduBFpMKSWQmNr3B2B0UP6Uvn0eZlvDT543n4pnId8wN1aQl8hLZQx+V7CfPCjlGtSIPCeed9cl3cT5Tet82xRB67EuyRv44azzjXNISz1XJOXIqwvYAkgmGQuxIKMSthZqnhreyC8nTt2cT269XR9e/cLhksdPGCIG9h/ULDep1ffQOSx1MPjM35xEVBNDT4gAeuae18r4ENsSPf0enhqz+eKP0S7zKfdnp+p2rTr+UPRTo3TrvZ6drwx0OoMKFNjLRzkP3D8ZGErOo1xbH9SoHED90WeCOftp9qLy+E2YQd/b8Qa0SbeF5HZSrBSvgE5w0Q7qLWZaDcgL9kl2iADXjixemmYOVAIqq5YuwJVu30EGgRfErCQo1jvCmKOjw6/LsJP4yJRIGH4G77SwQINaIj4r4Soat8GKWp3STLRNtFud5nWElw9A/rQ8duNFQjPIkIBvzI+rrABJfTjraNtI4U9BRo16ZILiEEmQoJOCvgk8cWFw2/SwIhvMCwArtH6KMEaPap/VblniFfcTDTiLbZDberZ8ee+LEQ9KnOJswOMgfbIgDI53bkJjaJFn2iTScLxXqgR3rLGkpQGkWV0HOFGhJnRKn2rcJUXbcK9WqWRsT2+j1rSLH4JmyxrqKrlWu31HPKYQOOm1eLa60u0dFfPgDI8HTfwO9OSfqRwsYAbhTCkRwSiUAhhA4QbEUv8sDBRIBSNThhEFdAybUJd/
 SuwM4wBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBowBY8AYMAaMAWPAGDAGjAFjwBgwBtoHA/8HB4ECl9BMC/YAAAAASUVORK5CYII=" /></div>
 		<div class="content">
-			<div class="header">Mitgliederbeitrag {PRINT_YEAR}, Piratenpartei Schweiz</div>
+			<div class="header">Mitgliederbeitrag 2013, Piratenpartei Schweiz</div>
 			<p><strong>Ahoi {MEMBER_NAME},</strong></p>
-			<p>im Anhang findest Du die Mitgliederrechnung für das Jahr {PRINT_DATE}. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.</p>
+			<p>im Anhang findest Du die Mitgliederrechnung für das Jahr 2013. Damit Du dein Piratenleben bei der Piratenpartei vollumfänglich ausleben und geniessen kannst, solltest Du diese schnellstmöglich begleichen. Die Zahlungsinformationen und alle erforderlichen Daten findest Du im PDF.</p>
 			<p>Für Fragen stehen dir die Vorstände Deiner Sektion, oder auch die nationalen gerne zur Verfügung.
 				<br/>Danke für deinen Beitrag, in finanzieller und auch personeller Hinsicht...
 			</p>
+			<hr size="1"/>
+			<p><strong>Informationen zum neuen Mitgliederbeitrag und generell zur Mitgliedschaft<strong><br/>
+				<a href="http://projects.piratenpartei.ch/knowledgebase/categories/20">http://projects.piratenpartei.ch/knowledgebase/categories/20</a>
+			</p>
+			<hr size="1"/>
+			<p><strong>Einladung zur ordentlichen PV 2013</strong><br/><br>
+				Die ordentliche PV findet am 23. Februar 2013 in der Auenhalle in Aarau-Rohr statt. Beginn ist um 10:00 Uhr CET, Akkreditierung ab 09:00 Uhr CET. Antragsfrist ist am 9. Februar um 10:00Uhr CET. Weitere Details werden zeitgerecht auf http://piratenpartei.ch publiziert.
+			</p>
+			<hr size="1"/>
+			<p><strong>Einladung zur ausserordentlichen PV 2013</strong><br/><br>
+				Die erste ausserordentliche PV findet am 8. Juni 2013 in der Mehrzeckanlage Teuchelweiher in Winterthur in der kleinen Reithalle statt. Beginn um 10:30 Uhr CEST. Akkreditierung ab 9:30 Uhr CEST. Antragsfrist ist am 25. Mai 2013 um 10:30 Uhr CEST. Weitere Details werden Zeitgerecht publiziert unter http://piratenpartei.ch
+			</p>
+			<hr size="1"/>
 			<p><strong>Der Vorstand der Piratenpartei Schweiz</strong></p>
 		</div>
 	</div>
