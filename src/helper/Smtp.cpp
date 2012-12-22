@@ -45,7 +45,7 @@ Smtp::~Smtp() {
 	delete socket;
 }
 
-bool Smtp::send(const QString & from, const QString & to, const QString & subject) {
+bool Smtp::send(const QString &from, const QString &to, const QString &subject) {
 	int timeout = 5000;
 	
 	socket = new QTcpSocket(this);
@@ -108,6 +108,11 @@ bool Smtp::send(const QString & from, const QString & to, const QString & subjec
 #ifdef SMTP_DEBUG
 	qDebug() << "SMTP_DEBUG: I do not send an Email! This is a DEBUG-BUILD without sending Emails!";
 	qDebug() << "SMTP_DEBUG: Remove the 'SMTP_DEBUG' in PiTres.pro and recompile with 'qmake && make'...";
+	
+#ifdef SMTP_SAVE_DEBUG
+	saveEmailDebug(from, to, subject, message);
+#endif
+	
 	return false;
 #else
 	socket->connectToHost(host, port);
@@ -376,3 +381,36 @@ QString Smtp::getMimeType(const QString &fileName) {
 #endif
 	return result;
 }
+
+#ifdef SMTP_SAVE_DEBUG
+void Smtp::saveEmailDebug(const QString &from, const QString &to, const QString &subject, const QString &message) {
+	QTextStream out;
+	QDir tmp(QDir::currentPath().append("/debug/").append(QString(to).replace('@', "-at-")));
+	qDebug() << "Save EMail for " << to << " into " << tmp.absolutePath();
+	tmp.mkpath(tmp.absolutePath());
+	
+	// Writing information file
+	QFile info(tmp.absolutePath().append("/info.txt"));
+	if (!info.open(QIODevice::WriteOnly | QFile::Truncate | QFile::Text)) {
+		qDebug() << "Unable to open SMTP-Debug file: " << info.fileName();
+	} else {
+		out.setDevice(&info);
+		out << QString("From: ").append(from).append("\n");
+		out << QString("To: ").append(to).append("\n");
+		out << QString("Subject: ").append(subject).append("\n");
+		out << dateHeader().append("\n");
+		info.close();
+	}
+	
+	// Writing the messsage
+	QFile msg(tmp.absolutePath().append("/message.eml"));
+	if (!msg.open(QIODevice::WriteOnly | QFile::Truncate | QFile::Text)) {
+		qDebug() << "Unable to open SMTP-Debug file: " << msg.fileName();
+	} else {
+		out.setDevice(&msg);
+		out << message;
+		msg.close();
+	}
+}
+#endif
+

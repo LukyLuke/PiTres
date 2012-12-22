@@ -44,6 +44,7 @@ public slots:
 	void invoiceNewMembers();
 	void invoiceUntilDate();
 	void invoiceAllMembers();
+	void sendReminders();
 };
 
 #endif // INVOICEWIZARD_H

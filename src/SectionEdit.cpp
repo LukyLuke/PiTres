@@ -126,6 +126,7 @@ void SectionEdit::resetSectionData() {
 	editAddress->setPlainText( s.address() );
 	editFoundingDate->setDate( s.founded() );
 	editParent->setCurrentIndex( editParent->findData( s.parent() ? s.parent()->name() : "" ) );
+	editEmail->setText(s.emailDB());
 	invoiceText_de->setPlainText( s.invoiceText("de") );
 	invoiceText_en->setPlainText( s.invoiceText("en") );
 	invoiceText_fr->setPlainText( s.invoiceText("fr") );
@@ -175,6 +176,7 @@ void SectionEdit::saveSection() {
 	s.setInvoiceText(invoiceText_en->toPlainText(), "en");
 	s.setInvoiceText(invoiceText_fr->toPlainText(), "fr");
 	s.setInvoiceText(invoiceText_it->toPlainText(), "it");
+	s.setEmail(editEmail->text());
 	
 	switch (logoType->currentIndex()) {
 		case 0:

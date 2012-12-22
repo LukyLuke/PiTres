@@ -36,7 +36,7 @@
 InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	newMemberDate->setDate(QDate::currentDate());
-	memberUntil->setDate(QDate::currentDate());
+	memberUntil->setDate(QDate(QDate::currentDate().year() + 1, 12, 31));
 
 	connect(memberUid, SIGNAL(returnPressed()), this, SLOT(insertMemberUid()));
 	connect(btnAddMember, SIGNAL(clicked()), this, SLOT(insertMemberUid()));
@@ -44,6 +44,7 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	connect(btnInvoiceNew, SIGNAL(clicked()), this, SLOT(invoiceNewMembers()));
 	connect(btnInvoiceUntil, SIGNAL(clicked()), this, SLOT(invoiceUntilDate()));
 	connect(btnInvoiceAll, SIGNAL(clicked()), this, SLOT(invoiceAllMembers()));
+	connect(btnSendReminder, SIGNAL(clicked()), this, SLOT(sendReminders()));
 }
 
 InvoiceWizard::~InvoiceWizard() {
@@ -100,7 +101,7 @@ void InvoiceWizard::invoiceMembers() {
 
 void InvoiceWizard::invoiceNewMembers() {
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE joining >= ? AND type = ?;");
+	query.prepare("SELECT uid FROM ldap_persons WHERE joining >= ? AND type <= ?;");
 	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(1, PPSPerson::Pirate);
 	query.exec();
@@ -109,8 +110,10 @@ void InvoiceWizard::invoiceNewMembers() {
 
 void InvoiceWizard::invoiceUntilDate() {
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE (paid_due < ? OR paid_due IS NULL or paid_due = '') AND type = ?;");
-	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
+	query.prepare("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
+	              " WHERE (ldap_persons_dates.paid_due < ? OR ldap_persons_dates.paid_due IS NULL OR ldap_persons_dates.paid_due = '')"
+	              " AND ldap_persons.type <= ?;");
+	query.bindValue(0, memberUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(1, PPSPerson::Pirate);
 	query.exec();
 	doCreateInvoices(&query);
@@ -118,10 +121,16 @@ void InvoiceWizard::invoiceUntilDate() {
 
 void InvoiceWizard::invoiceAllMembers() {
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE type = ?;");
+	query.prepare("SELECT uid FROM ldap_persons WHERE type <= ?;");
 	query.bindValue(0, PPSPerson::Pirate);
 	query.exec();
 	doCreateInvoices(&query);
+}
+
+void InvoiceWizard::sendReminders() {
+	// TODO: implement sending reminders for invoices not paid during last X months
+	qint32 months = reminderChooser->value();
+	qDebug() << "TODO: Sending Rmeinders...";
 }
 
 void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
@@ -144,6 +153,10 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 			break;
 		}
 		bar.setValue(cnt++);
+		
+		if (num < 0 && cnt < 2 && query->isActive()) {
+			num = query->size();
+		}
 
 		if (pers.load(query->value(0).toInt())) {
 			if (bar.wasCanceled()) break;

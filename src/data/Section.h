@@ -38,6 +38,7 @@ Q_PROPERTY(QString account READ account WRITE setAccount NOTIFY accountChanged)
 Q_PROPERTY(int treasurer READ treasurer WRITE setTreasurer NOTIFY treasurerChanged)
 Q_PROPERTY(QDate founded READ founded WRITE setFoundingDate NOTIFY foundedChanged)
 Q_PROPERTY(QString invoiceLogo READ invoiceLogo WRITE setInvoiceLogo NOTIFY invoiceLogoChanged)
+Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
 
 Q_ENUMS(AmountType)
 
@@ -68,6 +69,7 @@ public:
 	void setFoundingDate(QDate date);
 	void setInvoiceLogo(QString logo);
 	void setInvoiceText(QString text, QString language);
+	void setEmail(QString email);
 	
 	// Getter
 	bool loaded() { return _loaded; };
@@ -80,6 +82,7 @@ public:
 	QDate founded() const { return d_founded; }
 	QString invoiceLogo() const { return s_invoiceLogo; }
 	QString invoiceText(QString language) const { return m_invoiceLanguage.value(language, ""); }
+	QString emailDB() const { return s_email; };
 	QString email();
 	
 signals:
@@ -93,6 +96,7 @@ signals:
 	void foundedChanged(QDate);
 	void invoiceLogoChanged(QString);
 	void invoiceTextChanged(QString, QString);
+	void emailChanged(QString);
 	
 private:
 	QSqlDatabase db;
@@ -107,6 +111,7 @@ private:
 	QDate d_founded;
 	QString s_invoiceLogo;
 	QMap<QString, QString> m_invoiceLanguage;
+	QString s_email;
 	
 	void clear();
 };

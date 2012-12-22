@@ -85,6 +85,9 @@ private:
 	QString generateBoundary();
 	QString getMimeType(const QString &fileName);
 	QString chuckSplit(const QString &data, bool wordwise = false, bool isHtml = false);
+#ifdef SMTP_SAVE_DEBUG
+	void saveEmailDebug(const QString &from, const QString &to, const QString &subject, const QString &message);
+#endif
 };
 
 #endif // SMTP_H

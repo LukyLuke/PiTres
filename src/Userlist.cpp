@@ -64,8 +64,8 @@ void Userlist::createContextMenu() {
 
 void Userlist::loadData() {
 	QSqlQuery query("SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname,"
-					" ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons"
-					" LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;", db);
+	                " ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons"
+	                " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;", db);
 	tableModel->setQuery(query);
 
 	// InvoiceState: o_pen, c_anceled, p_aid, u_nknown

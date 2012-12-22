@@ -2,8 +2,8 @@
 run "qmake" first after each checkout
    $ qmake
 
-If you want Debug-Code, run qmake with the DEBUG=1 Parameter
-   $ qmake DEBUG=1
+For testing purposes, you can enable debug output and debug code. For this, just
+uncomment the needed DEFINES in the PiTres.pro and run qmake again.
 
 Compile with make
    $ make

@@ -50,6 +50,7 @@ void Section::clear() {
 	d_founded = QDate::currentDate();
 	s_invoiceLogo = "";
 	m_invoiceLanguage.clear();
+	s_email = "";
 	_loaded = FALSE;
 }
 
@@ -57,7 +58,7 @@ void Section::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.exec("CREATE TABLE IF NOT EXISTS pps_sections (name TEXT, parent TEXT, amount FLOAT, description TEXT,"
-	           "bank_account TEXT, address TEXT, treasurer INTEGER, founded DATE, invoice_logo TEXT);");
+	           "bank_account TEXT, address TEXT, treasurer INTEGER, founded DATE, invoice_logo TEXT, email TEXT);");
 	query.exec("CREATE TABLE IF NOT EXISTS pps_sections_texts (section TEXT, language TEXT, invoice_text TEXT);");
 }
 
@@ -112,6 +113,7 @@ void Section::load(const QString name) {
 		i_treasurer = query.value( record.indexOf("treasurer") ).toInt();
 		d_founded = query.value( record.indexOf("founded") ).toDate();
 		s_invoiceLogo = query.value( record.indexOf("invoice_logo") ).toString();
+		s_email = query.value( record.indexOf("email") ).toString();
 		
 		// Load section invoice texts
 		query.prepare("SELECT language, invoice_text FROM pps_sections_texts WHERE section=?;");
@@ -159,12 +161,12 @@ void Section::save() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	if (loaded()) {
-		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address,"
-		              "bank_account=:account,treasurer=:treasurer,founded=:founded,invoice_text=:text,invoice_logo=:logo"
-		              " WHERE name=:name;");
+		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address"
+		              ",bank_account=:account,treasurer=:treasurer,founded=:founded,invoice_text=:text,invoice_logo=:logo"
+		              ",email=:email WHERE name=:name;");
 	} else {
-		query.prepare("INSERT INTO pps_sections (name,description,amount,parent,address,bank_account,treasurer,founded,invoice_logo)"
-		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded,:logo);");
+		query.prepare("INSERT INTO pps_sections (name,description,amount,parent,address,bank_account,treasurer,founded,invoice_logo,email)"
+		              " VALUES (:name,:description,:amount,:parent,:address,:account,:treasurer,:founded,:logo,:email);");
 	}
 	query.bindValue(":name", s_name);
 	query.bindValue(":description", s_description);
@@ -175,11 +177,10 @@ void Section::save() {
 	query.bindValue(":treasurer", i_treasurer);
 	query.bindValue(":founded", d_founded);
 	query.bindValue(":logo", s_invoiceLogo);
+	query.bindValue(":email", s_email);
 	query.exec();
 	
 	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
 		_loaded = FALSE;
 	} else {
 		_loaded = TRUE;
@@ -204,17 +205,31 @@ bool Section::logoIsFile() {
 }
 
 QString Section::email() {
-	// TODO: Make this configurable or at least not that static ;)
-	if (s_name.toLower() == "members") {
-		return QString("info@piratenpartei.ch");
+	// build a standardized address if no email is set in the database
+	if (s_email.isEmpty()) {
+		QSettings settings;
+		bool first = TRUE;
+		QString mail(settings.value("pdf/email_prepend", "info").toString().append("@"));
+		Section *s = this, *p = parent();
+		while (p != NULL) {
+			mail.append(s->name()).append(".");
+			
+			// Don't cleanup the section itself ;)
+			if (first) {
+				first = FALSE;
+			} else {
+				delete s;
+			}
+			s = p;
+			p = s->parent();
+		}
+		if (p) {
+			delete p;
+		}
+		return mail.append(settings.value("pdf/email_append", "piratenpartei.ch").toString());
+		
 	}
-	
-	QString mail(s_name.toLower().prepend("info@"));
-	Section *s = this;
-	while ((s = s->parent()) != NULL && s->name() != "members") {
-		mail.append(".").append(s->name());
-	}
-	return mail.append(".piratenpartei.ch");
+	return s_email;
 }
 
 void Section::setParent(QString parent) {
@@ -265,4 +280,9 @@ void Section::setInvoiceText(QString text, QString language) {
 void Section::setInvoiceLogo(QString logo) {
 	s_invoiceLogo = logo;
 	emit invoiceLogoChanged(logo);
+}
+
+void Section::setEmail(QString email) {
+	s_email = email;
+	emit emailChanged(email);
 }

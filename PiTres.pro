@@ -9,8 +9,11 @@ DEBUG = True
 DEFINES += "FIO"
 
 # Comment out to send EMails
-DEFINES += "SMTP_DEBUG"
+#DEFINES += "SMTP_DEBUG"
 
+# Comment out to save EMails in a debug folder - each mail wi get a folder with all needed data inside.
+# This takes affect only when you are in SMTP_DEBUG.
+#DEFINES += "SMTP_SAVE_DEBUG"
 
 # Global parameters
 TEMPLATE = app

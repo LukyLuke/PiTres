@@ -45,8 +45,8 @@ void PPSPerson::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons (uid INTEGER, contribution INTEGER, nickname TEXT, gender TEXT, familyname TEXT, "
-				  "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
-				  "ldap_paid_due DATE, type INTEGER, notify_method INTEGER);");
+	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
+	              "ldap_paid_due DATE, type INTEGER, notify_method INTEGER);");
 	query.exec();
 
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_email (uid INTEGER, type TEXT, mail TEXT);");

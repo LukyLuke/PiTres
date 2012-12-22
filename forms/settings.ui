@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>793</width>
-    <height>557</height>
+    <height>617</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -53,7 +53,7 @@
             <x>0</x>
             <y>0</y>
             <width>769</width>
-            <height>483</height>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -301,7 +301,7 @@
             <x>0</x>
             <y>0</y>
             <width>769</width>
-            <height>483</height>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -379,11 +379,11 @@
               </item>
               <item row="4" column="1">
                <widget class="QLabel" name="labelTemplateHint">
-                <property name="minimumSize">
-                 <size>
-                  <width>518</width>
-                  <height>0</height>
-                 </size>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
                 <property name="text">
                  <string>The Filename for the PDF-Templates must be &quot;xxxx_LANGUAGE.xml&quot;, where LANGUAGE is the 2-Char Language-Identifier of the Language itself (de, en, fr, it)</string>
@@ -523,17 +523,61 @@
               </item>
               <item row="7" column="1">
                <widget class="QLabel" name="label_53">
-                <property name="minimumSize">
-                 <size>
-                  <width>518</width>
-                  <height>0</height>
-                 </size>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
                 <property name="text">
                  <string>The Date-Format uses &quot;y&quot; for the Year, &quot;M&quot; for the Month and &quot;d&quot; for the Day. Use a repeated value to show a single char to the full written Day/Month.</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QLabel" name="label_25">
+                <property name="text">
+                 <string>Email address prepend</string>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="0">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>Email address append</string>
+                </property>
+               </widget>
+              </item>
+              <item row="11" column="1">
+               <widget class="QLabel" name="label_58">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>The Email address is built like this: &lt;b&gt;{PREPEND}@[Section.[Section.[...]]]{APPEND}&lt;/b&gt;. This produces in addresses like &lt;i&gt;info@piratenpartei.ch&lt;/i&gt; or &lt;i&gt;info@city.ct.piratenpartei.ch&lt;/i&gt;</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <widget class="QLineEdit" name="pdfEmailPrepend">
+                <property name="text">
+                 <string>info</string>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="1">
+               <widget class="QLineEdit" name="pdfEmailAppend">
+                <property name="text">
+                 <string>piratenpartei.ch</string>
                 </property>
                </widget>
               </item>
@@ -581,7 +625,7 @@
             <x>0</x>
             <y>0</y>
             <width>769</width>
-            <height>483</height>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -849,7 +893,7 @@
             <x>0</x>
             <y>0</y>
             <width>769</width>
-            <height>483</height>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">

@@ -264,6 +264,8 @@ void PiTres::showSettings() {
 	settingsForm.pdfAccountNumber->setText(settings.value("pdf/bank_account_number", "01-84038-2").toString());
 	settingsForm.pdfCurrency->setText(settings.value("pdf/esr_currency", "CHF").toString());
 	settingsForm.pdfDateFormat->setText(settings.value("pdf/date_format", "dd.MM.yyyy").toString());
+	settingsForm.pdfEmailPrepend->setText(settings.value("pdf/email_prepend", "info").toString());
+	settingsForm.pdfEmailAppend->setText(settings.value("pdf/email_append", "piratenpartei.ch").toString());
 	
 	settingsDialog->show();
 }
@@ -340,6 +342,8 @@ void PiTres::doSaveSettings() {
 	settings.setValue("pdf/bank_account_number", settingsForm.pdfAccountNumber->text());
 	settings.setValue("pdf/esr_currency", settingsForm.pdfCurrency->text());
 	settings.setValue("pdf/date_format", settingsForm.pdfDateFormat->text());
+	settings.setValue("pdf/email_prepend", settingsForm.pdfEmailPrepend->text());
+	settings.setValue("pdf/email_append", settingsForm.pdfEmailPrepend->text());
 }
 
 void PiTres::showInvoiceFileDialog() {

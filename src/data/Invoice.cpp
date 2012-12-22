@@ -362,7 +362,7 @@ float Invoice::setRecommendations(QString section) {
 	}
 	Section sec(section);
 	Section *s = sec.parent();
-	if (s->loaded()) {
+	if (s && s->loaded()) {
 		back += setRecommendations(s->name());
 	}
 	l_recom.insert(sec.description().replace(QRegExp(";:"), ""), sec.amount());

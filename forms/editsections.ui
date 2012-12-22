@@ -130,11 +130,18 @@
            <item row="6" column="0">
             <widget class="QLabel" name="label_8">
              <property name="text">
+              <string>Email addres:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
               <string>Founding Date:</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
+           <item row="7" column="1">
             <widget class="QDateEdit" name="editFoundingDate">
              <property name="displayFormat">
               <string>yyyy-MM-dd</string>
@@ -143,6 +150,9 @@
               <bool>true</bool>
              </property>
             </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="editEmail"/>
            </item>
           </layout>
          </item>
@@ -618,6 +628,22 @@
     <hint type="destinationlabel">
      <x>385</x>
      <y>396</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editEmail</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>actionSave</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>527</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
