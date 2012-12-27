@@ -24,6 +24,7 @@
 #include "ui_fromtodates.h"
 #include "ui_dateform.h"
 #include "ui_invoiceedit.h"
+#include "ui_invoiceexportcsv.h"
 #include "data/Reminder.h"
 #include "data/Person.h"
 #include "data/Invoice.h"
@@ -73,9 +74,11 @@ private:
 	QDialog *invoiceQifDialog;
 	QDialog *paymentQifDialog;
 	QDialog *editDialog;
+	QDialog *csvDialog;
 	Ui::fromToDatesForm exportInvoiceQifForm;
 	Ui::fromToDatesForm exportPaymentQifForm;
 	Ui::editEditInvoice editInvoice;
+	Ui::invoiceCsvExport csvExport;
 	
 	QSqlQuery createQuery();
 	void createContextMenu();
@@ -99,6 +102,8 @@ public slots:
 	void printNewReminder();
 	void showEditInvoiceForm();
 	void doEditInvoice();
+	void exportCsvList();
+	void doExportCsvList();
 
 protected:
 	void timerEvent(QTimerEvent *event);

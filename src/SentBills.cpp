@@ -33,6 +33,7 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
+	connect(btnExportCsv, SIGNAL(clicked()), this, SLOT(exportCsvList()));
 
 	tableModel = new QSqlQueryModel(tableView);
 
@@ -52,6 +53,10 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	editDialog = new QDialog(this);
 	editInvoice.setupUi(editDialog);
 	connect(editInvoice.actionSave, SIGNAL(triggered()), this, SLOT(doEditInvoice()));
+	
+	csvDialog = new QDialog(this);
+	csvExport.setupUi(csvDialog);
+	connect(csvExport.actionChoose, SIGNAL(triggered()), this, SLOT(doExportCsvList()));
 
 	// Enable the ContextMenu
 	tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -265,6 +270,54 @@ void SentBills::doExportQifPayments() {
 		}
 	}
 	paymentQifDialog->close();
+}
+
+void SentBills::exportCsvList() {
+	QDate now = QDate::currentDate();
+	csvExport.fromDate->setDate(now.addMonths(-3));
+	csvExport.toDate->setDate(now);
+	csvDialog->show();
+}
+
+void SentBills::doExportCsvList() {
+	QSqlQuery query(db);
+	QString sql("SELECT pps_invoice.member_uid, pps_invoice.reference, pps_invoice.amount, pps_invoice.address_prefix, pps_invoice.address_name,"
+	            "pps_invoice.address_street1, pps_invoice.address_street2, pps_invoice.address_city, ldap_persons.country"
+	            " FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
+	            " WHERE pps_invoice.issue_date >= :date1 AND pps_invoice.issue_date <= :date2");
+	if (csvExport.radioEmail->isChecked()) {
+		sql.append(" AND (ldap_persons.notify_method=" + QString::number(PPSPerson::EMail) + " AND pps_invoice.address_email<>\"\")");
+	} else if (csvExport.radioSnailMail->isChecked()) {
+		sql.append(" AND (ldap_persons.notify_method=" + QString::number(PPSPerson::SnailMail) + " OR pps_invoice.address_email=\"\")");
+	}
+	query.prepare(sql);
+	query.bindValue(":date1", csvExport.fromDate->date().toString("yyyy-MM-dd"));
+	query.bindValue(":date2", csvExport.toDate->date().toString("yyyy-MM-dd"));
+	if (!query.exec()) {
+		qDebug() << query.lastError().text();
+		qDebug() << query.lastQuery();
+	}
+	
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save list as CSV"), "", tr("Comma separated file (*.csv);;Plaintext (*.txt)"));
+	if (!fileName.isEmpty()) {
+		QFile f(fileName);
+		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+			QTextStream out(&f);
+			out << "\"member_uid\",\"reference\",\"amount\",\"prefix\",\"name\",\"address\",\"city\",\"country\"\n";
+			
+			while (query.next()) {
+				out << query.value(0).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(1).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(2).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(3).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(4).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(5).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(7).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(8).toString().trimmed().replace('"',"\"\"").append("\"\n").prepend("\"");
+			}
+		}
+	}
+	csvDialog->close();
 }
 
 void SentBills::showTableContextMenu(const QPoint &point) {

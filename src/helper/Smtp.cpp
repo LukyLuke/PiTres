@@ -58,12 +58,12 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	QString msgBoundary = generateBoundary();
 	QString bodyBoundary = generateBoundary();
 	
-	QString msgTextBody = textBody.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
-	msgTextBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
+	QString msgTextBody = textBody.replace(QString::fromUtf8("\n"), QString::fromUtf8("\r\n"));
+	msgTextBody.replace(QString::fromUtf8("\r\n.\r\n"), QString::fromUtf8("\r\n..\r\n"));
 	msgTextBody = chuckSplit(msgTextBody, true);
 	
-	QString msgHtmlBody = htmlBody.replace(QString::fromLatin1("\n"), QString::fromLatin1("\r\n"));
-	msgHtmlBody.replace(QString::fromLatin1("\r\n.\r\n"), QString::fromLatin1("\r\n..\r\n"));
+	QString msgHtmlBody = htmlBody.replace(QString::fromUtf8("\n"), QString::fromUtf8("\r\n"));
+	msgHtmlBody.replace(QString::fromUtf8("\r\n.\r\n"), QString::fromUtf8("\r\n..\r\n"));
 	//msgHtmlBody = chuckSplit(msgHtmlBody, false, true);
 	
 	message = dateHeader() + "\r\n";
@@ -72,7 +72,7 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	message.append("From: " + from + "\r\n");
 	message.append("Subject: " + subject + "\r\n");
 	message.append("Content-Type: multipart/mixed;\r\n\tboundary=\""+msgBoundary+"\"\r\n");
-	message.append("Content-transfer-encoding: 7BIT\r\n\r\n");
+	//message.append("Content-transfer-encoding: 7BIT\r\n\r\n");
 	message.append("This is a multi-part message in MIME format.\r\n\r\n");
 	message.append("--" + msgBoundary);
 	message.append("\r\nContent-Type: multipart/alternative;\r\n\tboundary=\""+bodyBoundary+"\"\r\n\r\n");
