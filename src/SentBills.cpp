@@ -306,14 +306,14 @@ void SentBills::doExportCsvList() {
 			out << "\"member_uid\",\"reference\",\"amount\",\"prefix\",\"name\",\"address\",\"city\",\"country\"\n";
 			
 			while (query.next()) {
-				out << query.value(0).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(1).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(2).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(3).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(4).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(5).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(7).toString().trimmed().replace('"',"\"\"").append("\",").prepend("\"");
-				out << query.value(8).toString().trimmed().replace('"',"\"\"").append("\"\n").prepend("\"");
+				out << query.value(0).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(1).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(2).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(3).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(4).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(5).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(7).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
+				out << query.value(8).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\"\n").prepend("\"");
 			}
 		}
 	}
