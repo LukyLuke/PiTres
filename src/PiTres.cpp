@@ -20,10 +20,13 @@
 
 PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 #ifdef SMTP_DEBUG
-	qDebug() << "Compiled with SMTP_DEBUG: No EMails are sent out.";
+	qDebug() << "Compiled with SMTP_DEBUG: No emails are sent out.";
+#endif
+#ifdef SMTP_SAVE_DEBUG
+	qDebug() << "Compiled with SMTP_SAVE_DEBUG: Emails are stored in the debug folder.";
 #endif
 #ifdef FIO
-	qDebug() << "Compiled with FIO: The Financial Regulation Membership fee calculation is used with individual recommendatins for each section.";
+	qDebug() << "Compiled with FIO: The Financial-Regulation Membership-Fee calculation is used with individual recommendations for each individual section.";
 #else
 	qDebug() << "Compiled without FIO: The standard Membershipfee calculation is used with two Membership fee amounts.";
 #endif
