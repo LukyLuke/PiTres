@@ -9,11 +9,11 @@ DEBUG = True
 DEFINES += "FIO"
 
 # Comment out to send EMails
-#DEFINES += "SMTP_DEBUG"
+DEFINES += "SMTP_DEBUG"
 
 # Comment out to save EMails in a debug folder - each mail wi get a folder with all needed data inside.
 # This takes affect only when you are in SMTP_DEBUG.
-#DEFINES += "SMTP_SAVE_DEBUG"
+DEFINES += "SMTP_SAVE_DEBUG"
 
 # Global parameters
 TEMPLATE = app
@@ -54,7 +54,7 @@ QT = core gui network sql xml svg
 FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
         forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
         forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui \
-        forms/donations.ui forms/donation_import.ui forms/statistics.ui
+        forms/donations.ui forms/donation_import.ui forms/statistics.ui forms/invoiceexportcsv.ui
 OUT_PWD = build
 
 # Translations
