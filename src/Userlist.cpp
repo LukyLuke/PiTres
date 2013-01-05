@@ -312,11 +312,14 @@ void Userlist::adjustMemberDueDate() {
 }
 
 void Userlist::exportLdif() {
+	// using ldap_modify:
+	// ldapmodify -D "uniqueIdentifier=XX,dc=members,st=XX,dc=piratenpartei,dc=ch" -W -h localhost -p 1389 -c -f XX.ldif &> import.log
 	QSettings settings;
 	QHash<QString, LdifData> hashList;
 	QHash<QString, QString> sections;
 	QString ldif = "";
 	QString section, member, duedate, subsection, value, save_section;
+	QDate due;
 	qint32 cnt = 0;
 	QString members_dn = settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString();
 	QString main_dn = settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,%3st=%2,dc=piratenpartei,dc=ch").toString();
@@ -328,18 +331,20 @@ void Userlist::exportLdif() {
 	// Only get the last if entries should be relaced or all the other way
 	if (replaceAttribute) {
 		query.prepare("SELECT ldap_persons.uid,MAX(ldap_persons_dates.paid_due) AS paid_due,ldap_persons.nickname,ldap_persons.section FROM ldap_persons"
-					  " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
+		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
 	} else {
 		query.prepare("SELECT ldap_persons.uid,ldap_persons_dates.paid_due,ldap_persons.nickname,ldap_persons.section FROM ldap_persons"
-					  " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
+		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
 	}
 
 	if (query.exec()) {
 		while (query.next()) {
 			member = query.value(0).toString();
-			duedate = query.value(1).toString();
+			//duedate = query.value(1).toString();
 			//nickname = query.value(2).toString();
 			section = query.value(3).toString();
+			due = QDate::fromString(query.value(1).toString(), "yyyy-MM-dd");
+			duedate = due.toString("yyyyMMdd120000Z");
 
 			LdifData d;
 			if (!hashList.contains(member)) {
@@ -392,9 +397,10 @@ void Userlist::exportLdif() {
 		ldif.append("\nchangetype: modify");
 
 		// Always delete all Entries, we readd all after
-		ldif.append("\ndelete: " + attribute);
-		ldif.append("\n-");
-		ldif.append("\nadd: " + attribute);
+		//ldif.append("\ndelete: " + attribute);
+		//ldif.append("\n-");
+		//ldif.append("\nadd: " + attribute);
+		ldif.append("\nreplace: " + attribute);
 		ldif.append("\n");
 
 		for (int i = 0; i < d.dates.size(); ++i) {
