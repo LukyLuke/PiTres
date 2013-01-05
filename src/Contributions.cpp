@@ -98,10 +98,12 @@ void Contributions::loadSectionContributions() {
 QSqlQuery Contributions::createQuery() {
 	QSqlQuery query(db);
 	query.prepare("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
-	              " paid_date>=:start AND paid_date<=:end AND state=:state ORDER BY for_section ASC;");
+	              " paid_date>=:start AND paid_date<=:end AND payable_date<=:year AND state=:state ORDER BY for_section ASC;");
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
+	// only contribute payments til the end of the year - those have to be in the balance of the next year
+	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
 	return query;
 }
 
@@ -159,10 +161,12 @@ void Contributions::showOverview() {
 	dontContribute.removeAll("");
 	
 	// Refill with Data
-	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state GROUP BY for_section;");
+	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND payable_date<=:year AND state=:state GROUP BY for_section;");
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
+	// only contribute payments til the end of the year - those have to be in the balance of the next year
+	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
 	query.exec();
 	
 	double sum = 0.0;
@@ -284,12 +288,16 @@ void Contributions::createQif() {
 	}
 	
 	// Get all Data
-	query.prepare(QString("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND state=:state %1 GROUP BY for_section;").arg(notIn));
+	query.prepare(QString("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
+	                      " AND state=:state AND payable_date<=:year %1 GROUP BY for_section;").arg(notIn));
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
+	// only contribute payments til the end of the year - those have to be in the balance of the next year
+	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
+	
 	for (int i = 0; i < dontContribute.size(); i++) {
-		query.bindValue(i+3, dontContribute.at(i));
+		query.bindValue(i+4, dontContribute.at(i));
 	}
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
@@ -335,13 +343,16 @@ void Contributions::createQif() {
 	}
 	
 	// Mark all Invoices as Contributed - Don't use the Invoice-Class here in case of one vs. lot of queries
-	query.prepare(QString("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end AND state=:state %1;").arg(notIn));
+	query.prepare(QString("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end AND payable_date<=:year AND state=:state %1;").arg(notIn));
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
 	query.bindValue(":newstate", Invoice::StateContributed);
+	// only contribute payments til the end of the year - those have to be in the balance of the next year
+	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
+	
 	for (int i = 0; i < dontContribute.size(); i++) {
-		query.bindValue(i+4, dontContribute.at(i));
+		query.bindValue(i+5, dontContribute.at(i));
 	}
 	query.exec();
 }
