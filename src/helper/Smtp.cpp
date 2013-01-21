@@ -1,5 +1,5 @@
 /*
-	A simple SMTP-Class to send EMails with Attachmets
+	A simple SMTP-Class to send emails with attachmets.
 	Copyright (C) 2012  Lukas Zurschmiede <l.zurschmiede@delightsoftware.com>
 
 	This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,19 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/**
+ * For debuging your program, you can define two constants:
+ * 
+ *   SMTP_DEBUG
+ *     If set, no mails are sent out.
+ * 
+ *   SMTP_SAVE_DEBUG
+ *     If set, all mails are saved as .eml in the "debug" subfolder of the running path.
+ * 
+ * If you need to check the form of the emails before the golive, enable both.
+ * If you are developing parts witch sends emails. just enable SMTP_DEBUG to not send them.
+ */
 
 #include "Smtp.h"
 
@@ -58,13 +71,15 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	QString msgBoundary = generateBoundary();
 	QString bodyBoundary = generateBoundary();
 	
-	QString msgTextBody = textBody.replace(QString::fromUtf8("\n"), QString::fromUtf8("\r\n"));
-	msgTextBody.replace(QString::fromUtf8("\r\n.\r\n"), QString::fromUtf8("\r\n..\r\n"));
+	QString msgTextBody = textBody.replace("\n", "\r\n");
+	msgTextBody.replace("\r\n.\r\n", "\r\n..\r\n");
 	msgTextBody = chuckSplit(msgTextBody, true);
 	
-	QString msgHtmlBody = htmlBody.replace(QString::fromUtf8("\n"), QString::fromUtf8("\r\n"));
-	msgHtmlBody.replace(QString::fromUtf8("\r\n.\r\n"), QString::fromUtf8("\r\n..\r\n"));
-	//msgHtmlBody = chuckSplit(msgHtmlBody, false, true);
+	QString msgHtmlBody = htmlBody.replace("\n", "\r\n");
+	msgHtmlBody.replace("\r\n.\r\n", "\r\n..\r\n");
+	
+	// BUG: bluewin webmail cannot handle this and throws an exception.
+	msgHtmlBody.replace(QRegExp("\"data:image[^\"]+\""), "");
 	
 	message = dateHeader() + "\r\n";
 	message.append("MIME-Version: 1.0\r\n");
@@ -72,17 +87,16 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	message.append("From: " + from + "\r\n");
 	message.append("Subject: " + subject + "\r\n");
 	message.append("Content-Type: multipart/mixed;\r\n\tboundary=\""+msgBoundary+"\"\r\n");
-	//message.append("Content-transfer-encoding: 7BIT\r\n\r\n");
 	message.append("This is a multi-part message in MIME format.\r\n\r\n");
 	message.append("--" + msgBoundary);
 	message.append("\r\nContent-Type: multipart/alternative;\r\n\tboundary=\""+bodyBoundary+"\"\r\n\r\n");
 	message.append("--" + bodyBoundary + "\r\n");
 	message.append("Content-Type: text/plain; charset=\"utf-8\"\r\n");
-	message.append("Content-Transfer-Encoding: quoted-printable\r\n\r\n");
+	message.append("Content-Transfer-Encoding: 8Bit\r\n\r\n");
 	message.append(msgTextBody);
 	message.append("\r\n\r\n--" + bodyBoundary + "\r\n");
 	message.append("Content-Type: text/html; charset=\"utf-8\"\r\n");
-	message.append("Content-Transfer-Encoding: quoted-printable\r\n\r\n");
+	message.append("Content-Transfer-Encoding: 8Bit\r\n\r\n");
 	message.append(msgHtmlBody + "\r\n");
 	message.append("--" + bodyBoundary + "--\r\n\r\n");
 	
@@ -105,13 +119,13 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	isConnected = false;
 	textStream = new QTextStream(socket);
 	
-#ifdef SMTP_DEBUG
-	qDebug() << "SMTP_DEBUG: I do not send an Email! This is a DEBUG-BUILD without sending Emails!";
-	qDebug() << "SMTP_DEBUG: Remove the 'SMTP_DEBUG' in PiTres.pro and recompile with 'qmake && make'...";
-	
 #ifdef SMTP_SAVE_DEBUG
 	saveEmailDebug(from, to, subject, message);
 #endif
+	
+#ifdef SMTP_DEBUG
+	qDebug() << "SMTP_DEBUG: I do not send an Email! This is a DEBUG-BUILD without sending Emails!";
+	qDebug() << "SMTP_DEBUG: Remove the 'SMTP_DEBUG' in PiTres.pro and recompile with 'qmake && make'...";
 	
 	return false;
 #else
@@ -314,11 +328,11 @@ void Smtp::readyRead() {
 }
 
 void Smtp::setTextMessage(const QString &body) {
-	textBody = body;
+	textBody = body.toUtf8();
 }
 
 void Smtp::setHtmlMessage(const QString &body) {
-	htmlBody = body;
+	htmlBody = body.toUtf8();
 	if (htmlBody.indexOf("<html", 0, Qt::CaseInsensitive) < 0) {
 		htmlBody.prepend("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"><html><head><style></style></head><body>");
 		htmlBody.append("</body></html>");
