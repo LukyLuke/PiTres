@@ -243,9 +243,9 @@ bool XmlPdf::send(QString email) {
 						subject = n.toElement().text();
 					} else if (n.isElement() && n.nodeName().toLower() == "content") {
 						if (type == "text") {
-							textMessage = QString::fromUtf8(n.toElement().text().toUtf8());
+							textMessage = n.toElement().text();
 						} else if (type == "html") {
-							htmlMessage = QString::fromUtf8(n.toElement().text().toUtf8());
+							htmlMessage = n.toElement().text();
 						}
 					}
 				}
