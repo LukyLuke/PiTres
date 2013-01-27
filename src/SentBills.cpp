@@ -22,23 +22,23 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 
 	QSettings settings;
-	pendingOnly->setChecked(settings.value("sentbills/pending", false).toBool());
+	checkPending->setChecked(settings.value("sentbills/pending", false).toBool());
 	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate().addMonths(-3)).toDate());
 	maxDate->setDate(settings.value("sentbills/maxdate", QDate::currentDate().addDays(1)).toDate());
 
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
-	connect(pendingOnly, SIGNAL(toggled(bool)), this, SLOT(searchData()));
+	connect(checkPending, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
 	connect(btnExportCsv, SIGNAL(clicked()), this, SLOT(exportCsvList()));
-
+	
 	tableModel = new QSqlQueryModel(tableView);
-
 	loadData();
 	createContextMenu();
+	createMassChangeButton();
 
 	invoiceQifDialog = new QDialog(this);
 	exportInvoiceQifForm.setupUi(invoiceQifDialog);
@@ -86,6 +86,45 @@ void SentBills::createContextMenu() {
 	connect(actionPrintReminder, SIGNAL(triggered()), this, SLOT(printNewReminder()));
 }
 
+void SentBills::createMassChangeButton() {
+	actionStateChange = new QActionGroup(this);
+	
+	QAction *open = new QAction(tr("Open"), this);
+	open->setStatusTip(tr("Change the paid-state to open."));
+	open->setData(QVariant(Invoice::StateOpen));
+	actionStateChange->addAction(open);
+	
+	QAction *canceled = new QAction(tr("Canceled"), this);
+	canceled->setStatusTip(tr("Change the paid-state to canceled."));
+	canceled->setData(QVariant(Invoice::StateCanceled));
+	actionStateChange->addAction(canceled);
+	
+	QAction *paid = new QAction(tr("Paid"), this);
+	paid->setStatusTip(tr("Change the paid-state to paid."));
+	paid->setData(QVariant(Invoice::StatePaid));
+	actionStateChange->addAction(paid);
+	
+	QAction *unknown = new QAction(tr("Unknown"), this);
+	unknown->setStatusTip(tr("Change the paid-state to unknown."));
+	unknown->setData(QVariant(Invoice::StateUnknown));
+	actionStateChange->addAction(unknown);
+	
+	QAction *contributed = new QAction(tr("Contributed"), this);
+	contributed->setStatusTip(tr("Change the paid-state to contributed."));
+	contributed->setData(QVariant(Invoice::StateContributed));
+	actionStateChange->addAction(contributed);
+	
+	connect(actionStateChange, SIGNAL(triggered(QAction*)), this, SLOT(massChangeState(QAction*)));
+	
+	QMenu *menu = new QMenu(btnChangeStates);
+	menu->addAction(open);
+	menu->addAction(canceled);
+	menu->addAction(paid);
+	menu->addAction(contributed);
+	menu->addAction(unknown);
+	btnChangeStates->setMenu(menu);
+}
+
 void SentBills::loadData() {
 	tableModel->setQuery(createQuery());
 
@@ -125,7 +164,7 @@ QSqlQuery SentBills::createQuery() {
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	QString qs("SELECT * FROM pps_invoice WHERE issue_date >= :issued_after AND issue_date <= :issued_before");
 
-	if (pendingOnly->isChecked()) {
+	if (checkPending->isChecked()) {
 		qs.append(" AND state=" + QString::number((int)Invoice::StateOpen));
 	}
 
@@ -159,17 +198,12 @@ QSqlQuery SentBills::createQuery() {
 		}
 	}
 	query.exec();
-
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
 	return query;
 }
 
 void SentBills::searchData() {
 	QSettings settings;
-	settings.setValue("sentbills/pending", pendingOnly->isChecked());
+	settings.setValue("sentbills/pending", checkPending->isChecked());
 	settings.setValue("sentbills/sincedate", sinceDate->date());
 	settings.setValue("sentbills/maxdate", maxDate->date());
 
@@ -319,6 +353,63 @@ void SentBills::doExportCsvList() {
 	}
 	csvDialog->close();
 }
+
+void SentBills::massChangeState(QAction *action) {
+	QString state;
+	switch (action->data().toInt()) {
+		case Invoice::StateOpen:
+			state = tr("Open");
+			break;
+		case Invoice::StateCanceled:
+			state = tr("Canceled");
+			break;
+		case Invoice::StateContributed:
+			state = tr("Contributed");
+			break;
+		case Invoice::StatePaid:
+			state = tr("Paid");
+			break;
+		case Invoice::StateUnknown:
+			state = tr("Unknown");
+			break;
+	}
+	QSet<int> list = getSelectedRows();
+	if (list.size() <= 0) {
+		while (tableModel->canFetchMore()) {
+			tableModel->fetchMore();
+		}
+	}
+	int max = list.size() > 0 ? list.size() : tableModel->rowCount();
+	QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Change invoice states"), tr("You are to change about %1 invoices to the State %2.\n"
+		"If you are not sure, please cancel this action, you will not be able to undo this action!")
+	.arg(max).arg(state), QMessageBox::Ok | QMessageBox::Cancel);
+	
+	if (btn == QMessageBox::Cancel) {
+		return;
+	}
+	
+	QSqlRecord record;
+	QSqlQuery query(db);
+	query.prepare("UPDATE pps_invoice SET state=:state WHERE reference=:reference;");
+	query.bindValue(":state", action->data().toInt());
+	
+	// Check for select entries. If there are some, change only those. Otherwise change all visible.
+	if (list.size() > 0) {
+		foreach (const int &i, list) {
+			record = tableModel->record(i);
+			query.bindValue(":reference", record.value("reference").toString());
+			query.exec();
+		}
+	} else {
+		for (int i = 0; i < tableModel->rowCount(); i++) {
+			record = tableModel->record(i);
+			query.bindValue(":reference", record.value("reference").toString());
+			query.exec();
+		}
+	}
+	
+}
+
 
 void SentBills::showTableContextMenu(const QPoint &point) {
 	QMenu menu(tableView);

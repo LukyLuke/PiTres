@@ -48,6 +48,7 @@
 #include <QMenu>
 #include <QSet>
 #include <QAction>
+#include <QActionGroup>
 #include <QSizePolicy>
 #include <QTableView>
 #include <QItemSelectionModel>
@@ -70,6 +71,7 @@ private:
 	QAction *actionSendReminder;
 	QAction *actionPrintReminder;
 	QAction *actionShowEdit;
+	QActionGroup *actionStateChange;
 	
 	QDialog *invoiceQifDialog;
 	QDialog *paymentQifDialog;
@@ -82,6 +84,7 @@ private:
 	
 	QSqlQuery createQuery();
 	void createContextMenu();
+	void createMassChangeButton();
 	QSet<int> getSelectedRows();
 	void createPdfReminds(bool email);
 
@@ -104,6 +107,7 @@ public slots:
 	void doEditInvoice();
 	void exportCsvList();
 	void doExportCsvList();
+	void massChangeState(QAction *action);
 
 protected:
 	void timerEvent(QTimerEvent *event);

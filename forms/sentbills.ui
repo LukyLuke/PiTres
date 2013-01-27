@@ -26,13 +26,6 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QCheckBox" name="pendingOnly">
-       <property name="text">
-        <string>Pending</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLineEdit" name="searchEdit">
        <property name="placeholderText">
         <string>Search over all Datasets</string>
@@ -60,6 +53,50 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QCheckBox" name="checkOpposite">
+       <property name="toolTip">
+        <string>Check this to NOT select the selected states.</string>
+       </property>
+       <property name="statusTip">
+        <string>Check this to NOT select the selected states.</string>
+       </property>
+       <property name="whatsThis">
+        <string>Check this to NOT select the selected states.</string>
+       </property>
+       <property name="text">
+        <string>Not</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkPending">
+       <property name="text">
+        <string>Pending</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkOpen">
+       <property name="text">
+        <string>Open</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkCanceled">
+       <property name="text">
+        <string>Canceled</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkContributed">
+       <property name="text">
+        <string>Contributed</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -110,6 +147,26 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QToolButton" name="btnChangeStates">
+       <property name="text">
+        <string>Mass change</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/contract.png</normaloff>:/icons/resources/icons/contract.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
