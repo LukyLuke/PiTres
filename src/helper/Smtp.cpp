@@ -78,8 +78,11 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	QString msgHtmlBody = htmlBody.replace("\n", "\r\n");
 	msgHtmlBody.replace("\r\n.\r\n", "\r\n..\r\n");
 	
-	// BUG: bluewin webmail cannot handle this and throws an exception.
-	msgHtmlBody.replace(QRegExp("\"data:image[^\"]+\""), "");
+	// BUG: swisscom webmail cannot handle this and throws an exception.
+	//      this error is currently discussed by them, maybe they can solve it :o)
+	if (to.contains(QRegExp("(swisscom|bluewin|bluemail)\.(ch|com)"))) {
+		msgHtmlBody.replace(QRegExp("\"data:image[^\"]+\""), "");
+	}
 	
 	message = dateHeader() + "\r\n";
 	message.append("MIME-Version: 1.0\r\n");
