@@ -70,16 +70,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkPending">
+      <widget class="QCheckBox" name="checkOpen">
        <property name="text">
-        <string>Pending</string>
+        <string>Open</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkOpen">
+      <widget class="QCheckBox" name="checkPaid">
        <property name="text">
-        <string>Open</string>
+        <string>Paid</string>
        </property>
       </widget>
      </item>

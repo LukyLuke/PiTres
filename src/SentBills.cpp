@@ -22,14 +22,14 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 
 	QSettings settings;
-	checkPending->setChecked(settings.value("sentbills/pending", false).toBool());
+	checkOpen->setChecked(settings.value("sentbills/pending", false).toBool());
 	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate().addMonths(-3)).toDate());
 	maxDate->setDate(settings.value("sentbills/maxdate", QDate::currentDate().addDays(1)).toDate());
 
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
-	connect(checkPending, SIGNAL(toggled(bool)), this, SLOT(searchData()));
+	connect(checkOpen, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
@@ -164,7 +164,7 @@ QSqlQuery SentBills::createQuery() {
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	QString qs("SELECT * FROM pps_invoice WHERE issue_date >= :issued_after AND issue_date <= :issued_before");
 
-	if (checkPending->isChecked()) {
+	if (checkOpen->isChecked()) {
 		qs.append(" AND state=" + QString::number((int)Invoice::StateOpen));
 	}
 
@@ -203,7 +203,7 @@ QSqlQuery SentBills::createQuery() {
 
 void SentBills::searchData() {
 	QSettings settings;
-	settings.setValue("sentbills/pending", checkPending->isChecked());
+	settings.setValue("sentbills/pending", checkOpen->isChecked());
 	settings.setValue("sentbills/sincedate", sinceDate->date());
 	settings.setValue("sentbills/maxdate", maxDate->date());
 
@@ -307,9 +307,12 @@ void SentBills::doExportQifPayments() {
 }
 
 void SentBills::exportCsvList() {
-	QDate now = QDate::currentDate();
-	csvExport.fromDate->setDate(now.addMonths(-3));
-	csvExport.toDate->setDate(now);
+	csvExport.fromDate->setDate(sinceDate->date());
+	csvExport.toDate->setDate(maxDate->date());
+	csvExport.stateOpen->setChecked(checkOpen->isChecked());
+	csvExport.statePaid->setChecked(checkPaid->isChecked());
+	csvExport.stateCanceled->setChecked(checkCanceled->isChecked());
+	csvExport.stateContributed->setChecked(checkContributed->isChecked());
 	csvDialog->show();
 }
 
@@ -323,6 +326,9 @@ void SentBills::doExportCsvList() {
 		sql.append(" AND (ldap_persons.notify_method=" + QString::number(PPSPerson::EMail) + " AND pps_invoice.address_email<>\"\")");
 	} else if (csvExport.radioSnailMail->isChecked()) {
 		sql.append(" AND (ldap_persons.notify_method=" + QString::number(PPSPerson::SnailMail) + " OR pps_invoice.address_email=\"\")");
+	}
+	if (csvExport.stateOpen->isChecked()) {
+		sql.append(" AND pps_invoice.state=" + QString::number((int)Invoice::StateOpen));
 	}
 	query.prepare(sql);
 	query.bindValue(":date1", csvExport.fromDate->date().toString("yyyy-MM-dd"));
@@ -512,6 +518,8 @@ void SentBills::createPdfReminds(bool email) {
 			pdf = reminder.createPdf("invoice");
 			pdf->send(reminder.addressEmail());
 		}
+		reminder.setReminded(reminder.reminded() + 1);
+		reminder.save();
 	}
 	bar.setValue(max);
 }
