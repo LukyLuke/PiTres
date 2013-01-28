@@ -47,8 +47,11 @@ CH-1337 Vallorbe]]></text>
 			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Total Empfehlungen:]]></text>
 			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
 
-			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
-			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
+			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Bezahlen bis:]]></text>
+			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[11.03.2013]]></text>
+
+			<text x="10" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
+			<text x="130" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
 		<g part="text1">
