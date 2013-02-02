@@ -385,7 +385,12 @@ bool Invoice::pay(float amount, QDate *date) {
 	}
 	setAmountPaid(amount);
 
-	if (f_amount <= amountPaid()) {
+#ifdef FIO
+	float min_amount = settings.value("invoice/minimum_amount", 30.0).toFloat();
+	if (amountPaid() >= min_amount) {
+#else
+	if (amountPaid() >= f_amount) {
+#endif
 		setState(StatePaid);
 	}
 	save();

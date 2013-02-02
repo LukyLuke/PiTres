@@ -199,12 +199,15 @@ void PiTres::showSettings() {
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_limited", 60.0).toFloat());
 	delete settingsForm.labelrecommendationsMaxSections;
 	delete settingsForm.maxNumSections;
+	delete settingsForm.memberAmountMin;
+	delete settingsForm.labelMemberAmountMinimum;
 #else
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/recommendation_maximum", 125.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/recommendation_none", 15.0).toFloat());
 	settingsForm.maxNumSections->setValue(settings.value("invoice/recommendation_numsections", 4).toInt());
 	settingsForm.labelMemberAmountFull->setText(tr("Maximum recommendation per Section"));
 	settingsForm.labelMemberAmountLimited->setText(tr("Default recommendation"));
+	settingsForm.memberAmountMin->setValue(settings.value("invoice/minimum_amount", 30.0).toFloat());
 #endif
 	
 	settingsForm.pdfInvoice->setText(settings.value("pdf/invoice_template", "data/invoice.xml").toString());
@@ -287,6 +290,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("invoice/recommendation_maximum", settingsForm.memberAmountFull->value());
 	settings.setValue("invoice/recommendation_none", settingsForm.memberAmountLimited->value());
 	settings.setValue("invoice/recommendation_numsections", settingsForm.maxNumSections->value());
+	settings.setValue("invoice/minimum_amount", settingsForm.memberAmountMin->value());
 #endif
 	
 	settings.setValue("pdf/invoice_template", settingsForm.pdfInvoice->text());

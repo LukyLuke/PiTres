@@ -123,14 +123,14 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="labelrecommendationsMaxSections">
                 <property name="text">
                  <string>Maximum number sections</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="3" column="1">
                <widget class="QSpinBox" name="maxNumSections">
                 <property name="minimum">
                  <number>1</number>
@@ -140,14 +140,14 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_29">
                 <property name="text">
                  <string>Member due Date Format</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="4" column="1">
                <widget class="QLineEdit" name="memberDueDate">
                 <property name="toolTip">
                  <string>&lt;p&gt;The Format must be in form of &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy-MM-dd&lt;/span&gt; but can have static values.&lt;br/&gt;For example to terminate to the end of a Year, enter &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy-12-31&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy&lt;/span&gt; for the 4-digit Year&lt;br/&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;MM&lt;/span&gt; for the 2-digit Month&lt;br/&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;dd&lt;/span&gt; for the 2-digit Day&lt;/p&gt;</string>
@@ -156,6 +156,23 @@
                  <string>yyyy-12-13</string>
                 </property>
                </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QCheckBox" name="memberDueDateNextYear">
+                <property name="text">
+                 <string>Member due next Year</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelMemberAmountMinimum">
+                <property name="text">
+                 <string>Minimal amount</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="memberAmountMin"/>
               </item>
              </layout>
             </widget>
