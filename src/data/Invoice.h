@@ -74,6 +74,7 @@ public:
 	static QList<Invoice *> getInvoicesForMember(int member);
 	static void createTables();
 	static void setContributed(QString reference);
+	static void synchronizeWithMembers();
 
 	// InvoiceState in old DB: o_pen, c_anceled, p_aid, u_nknown
 	enum State { StateOpen=0, StateCanceled=1, StatePaid=2, StateUnknown=3, StateContributed=4 };

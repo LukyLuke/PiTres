@@ -276,9 +276,12 @@ void LDAPImport::importFromLdap() {
 		delete person;
 	}
 #else
-  progressBar->setValue(max);
-  labelImportState->setText(QString("LDAP-Import not supported under windows at the moment, sorry..."));
+	progressBar->setValue(max);
+	labelImportState->setText(QString("LDAP-Import not supported under windows at the moment, sorry..."));
 #endif
+
+	// Close all Invoices from persons they are no longer in the database
+	Invoice::synchronizeWithMembers();
 }
 
 void LDAPImport::emptyDatabase() {

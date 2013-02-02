@@ -156,6 +156,20 @@ void Invoice::save() {
 	}
 }
 
+void Invoice::synchronizeWithMembers() {
+	QSqlDatabase db;
+	QSqlQuery query(db);
+
+	// Close all no longer existent invoices
+	query.prepare("UPDATE pps_invoice SET state=:state_new WHERE member_uid IN"
+		" (SELECT pps_invoice.member_uid FROM pps_invoice LEFT JOIN ldap_persons ON"
+		" (pps_invoice.member_uid = ldap_persons.uid) WHERE pps_invoice.state=:state_old"
+		" AND ldap_persons.uid IS NULL);");
+	query.bindValue(":state_new", Invoice::StateCanceled);
+	query.bindValue(":state_old", Invoice::StateOpen);
+	query.exec();
+}
+
 void Invoice::loadLast(int member) {
 	clear();
 	QSqlQuery query(db);
