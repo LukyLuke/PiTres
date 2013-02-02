@@ -121,11 +121,16 @@ void PaymentImport::searchDataTimeout(QString /*data*/) {
 void PaymentImport::invoiceSelected(QListWidgetItem *item) {
 	QSettings settings;
 	QRegExp re(reString);
+	QDate paidDue = QDate::fromString(datePaidDue->date().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd");
+	
+	if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
+		paidDue = paidDue.addYears(1);
+	}
 	
 	if (re.indexIn(item->text()) > -1) {
 		editAmount->setValue(re.cap(7).toFloat() - re.cap(6).toFloat());
 		datePaidDue->setDate(QDate::fromString(re.cap(2), "yyyy-MM-dd"));
-		datePaidDue->setDate( QDate::fromString(datePaidDue->date().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd") );
+		datePaidDue->setDate(paidDue);
 	 }
 }
 

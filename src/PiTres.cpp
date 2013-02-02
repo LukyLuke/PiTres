@@ -194,6 +194,7 @@ void PiTres::showSettings() {
 	
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-12-31").toString());
+	settingsForm.memberDueDateNextYear->setChecked(settings.value("invoice/member_due_next_year", TRUE).toBool());
 #ifndef FIO
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_default", 30.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_limited", 60.0).toFloat());
@@ -208,6 +209,7 @@ void PiTres::showSettings() {
 	settingsForm.labelMemberAmountFull->setText(tr("Maximum recommendation per Section"));
 	settingsForm.labelMemberAmountLimited->setText(tr("Default recommendation"));
 	settingsForm.memberAmountMin->setValue(settings.value("invoice/minimum_amount", 30.0).toFloat());
+	
 #endif
 	
 	settingsForm.pdfInvoice->setText(settings.value("pdf/invoice_template", "data/invoice.xml").toString());
@@ -283,6 +285,7 @@ void PiTres::doSaveSettings() {
 	
 	settings.setValue("database/sqlite", settingsForm.sqliteFile->text());
 	settings.setValue("invoice/member_due_format", settingsForm.memberDueDate->text());
+	settings.setValue("invoice/member_due_next_year", settingsForm.memberDueDateNextYear->isChecked());
 #ifndef FIO
 	settings.setValue("invoice/amount_default", settingsForm.memberAmountFull->value());
 	settings.setValue("invoice/amount_limited", settingsForm.memberAmountLimited->value());

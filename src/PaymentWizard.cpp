@@ -49,14 +49,19 @@ PaymentWizard::~PaymentWizard() {
 
 void PaymentWizard::setPerson(int uid) {
 	QSettings settings;
+	QDate paidDue = QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd");
 	Invoice *inv;
 	person.clear();
 	person.load(uid);
 	
+	if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
+		paidDue = paidDue.addYears(1);
+	}
+	
 	setWindowTitle(tr("Unpaid invoices from %1 %2 (%3)").arg(person.familyName(), person.givenName(), person.nickname()));
 	amountBox->setValue(person.contributionClass() == PPSPerson::ContributeStudent ? settings.value("invoice/amount_limited", 30).toFloat() : settings.value("invoice/amount_default", 60).toFloat());
 	paidDate->setDate(QDate::currentDate());
-	paidDueDate->setDate( QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd") );
+	paidDueDate->setDate(paidDue);
 	
 	QList<Invoice *> list = person.getInvoices();
 	for (int i = 0; i < list.size(); i++) {
