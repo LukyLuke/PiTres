@@ -27,7 +27,7 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="190" x2="5" y2="310" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="340" stroke="0.2" />
 
 			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Associato numero:]]></text>
 			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
@@ -52,6 +52,9 @@ CH-1337 Vallorbe]]></text>
 
 			<text x="10" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[Località, Data:]]></text>
 			<text x="130" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
+
+			<text x="10" y="310" width="600" height="10" wordwrap="false" size="9" weight="bold"><![CDATA[Considerato pagamenti fino al {PAYMENTS_CONSIDERED}.]]></text>
+			<text x="10" y="325" width="600" height="10" wordwrap="false" size="9"><![CDATA[Il pagamento ha attraversato con questa affermazione? Quindi prendere in considerazione questa lettera come irrilevante.]]></text>
 		</g>
 
 		<g part="text1">

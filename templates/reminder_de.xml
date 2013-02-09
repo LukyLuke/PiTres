@@ -27,7 +27,7 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="190" x2="5" y2="310" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="340" stroke="0.2" />
 
 			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliedernummer:]]></text>
 			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
@@ -52,6 +52,9 @@ CH-1337 Vallorbe]]></text>
 
 			<text x="10" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
 			<text x="130" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
+
+			<text x="10" y="310" width="600" height="10" wordwrap="false" size="9" weight="bold"><![CDATA[Zahlungseingänge bis zum {PAYMENTS_CONSIDERED} berücksichtigt.]]></text>
+			<text x="10" y="325" width="600" height="10" wordwrap="false" size="9"><![CDATA[Hat sich die Bezahlung mit dieser Rechnung gekreuzt? Dann beachten Sie dieses Schreiben als gegenstandslos.]]></text>
 		</g>
 
 		<g part="text1">
@@ -70,8 +73,8 @@ CH-1337 Vallorbe]]></text>
 			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Das ist eine Empfehlung, wie viel du bezahlst liegt bei Dir. Der Mindestbeitrag ist 30.00 CHF, alles über 500.00 CHF wird als Spende verbucht. Egal was du zahlst, es wird gerecht auf alle Deine Sektionen aufgeteilt.]]></text>
 		</g>
 		<g part="text2">
-			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
-			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
+			<text x="20" y="600" width="690" height="60" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
+			<text x="20" y="660" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[
 			Deine Sektionen und die Piratenpartei Schweiz danken Dir für deine Unterstützung!]]></text>
 		</g>
 

@@ -440,6 +440,7 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("invoice_number", reference());
 	pdf->setVar("invoice_date", issueDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("invoice_payable_due", payableDue().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
+	pdf->setVar("payments_considered", QDate::currentDate().toString( settings.value("pdf/date_format", "dd.MM.yyyy").toString() ));
 	pdf->setVar("invoice_esr", getEsr());
 #ifndef FIO
 	pdf->setVar("invoice_amount", locale.toString(amount(), 'f', 2));

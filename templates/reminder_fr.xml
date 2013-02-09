@@ -27,7 +27,7 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="190" x2="5" y2="310" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="340" stroke="0.2" />
 
 			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Numéro membre:]]></text>
 			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
@@ -52,6 +52,9 @@ CH-1337 Vallorbe]]></text>
 
 			<text x="10" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[Lieu, Date:]]></text>
 			<text x="130" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
+
+			<text x="10" y="310" width="600" height="10" wordwrap="false" size="9" weight="bold"><![CDATA[Considérés comme des paiements jusqu'à {PAYMENTS_CONSIDERED}.]]></text>
+			<text x="10" y="325" width="600" height="10" wordwrap="false" size="9"><![CDATA[Le paiement a franchi avec cet énoncé? Ensuite, considérer cette lettre comme sans importance.]]></text>
 		</g>
 
 		<g part="text1">
@@ -70,8 +73,8 @@ CH-1337 Vallorbe]]></text>
 			<text x="110" y="24" width="550" height="50" wordwrap="true" size="8" halign="justify" spacing="8" nth="last"><![CDATA[Ceci n'est qu'une recommendation. Le montant de votre cotisation dépend de vous uniquement. Le minimum est de 30.00 CHF, et tout montant au-dessus de 500.00 CHF sera comptabilisé comme donation. Quelque soit le montant payé, la cotisation sera répartie équitablement entre les sections.]]></text>
 		</g>
 		<g part="text2">
-			<text x="20" y="600" width="690" height="70" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
-			<text x="20" y="670" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Votre section et le Parti Pirate Suisse vous remercient pour votre soutien!]]></text>
+			<text x="20" y="600" width="690" height="60" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[{SECTION_TEXT}]]></text>
+			<text x="20" y="660" width="550" height="10" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Votre section et le Parti Pirate Suisse vous remercient pour votre soutien!]]></text>
 		</g>
 
 		<g part="creditslip">
