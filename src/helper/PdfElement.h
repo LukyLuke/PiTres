@@ -46,7 +46,7 @@ public:
 	void setVars(QHash<QString, QString> *variables);
 	void setVars(QHash<QString, QString> *variables, QHash<QString, QString> *repeating);
 	void setTop(qreal top);
-	
+
 	QHash<QString, QString> attributes() const { return _attributes; };
 	PdfElementType type() const { return _type; };
 	QList<PdfElement> nodes() const { return _nodes; };
@@ -72,10 +72,30 @@ protected:
 	bool _onlyOnLast;
 	bool _onlyOnFirst;
 	qint32 _onlyOnNth;
-	
+
 	PdfElement parseType(QString nodeName);
 	void parse(QDomNode node);
 	qreal toQReal(QString value);
+
+	struct expression {
+		bool (*expr)(const QString*, const QString*);
+		QString successfull;
+		QString otherwise;
+		QString value;
+		QString variable;
+		bool valid() { return !variable.isEmpty() && expr != NULL; };
+	};
+	static bool expr_gt(const QString *a, const QString *b) { return a->toFloat() >  b->toFloat(); }
+	static bool expr_lt(const QString *a, const QString *b) { return a->toFloat() <  b->toFloat(); }
+	static bool expr_ge(const QString *a, const QString *b) { return a->toFloat() >= b->toFloat(); }
+	static bool expr_le(const QString *a, const QString *b) { return a->toFloat() <= b->toFloat(); }
+	static bool expr_eq(const QString *a, const QString *b) { return a->toLower() == b->toLower(); }
+	static bool expr_ne(const QString *a, const QString *b) { return a->toLower() != b->toLower(); }
+	static bool expr_contains(const QString *a, const QString *b) { return a->toLower().contains(b->toLower()); }
+
+	QHash<QString, expression> _expressions;
+	void extractExpressions(QString *cdata);
+	void evalExpression(QString *cdata, const QString &var, const QString &val);
 };
 
 class PdfElementLine : public PdfElement {

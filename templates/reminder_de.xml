@@ -58,7 +58,7 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Mitgliederrechnung für das Jahr 2013]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[{IF REMINDED > "0"}Zahlungserinnerung{ELSE}Mitgliederrechnung{/IF} für das Jahr 2013]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
 			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[Damit Du dein Piratenleben bei der Piratenpartei im Jahr 2013 vollumfänglich ausleben und geniessen kannst, solltest Du deinen Mitgliederbeitrag anhand der untenstehenden Daten begleichen.
 			Der Mitgliederbetrag setzt sich dieses Jahr aus folgenden Empfehlungen zusammen:]]></text>

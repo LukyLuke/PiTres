@@ -56,6 +56,7 @@ PdfElement::PdfElement(const PdfElement &newPdfElement) {
 	_onlyOnFirst= newPdfElement._onlyOnFirst;
 	_onlyOnLast = newPdfElement._onlyOnLast;
 	_onlyOnNth = newPdfElement._onlyOnNth;
+	_expressions = newPdfElement._expressions;
 }
 
 PdfElement::~PdfElement() {}
@@ -110,6 +111,10 @@ qreal PdfElement::paint(QPainter *painter, const qint32 row, const qint32 maxrow
 			case PdfImage:
 				_image = (PdfElementImage *)&e;
 				back = _image->paint(painter);
+				break;
+			case PdfUnknown:
+			default:
+				back = 0;
 				break;
 		}
 		bottom = back > bottom ? back : bottom;
@@ -167,6 +172,10 @@ qreal PdfElement::bottom(const qint32 row, const qint32 maxrows) {
 			case PdfImage:
 				_image = (PdfElementImage *)&e;
 				back = _image->bottom();
+				break;
+			case PdfUnknown:
+			default:
+				back = 0;
 				break;
 		}
 		_bottom = back > _bottom ? back : _bottom;
@@ -275,9 +284,11 @@ PdfElement PdfElement::parseType(QString name) {
 
 void PdfElement::setAttributes(const QDomNamedNodeMap attr, const QString cdata) {
 	_attributes.clear();
-	if (cdata != NULL) {
+	if (cdata != NULL && !cdata.isEmpty()) {
+		extractExpressions(const_cast<QString*>(&cdata));
 		_attributes.insert("cdata", cdata);
 	}
+	QString val;
 	for (uint i = 0; i < attr.length(); i++) {
 		QDomAttr a = attr.item(i).toAttr();
 		if (!a.isNull()) {
@@ -286,7 +297,82 @@ void PdfElement::setAttributes(const QDomNamedNodeMap attr, const QString cdata)
 				_onlyOnFirst = a.value().toLower() == "first";
 				_onlyOnNth = _onlyOnLast || _onlyOnFirst ? 1 : a.value().toInt();
 			}
-			_attributes.insert(a.name().toLower(), a.value());
+			val = a.value();
+			extractExpressions(const_cast<QString*>(&val));
+			_attributes.insert(a.name().toLower(), val);
+		}
+	}
+}
+
+void PdfElement::extractExpressions(QString *cdata) {
+	// Search for "{IF variable exp 'value'}...{ELSE}...{/IF}"
+	QRegExp rx("\\{IF\\s+([A-Z0-9_-]+)\\s+(\\<|\\>|\\<=|\\>=|==|\\<\\>|\\!=|\\~=)\\s+(\"|\\')([^\\}]*)(\\3)\\}(.*)\\{ELSE\\}(.*)\\{\\/IF\\}");
+	rx.setCaseSensitivity(Qt::CaseInsensitive);
+
+	// Offsets:
+	// 0: Replacement
+	// 1: Variable name
+	// 2: expression
+	// 3: " or ' to enclose the value to check against
+	// 4: Value to check against
+	// 5: " or ' to enclose the value to check against
+	// 6: Value if expresion succeed
+	// 7: Value if expresion failes
+
+	// Search for all occurences
+	int offset = 0;
+	while ((offset = rx.indexIn(*cdata, offset)) != -1) {
+		QStringList match = rx.capturedTexts();
+		QString expr;
+		if (match.size() >= 6) {
+			expression e;
+			e.value = match.at(4);
+			e.successfull = match.value(6).trimmed();
+			e.otherwise = match.value(7).trimmed();
+			e.variable = match.at(1);
+			e.expr = NULL;
+			expr = match.at(2);
+			e.expr = (
+				(expr == "<" ? &expr_lt :
+				(expr == ">" ? &expr_gt :
+				(expr == "<=" ? &expr_le :
+				(expr == ">=" ? &expr_ge :
+				(expr == "==" ? &expr_eq :
+				(expr == "<>" || expr == "!=" ? &expr_ne :
+				(expr == "~=" ? &expr_contains : NULL)
+			)))))));
+
+			// Only if we have a valid expression we use it
+			if (e.expr != NULL) {
+				QString key("{IF:");
+				key.append(QString::number(_expressions.size())).append("}");
+				_expressions.insert(key, e);
+				cdata->replace(match.at(0), key);
+				offset += key.length();
+				continue;
+			}
+		}
+		// Not count up here if we  found a valid match - see continue above
+		offset += rx.matchedLength();
+	}
+}
+
+void PdfElement::evalExpression(QString *cdata, const QString &var, const QString &val) {
+	if (cdata->contains("{IF:")) {
+		int offset = 0;
+		QRegExp rx("\\{IF:\\d+\\}");
+		rx.setCaseSensitivity(Qt::CaseSensitive);
+		QString match, res;
+		while ((offset = rx.indexIn(*cdata, offset)) != -1) {
+			match = rx.capturedTexts().at(0);
+			expression e = _expressions.value(match);
+			if (e.valid() && var.compare(e.variable, Qt::CaseInsensitive)) {
+				res = (e.expr(&val, &e.value) ? e.successfull : e.otherwise);
+				cdata->replace(match, res);
+				offset += res.size();
+			} else {
+				offset += rx.matchedLength();
+			}
 		}
 	}
 }
@@ -475,7 +561,7 @@ qreal PdfElementText::paint(QPainter *painter) {
 	qreal w = toQReal(_attributes.value("width", "0"));
 	qreal h = toQReal(_attributes.value("height", "0"));
 	qreal s = toQReal(_attributes.value("spacing", "0"));
-	
+
 	if (w > 0 && h > 0) {
 		QFont font = QApplication::font();
 		font.setFamily(fontfamily);
@@ -495,24 +581,24 @@ qreal PdfElementText::paint(QPainter *painter) {
 		font.setItalic(italic);
 		font.setUnderline(underline);
 		font.setPointSizeF(size);
-		
+
 		QPen pen(Qt::black, width, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
 		painter->setPen(pen);
 		painter->setBrush(Qt::black);
 		painter->setFont(font);
-		
+
 		int flags = Qt::TextDontClip;
 		if (halign == "left") flags |= Qt::AlignLeft;
 		else if (halign == "right") flags |= Qt::AlignRight;
 		else if (halign == "justify") flags |= Qt::AlignJustify;
 		else if (halign == "center") flags |= Qt::AlignHCenter;
-		
+
 		if (valign == "top") flags |= Qt::AlignTop;
 		else if (valign == "bottom") flags |= Qt::AlignBottom;
 		else if (valign == "center") flags |= Qt::AlignVCenter;
-		
+
 		if (wordwrap) flags |= Qt::TextWordWrap;
-		
+
 		// Replace repeating variables and static ones after
 		QString cdata = _attributes.value("cdata", "");
 		QHash<QString, QString>::const_iterator it;
@@ -523,13 +609,17 @@ qreal PdfElementText::paint(QPainter *painter) {
 		}
 		if (_variables != 0) {
 			for (it = _variables->constBegin(); it != _variables->constEnd(); it++) {
+				// #14 Variables can occure in expressions and show different content in different situations
+				evalExpression(&cdata, it.key(), it.value());
+
+				// Replace variables with it's value
 				cdata.replace(QString("{%1}").arg(it.key()), it.value(), Qt::CaseInsensitive);
 			}
 		}
-		
+
 		// split into different paragraphs
 		QStringList paragraphs = cdata.split(QRegExp("(\r|\n)"), QString::SkipEmptyParts);
-		
+
 		// paint the text
 		QRectF *bounding = new QRectF;
 		QRectF rect = QRectF(QPointF(x, y), QSizeF(w, h));
