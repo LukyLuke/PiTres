@@ -27,7 +27,7 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="memberinfo">
-			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
+			<line x1="5" y1="190" x2="5" y2="310" stroke="0.2" />
 
 			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Membernumber:]]></text>
 			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{MEMBER_NUMBER}]]></text>
@@ -48,7 +48,7 @@ CH-1337 Vallorbe]]></text>
 			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAY_AMOUNT} CHF]]></text>
 
 			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Pay until:]]></text>
-			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[11.03.2013]]></text>
+			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{INVOICE_PAYABLE_DUE}]]></text>
 
 			<text x="10" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[Location, Date:]]></text>
 			<text x="130" y="295" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
