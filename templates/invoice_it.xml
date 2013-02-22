@@ -58,7 +58,7 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Membership fee for 2013]]></text>
+			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[{IF REMINDED > "0"}Payment reminder{ELSE}Membership{/IF} fee for 2013]]></text>
 			<text x="20" y="400" width="500" height="10" wordwrap="false" size="10"><![CDATA[Ahoi {MEMBER_NAME}]]></text>
 			<text x="20" y="425" width="690" height="200" wordwrap="true" size="10" halign="justify" spacing="8"><![CDATA[To fully enjoy your life as Pirate in the PirateParty Switzerland in 2013, you have to pay your membership fee based on the data below.
 			Your Membership fee is composed as follow:]]></text>

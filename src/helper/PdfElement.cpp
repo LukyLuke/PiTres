@@ -366,7 +366,7 @@ void PdfElement::evalExpression(QString *cdata, const QString &var, const QStrin
 		while ((offset = rx.indexIn(*cdata, offset)) != -1) {
 			match = rx.capturedTexts().at(0);
 			expression e = _expressions.value(match);
-			if (e.valid() && var.compare(e.variable, Qt::CaseInsensitive)) {
+			if (e.valid() && (var.compare(e.variable, Qt::CaseInsensitive) == 0)) {
 				res = (e.expr(&val, &e.value) ? e.successfull : e.otherwise);
 				cdata->replace(match, res);
 				offset += res.size();

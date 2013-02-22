@@ -500,6 +500,7 @@ void SentBills::createPdfReminds(bool email) {
 	foreach (const int &i, rows) {
 		uid = tableModel->record(i).value(0).toInt();
 		reminder.loadLast(uid);
+		reminder.setReminded(reminder.reminded() + 1);
 		pers.load(uid);
 
 		bar.setValue(i);
@@ -518,7 +519,6 @@ void SentBills::createPdfReminds(bool email) {
 			pdf = reminder.createPdf("invoice");
 			pdf->send(reminder.addressEmail());
 		}
-		reminder.setReminded(reminder.reminded() + 1);
 		reminder.save();
 	}
 	bar.setValue(max);
