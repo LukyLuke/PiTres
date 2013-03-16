@@ -60,6 +60,7 @@ private:
 	struct LdifData {
 		QString section;
 		QString uid;
+		QString type;
 		QStringList dates;
 	};
 	

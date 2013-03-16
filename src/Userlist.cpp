@@ -322,41 +322,43 @@ void Userlist::exportLdif() {
 	QHash<QString, LdifData> hashList;
 	QHash<QString, QString> sections;
 	QString ldif = "";
-	QString section, member, duedate, subsection, value, save_section;
+	QString section, member, duedate, type, subsection, value, save_section;
 	QDate due;
 	qint32 cnt = 0;
 	QString members_dn = settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString();
 	QString main_dn = settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,%3st=%2,dc=piratenpartei,dc=ch").toString();
 	QString sub_concat = settings.value("ldif/subsection_concat", "l=%1,").toString();
 	QString attribute = settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString();
+	QString membertype = settings.value("ldif/membertype_attribute", "employeeType").toString();
 	bool replaceAttribute = settings.value("ldif/replace_attribute", false).toBool();
 	QSqlQuery query(db);
 
 	// Only get the last if entries should be relaced or all the other way
 	if (replaceAttribute) {
-		query.prepare("SELECT ldap_persons.uid,MAX(ldap_persons_dates.paid_due) AS paid_due,ldap_persons.nickname,ldap_persons.section FROM ldap_persons"
+		query.prepare("SELECT ldap_persons.uid,MAX(ldap_persons_dates.paid_due) AS paid_due,ldap_persons.type,ldap_persons.section FROM ldap_persons"
 		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
 	} else {
-		query.prepare("SELECT ldap_persons.uid,ldap_persons_dates.paid_due,ldap_persons.nickname,ldap_persons.section FROM ldap_persons"
+		query.prepare("SELECT ldap_persons.uid,ldap_persons_dates.paid_due,ldap_persons.type,ldap_persons.section FROM ldap_persons"
 		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
 	}
 
 	if (query.exec()) {
 		while (query.next()) {
 			member = query.value(0).toString();
-			//duedate = query.value(1).toString();
-			//nickname = query.value(2).toString();
+			duedate = QDate::fromString(query.value(1).toString(), "yyyy-MM-dd").toString("yyyyMMdd235959Z");
+			type = query.value(2).toString();
 			section = query.value(3).toString();
-			due = QDate::fromString(query.value(1).toString(), "yyyy-MM-dd");
-			duedate = due.toString("yyyyMMdd235959Z"); // Till midnight.
 
+			// If we want to add all paid dates and not only the last, we create an entry only the first time and add just the date if we get the user again
 			LdifData d;
 			if (!hashList.contains(member)) {
 				d.section = section;
 				d.uid = member;
+				d.type = type;
 				hashList.insert(member, d);
 			}
 
+			// Add the current date if it is not already in
 			d = hashList.value(member);
 			if (!d.dates.contains(duedate)) {
 				d.dates.append(duedate);
@@ -400,13 +402,16 @@ void Userlist::exportLdif() {
 		}
 		ldif.append("\nchangetype: modify");
 
-		// Always delete all Entries, we readd all after
 		//ldif.append("\ndelete: " + attribute);
 		//ldif.append("\n-");
 		//ldif.append("\nadd: " + attribute);
-		ldif.append("\nreplace: " + attribute);
-		ldif.append("\n");
 
+		// Add the employee type
+		ldif.append("\nreplace: " + membertype + "\n");
+		ldif.append(membertype + ": " + d.type + "\n-");
+
+		// Add all dates
+		ldif.append("\nreplace: " + attribute + "\n");
 		for (int i = 0; i < d.dates.size(); ++i) {
 			ldif.append(attribute).append(": ").append(d.dates.at(i));
 			ldif.append("\n");

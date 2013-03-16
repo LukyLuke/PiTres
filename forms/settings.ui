@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -317,8 +317,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>362</width>
+            <height>727</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -814,28 +814,28 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_13">
                 <property name="text">
                  <string>Paid-Due Attribute</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="4" column="1">
                <widget class="QLineEdit" name="ldifPaidDueAttribute">
                 <property name="text">
                  <string>ppsVotingRightUntil</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="label_14">
                 <property name="text">
                  <string>Replace Attribute</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QCheckBox" name="ldifPaidDueReplace">
                 <property name="text">
                  <string>Check for a sinlge / Uncheck for multiple Paid-Due Attributes</string>
@@ -845,24 +845,38 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QLabel" name="label_15">
                 <property name="text">
                  <string>Use &quot;%1&quot; for the Member-UID</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="7" column="1">
                <widget class="QLabel" name="label_16">
                 <property name="text">
                  <string>Use &quot;%2&quot; for the Section, the Member is asigned to</string>
                 </property>
                </widget>
               </item>
-              <item row="7" column="1">
+              <item row="8" column="1">
                <widget class="QLabel" name="label_57">
                 <property name="text">
                  <string>Use &quot;%3&quot; for the position the Subsection-String sould be applied to</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_30">
+                <property name="text">
+                 <string>Employee type attribute</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="ldifMembertypeAttribute">
+                <property name="text">
+                 <string>employeeType</string>
                 </property>
                </widget>
               </item>
@@ -909,8 +923,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>400</width>
+            <height>390</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">

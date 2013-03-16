@@ -239,6 +239,7 @@ void PiTres::showSettings() {
 	settingsForm.ldifNonsectionMembers->setText(settings.value("ldif/members_dn", "uniqueIdentifier=%1,dc=members,dc=piratenpartei,dc=ch").toString());
 	settingsForm.ldifSectionMembers->setText(settings.value("ldif/main_dn", "uniqueIdentifier=%1,dc=members,%3st=%2,dc=piratenpartei,dc=ch").toString());
 	settingsForm.ldifSubSection->setText(settings.value("ldif/subsection_concat", "l=%1,").toString());
+	settingsForm.ldifPaidDueAttribute->setText(settings.value("ldif/membertype_attribute", "employeeType").toString());
 	settingsForm.ldifPaidDueAttribute->setText(settings.value("ldif/memberstate_attribute", "ppsVotingRightUntil").toString());
 	settingsForm.ldifPaidDueReplace->setChecked(settings.value("ldif/replace_attribute", false).toBool());
 	
@@ -324,6 +325,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("ldif/main_dn", settingsForm.ldifSectionMembers->text());
 	settings.setValue("ldif/subsection_concat", settingsForm.ldifSubSection->text());
 	settings.setValue("ldif/memberstate_attribute", settingsForm.ldifPaidDueAttribute->text());
+	settings.setValue("ldif/membertype_attribute", settingsForm.ldifMembertypeAttribute->text());
 	settings.setValue("ldif/replace_attribute", settingsForm.ldifPaidDueReplace->isChecked());
 	
 	settings.setValue("contribution/payer", settingsForm.contributionPayer->text());
