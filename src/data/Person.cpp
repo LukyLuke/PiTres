@@ -46,7 +46,7 @@ void PPSPerson::createTables() {
 	QSqlQuery query(db);
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons (uid INTEGER, contribution INTEGER, nickname TEXT, gender TEXT, familyname TEXT, "
 	              "givenname TEXT, address TEXT, plz TEXT, city TEXT, country TEXT, state TEXT, birthday DATE, language TEXT, joining DATE, section TEXT, "
-	              "ldap_paid_due DATE, type INTEGER, notify_method INTEGER);");
+	              "type INTEGER, notify_method INTEGER);");
 	query.exec();
 
 	query.prepare("CREATE TABLE IF NOT EXISTS ldap_persons_email (uid INTEGER, type TEXT, mail TEXT);");
@@ -89,8 +89,8 @@ void PPSPerson::save() {
 
 	// Persons are Readonly, expect when they are loaded from LDAP
 	if (!is_loaded) {
-		query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section, ldap_paid_due, type, notify_method) "
-					  "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section, :ldappaiddue, :type, :notify);");
+		query.prepare("INSERT INTO ldap_persons (uid, contribution, nickname, gender, familyname, givenname, address, plz, city, country, state, birthday, language, joining, section, type, notify_method) "
+		              "VALUES (:uid, :contcls, :nickname, :gender, :familyname, :givenname, :address, :plz, :city, :country, :state, :birthday, :language, :joining, :section, :type, :notify);");
 		query.bindValue(":uid", i_uid);
 		query.bindValue(":section", s_section);
 		query.bindValue(":contcls", (int)m_contributionClass);
@@ -106,7 +106,6 @@ void PPSPerson::save() {
 		query.bindValue(":birthday", d_birthdate);
 		query.bindValue(":joining", d_joining);
 		query.bindValue(":language", (int)m_language);
-		query.bindValue(":ldappaiddue", d_ldapPaidDue);
 		query.bindValue(":type", (int)m_type);
 		query.bindValue(":notify", (int)m_notify);
 		query.exec();
@@ -143,26 +142,24 @@ void PPSPerson::save() {
 		}
 	}
 
-	if (!b_paidDueLoaded) {
-		// Save the PaidDue matching Table
+	if (!l_paidDue.isEmpty()) {
+		// Remove all dates
+		query.prepare("DELETE FROM ldap_persons_dates WHERE uid=:uid;");
+		query.bindValue(":uid", i_uid);
+		query.exec();
+
+		// Insert all paid dates
 		query.prepare("INSERT INTO ldap_persons_dates (uid,paid_due) VALUES (:uid,:due);");
 		query.bindValue(":uid", i_uid);
-		query.bindValue(":due", d_paidDue);
-		query.exec();
-		b_paidDueLoaded = TRUE;
-
-	} else {
-		// Update the PaidDue matching Table
-		query.prepare("UPDATE ldap_persons_dates SET paid_due=:due WHERE uid=:uid;");
-		query.bindValue(":uid", i_uid);
-		query.bindValue(":due", d_paidDue);
-		query.exec();
+		for (i = 0; i < l_paidDue.size(); i++) {
+			query.bindValue(":due", l_paidDue.at(i));
+			query.exec();
+		}
 	}
 }
 
 void PPSPerson::clear() {
 	is_loaded = FALSE;
-	b_paidDueLoaded = FALSE;
 	i_uid = 0;
 	s_section = "";
 	m_contributionClass = ContributeFull;
@@ -181,7 +178,7 @@ void PPSPerson::clear() {
 	d_birthdate = QDate(1970, 1, 1);
 	d_joining = QDate::currentDate();
 	m_language = EN;
-	d_paidDue = QDate(1970, 1, 1);
+	l_paidDue.clear();
 	m_type = Pirate;
 	m_notify = EMail;
 	_invoice.clear();
@@ -189,6 +186,8 @@ void PPSPerson::clear() {
 
 bool PPSPerson::load(int uid) {
 	clear();
+	i_uid = uid;
+
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM ldap_persons WHERE uid=?;");
 	query.bindValue(0, uid);
@@ -196,7 +195,6 @@ bool PPSPerson::load(int uid) {
 
 	if (query.first()) {
 		QSqlRecord record = query.record();
-		i_uid = query.value(record.indexOf("uid")).toInt();
 		s_section = query.value(record.indexOf("section")).toString();
 		m_contributionClass = (ContributionClass)query.value(record.indexOf("contribution")).toInt();
 		s_nickname = query.value(record.indexOf("nickname")).toString();
@@ -236,59 +234,65 @@ bool PPSPerson::load(int uid) {
 			l_email << query.value(0).toString();
 		}
 
-		query.prepare("SELECT paid_due FROM ldap_persons_dates WHERE uid=?;");
-		query.bindValue(0, uid);
-		query.exec();
-		if (query.next()) {
-			d_paidDue = query.value(0).toDate();
-			b_paidDueLoaded = TRUE;
-		}
-
 		_invoice.loadLast(uid);
+		is_loaded = TRUE;
 	}
-	is_loaded = TRUE;
+
+	// Even we have no personal data, we load the dates because on importing from LDAP we need them.
+	// Otherwise there might be a lack of data.
+	loadPaidDueDates();
+
 	return isLoaded();
+}
+
+void PPSPerson::loadPaidDueDates() {
+	QSqlQuery query(db);
+	query.prepare("SELECT paid_due FROM ldap_persons_dates WHERE uid=? ORDER BY paid_due DESC;");
+	query.bindValue(0, i_uid);
+	query.exec();
+	QDate d;
+	while (query.next()) {
+		d = query.value(0).toDate();
+		if (!l_paidDue.contains(d)) {
+			l_paidDue << d;
+		}
+	}
 }
 
 bool PPSPerson::loadByPersonsFields(QString uid) {
 	QSqlQuery query(db);
-	
 	query.prepare("SELECT uid FROM ldap_persons WHERE uid=:val OR nickname=:val OR familyname=:val OR givenname=:val OR (givenname||' '||familyname)=:val OR (familyname||' '||givenname)=:val;");
 	query.bindValue(":val", uid);
 	if (query.exec() && query.first()) {
 		return load(query.value(0).toInt());
 	}
-	
 	return load(0);
 }
 
 bool PPSPerson::loadByTelephone(QString uid) {
 	QSqlQuery query(db);
-	
 	query.prepare("SELECT uid FROM ldap_persons_mobile WHERE number LIKE :val;");
 	query.bindValue(":val", "%" + uid + "%");
 	if (query.exec() && query.first()) {
 		return load(query.value(0).toInt());
 	}
-	
+
 	query.prepare("SELECT uid FROM ldap_persons_telephone WHERE number LIKE :val;");
 	query.bindValue(":val", "%" + uid + "%");
 	if (query.exec() && query.first()) {
 		return load(query.value(0).toInt());
 	}
-	
 	return load(0);
 }
 
 bool PPSPerson::loadByEmail(QString uid) {
 	QSqlQuery query(db);
-	
+
 	query.prepare("SELECT uid FROM ldap_persons_email WHERE mail=:val;");
 	query.bindValue(":val", uid);
 	if (query.exec() && query.first()) {
 		return load(query.value(0).toInt());
 	}
-	
 	return load(0);
 }
 
@@ -307,6 +311,9 @@ QList<Invoice *> PPSPerson::getInvoices() {
 void PPSPerson::setUid(int uid) {
 	i_uid = uid;
 	emit uidChanged(uid);
+
+	loadPaidDueDates();
+	emit paidDueListChanged(l_paidDue);
 }
 
 void PPSPerson::setSection(QString section) {
@@ -481,14 +488,23 @@ void PPSPerson::setLanguage(Language language) {
 	emit languageChanged(language);
 }
 
-void PPSPerson::setPaidDue(QDate paidDue) {
-	d_paidDue = paidDue;
-	emit paidDueChanged(paidDue);
+void PPSPerson::setPaidDueList(QList<QDate> paidDue) {
+	l_paidDue = paidDue;
+	if (l_paidDue.isEmpty()) {
+		l_paidDue.append(QDate(1970, 1, 1));
+	}
+	qSort(l_paidDue);
+	emit paidDueChanged(l_paidDue.first());
+	emit paidDueListChanged(l_paidDue);
 }
 
-void PPSPerson::setLdapPaidDue(QDate paidDue) {
-	d_ldapPaidDue = paidDue;
-	emit ldapPaidDueChanged(paidDue);
+void PPSPerson::setPaidDue(QDate paidDue) {
+	if (!l_paidDue.contains(paidDue)) {
+		l_paidDue.append(paidDue);
+		qSort(l_paidDue);
+		emit paidDueChanged(paidDue);
+		emit paidDueListChanged(l_paidDue);
+	}
 }
 
 void PPSPerson::setType(PersonType type) {

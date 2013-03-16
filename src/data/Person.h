@@ -48,8 +48,8 @@ Q_PROPERTY(QList<QString> email READ email WRITE setEmail NOTIFY emailChanged)
 Q_PROPERTY(QDate birthdate READ birthdate WRITE setBirthdate NOTIFY birthdateChanged)
 Q_PROPERTY(QDate joining READ joining WRITE setJoining NOTIFY joiningChanged)
 Q_PROPERTY(Language language READ language WRITE setLanguage NOTIFY languageChanged)
+Q_PROPERTY(QList<QDate> paidDueList READ paidDueList WRITE setPaidDueList NOTIFY paidDueListChanged)
 Q_PROPERTY(QDate paidDue READ paidDue WRITE setPaidDue NOTIFY paidDueChanged)
-Q_PROPERTY(QDate ldapPaidDue READ ldapPaidDue WRITE setLdapPaidDue NOTIFY ldapPaidDueChanged)
 Q_PROPERTY(PersonType type READ type WRITE setType NOTIFY typeChanged)
 Q_PROPERTY(NotifyMethod notify READ notify WRITE setNotify NOTIFY notifyChanged)
 
@@ -109,8 +109,8 @@ public:
 	void setBirthdate(QDate birthdate);
 	void setJoining(QDate joining);
 	void setLanguage(Language language);
+	void setPaidDueList(QList<QDate> paidDue);
 	void setPaidDue(QDate paidDue);
-	void setLdapPaidDue(QDate paidDue);
 	void setType(PersonType type);
 	void setNotify(NotifyMethod notify);
 
@@ -134,8 +134,8 @@ public:
 	QDate birthdate() const { return d_birthdate; };
 	QDate joining() const { return d_joining; };
 	Language language() const { return m_language; };
-	QDate paidDue() const { return d_paidDue; };
-	QDate ldapPaidDue() const { return d_ldapPaidDue; };
+	QList<QDate> paidDueList() const { return l_paidDue; };
+	QDate paidDue() const { return l_paidDue.first(); };
 	PersonType type() const { return m_type; };
 	NotifyMethod notify() const { return m_notify; };
 
@@ -167,8 +167,8 @@ signals:
 	void birthdateChanged(QDate);
 	void joiningChanged(QDate);
 	void languageChanged(Language);
+	void paidDueListChanged(QList<QDate>);
 	void paidDueChanged(QDate);
-	void ldapPaidDueChanged(QDate);
 	void typeChanged(PersonType);
 	void notifyChanged(NotifyMethod);
 
@@ -193,12 +193,14 @@ private:
 	QDate d_joining;
 	Language m_language;
 	Invoice _invoice;
-	QDate d_paidDue;
-	QDate d_ldapPaidDue;
+	QList<QDate> l_paidDue;
 	PersonType m_type;
 	NotifyMethod m_notify;
 	bool is_loaded;
-	bool b_paidDueLoaded;
+
+protected:
+	void loadPaidDueDates();
+
 };
 
 #endif // Data_Person_H

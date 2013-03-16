@@ -348,7 +348,7 @@ void Userlist::exportLdif() {
 			//nickname = query.value(2).toString();
 			section = query.value(3).toString();
 			due = QDate::fromString(query.value(1).toString(), "yyyy-MM-dd");
-			duedate = due.toString("yyyyMMdd120000Z");
+			duedate = due.toString("yyyyMMdd235959Z"); // Till midnight.
 
 			LdifData d;
 			if (!hashList.contains(member)) {
