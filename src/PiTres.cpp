@@ -193,7 +193,7 @@ void PiTres::showSettings() {
 	QSettings settings;
 	
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
-	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-12-31").toString());
+	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-02-15").toString());
 	settingsForm.memberDueDateNextYear->setChecked(settings.value("invoice/member_due_next_year", TRUE).toBool());
 #ifndef FIO
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_default", 30.0).toFloat());

@@ -293,7 +293,7 @@ void Userlist::showMemberDueAdjust() {
 		if (person.paidDue() > QDate(1970, 1, 2)) {
 			dateForm.fromDate->setDate(person.paidDue());
 		} else {
-			QDate paidDue = QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd");
+			QDate paidDue = QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd");
 			if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
 				paidDue = paidDue.addYears(1);
 			}

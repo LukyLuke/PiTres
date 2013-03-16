@@ -41,7 +41,7 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	listString = "%1 (%2): %3 (%4) / Section %5 / %6 of %7 paid";
 	setupUi(this);
 	dateEdit->setDate(QDate::currentDate());
-	datePaidDue->setDate( QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd") );
+	datePaidDue->setDate( QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd") );
 	
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
@@ -121,7 +121,7 @@ void PaymentImport::searchDataTimeout(QString /*data*/) {
 void PaymentImport::invoiceSelected(QListWidgetItem *item) {
 	QSettings settings;
 	QRegExp re(reString);
-	QDate paidDue = QDate::fromString(datePaidDue->date().toString(settings.value("invoice/member_due_format", "yyyy-12-31").toString()), "yyyy-MM-dd");
+	QDate paidDue = QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd");
 	
 	if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
 		paidDue = paidDue.addYears(1);
