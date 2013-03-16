@@ -83,6 +83,19 @@
          </property>
         </widget>
        </item>
+       <item row="17" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="1" column="1">
         <widget class="QLabel" name="label_3">
          <property name="text">
@@ -145,19 +158,6 @@
           <string>Member due:</string>
          </property>
         </widget>
-       </item>
-       <item row="16" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="0" column="2">
         <widget class="QLabel" name="detailUid">
@@ -251,7 +251,7 @@
         </widget>
        </item>
        <item row="13" column="2">
-        <widget class="QLabel" name="detailContributionClass">
+        <widget class="QLabel" name="detailType">
          <property name="text">
           <string/>
          </property>
@@ -308,6 +308,20 @@
        </item>
        <item row="15" column="2">
         <widget class="QLabel" name="detailNotifyType">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="1">
+        <widget class="QLabel" name="labelContribute">
+         <property name="text">
+          <string>Contribute:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="2">
+        <widget class="QLabel" name="detailContribute">
          <property name="text">
           <string/>
          </property>

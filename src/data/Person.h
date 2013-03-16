@@ -74,6 +74,7 @@ public:
 	QList<Invoice *> getInvoices();
 	static void createTables();
 	static void emptyTables();
+	static void resetMembertypes();
 
 	enum ContributionClass { ContributeFull=0 , ContributeStudent=1 };
 	enum Gender { GenderMale=0, GenderFemale=1, GenderBoth=2, GenderNone=3, GenderUnknown=-1 };

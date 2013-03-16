@@ -80,6 +80,7 @@ void Userlist::loadData() {
 	tableModel->setHeaderData(5, Qt::Horizontal, tr("City"));
 	tableModel->setHeaderData(6, Qt::Horizontal, tr("Joining Date"));
 	tableModel->setHeaderData(7, Qt::Horizontal, tr("Section"));
+	tableModel->setHeaderData(8, Qt::Horizontal, tr("Type"));
 
 	tableView->setSortingEnabled(true);
 	tableView->setModel(tableModel);
@@ -127,7 +128,7 @@ QSqlQuery Userlist::createQuery() {
 	bool bindSection = (selectSection->currentIndex() != 0);
 	if (!bindSection) {
 		qs = "SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname,"
-			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)";
+			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section, ldap_persons.type FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)";
 		if (sl.size() > 0) {
 			qs.append(" WHERE ").append(search);
 		}
@@ -135,7 +136,7 @@ QSqlQuery Userlist::createQuery() {
 
 	} else {
 		qs = "SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname,"
-			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
+			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section, ldap_persons.type FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
 			 " WHERE ldap_persons.section=:section";
 		if (sl.size() > 0) {
 			qs.append(" AND (").append(search).append(")");
@@ -176,6 +177,14 @@ void Userlist::showDetails(int index) {
 
 	detailUid->setText(QString::number(person.uid()));
 	detailNickname->setText(person.nickname());
+	detailName->setText(person.familyName()+" "+person.givenName());
+	detailAddress->setText(person.street());
+	detailZipCity->setText(person.postalCode()+" "+person.city());
+	detailCountry->setText(person.country());
+	detailBirthday->setText(person.birthdate().toString("yyyy-MM-dd"));
+	detailJoined->setText(person.joining().toString("yyyy-MM-dd"));
+	detailSection->setText(person.section());
+
 	switch (person.gender()) {
 		case PPSPerson::GenderMale: detailGender->setText(tr("Male")); break;
 		case PPSPerson::GenderFemale: detailGender->setText(tr("Female")); break;
@@ -183,12 +192,17 @@ void Userlist::showDetails(int index) {
 		case PPSPerson::GenderNone: detailGender->setText(tr("None")); break;
 		default: detailGender->setText(tr("Unknown")); break;
 	}
-	detailName->setText(person.familyName()+" "+person.givenName());
-	detailAddress->setText(person.street());
-	detailZipCity->setText(person.postalCode()+" "+person.city());
-	detailCountry->setText(person.country());
-	detailBirthday->setText(person.birthdate().toString("yyyy-MM-dd"));
-	detailJoined->setText(person.joining().toString("yyyy-MM-dd"));
+
+	switch (person.type()) {
+		case PPSPerson::LandLubber: detailType->setText(tr("LandLubber")); break;
+		case PPSPerson::Sympathizer: detailType->setText(tr("Sympathizer")); break;
+		case PPSPerson::Pirate: detailType->setText(tr("Pirate")); break;
+		case PPSPerson::Veteran: detailType->setText(tr("Veteran")); break;
+		case PPSPerson::PlankWalker: detailType->setText(tr("PlankWalker")); break;
+		case PPSPerson::FleetPirate: detailType->setText(tr("FleetPirate")); break;
+		default: detailType->setText(tr("Unknown")); break;
+	}
+
 	switch (person.language()) {
 		case PPSPerson::DE: detailLanguage->setText(tr("German")); break;
 		case PPSPerson::EN: detailLanguage->setText(tr("English")); break;
@@ -196,11 +210,15 @@ void Userlist::showDetails(int index) {
 		case PPSPerson::FR: detailLanguage->setText(tr("French")); break;
 		default: detailLanguage->setText(tr("English")); break;
 	}
-	detailSection->setText(person.section());
+#ifndef FIO
 	switch (person.contributionClass()) {
-		case PPSPerson::ContributeStudent: detailContributionClass->setText(tr("Limited")); break;
-		default: detailContributionClass->setText(tr("Full")); break;
+		case PPSPerson::ContributeStudent: detailContribute->setText(tr("Limited")); break;
+		default: detailContribute->setText(tr("Full")); break;
 	}
+#else
+	detailContribute->hide();
+	labelContribute->hide();
+#endif
 
 	switch (person.notify()) {
 		case PPSPerson::SnailMail: detailNotifyType->setText(tr("Snail-Mail")); break;
@@ -232,11 +250,15 @@ void Userlist::showDetails(int index) {
 }
 
 void Userlist::exportData() {
+	// Reset all membes types
+	PPSPerson::resetMembertypes();
+
+	// Create the query and export all data
 	QSqlQuery query = createQuery();
 	query.exec();
 
 	QRegExp re("[\"',\r\n]+");
-	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Paid\n");
+	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Type,Paid\n");
 	while (query.next()) {
 		// "SELECT uid,paid_due_date,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
 		csv.append( query.value(0).toString().remove(re) ).append(",");
@@ -245,6 +267,15 @@ void Userlist::exportData() {
 		csv.append( query.value(4).toString().remove(re) ).append(",");
 		csv.append( query.value(5).toString().remove(re) ).append(",");
 		csv.append( query.value(7).toString().remove(re) ).append(",");
+		switch (query.value(8).toInt()) {
+			case PPSPerson::LandLubber: csv.append("LandLubber").append(","); break;
+			case PPSPerson::Sympathizer: csv.append("Sympathizer").append(","); break;
+			case PPSPerson::Pirate: csv.append("Pirate").append(","); break;
+			case PPSPerson::Veteran: csv.append("Veteran").append(","); break;
+			case PPSPerson::PlankWalker: csv.append("PlankWalker").append(","); break;
+			case PPSPerson::FleetPirate: csv.append("FleetPirate").append(","); break;
+			default: csv.append("Unknown").append(","); break;
+		}
 		csv.append( query.value(1).toString().remove(re) ).append("\n");
 	}
 
@@ -332,6 +363,9 @@ void Userlist::exportLdif() {
 	QString membertype = settings.value("ldif/membertype_attribute", "employeeType").toString();
 	bool replaceAttribute = settings.value("ldif/replace_attribute", false).toBool();
 	QSqlQuery query(db);
+
+	// Reset all membes types
+	PPSPerson::resetMembertypes();
 
 	// Only get the last if entries should be relaced or all the other way
 	if (replaceAttribute) {

@@ -83,6 +83,27 @@ void PPSPerson::emptyTables() {
 	query.exec();
 }
 
+void PPSPerson::resetMembertypes() {
+	QSqlDatabase db;
+	QSqlQuery save(db);
+	QSqlQuery query(db);
+	query.prepare("SELECT ldap_persons.uid,MAX(ldap_persons_dates.paid_due) AS paid_due,ldap_persons.type FROM ldap_persons"
+	              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
+	save.prepare("UPDATE ldap_persons SET type=:type WHERE uid=:uid;");
+
+	QDate now = QDate::currentDate();
+	int type;
+	query.exec();
+	while (query.next()) {
+		type = query.value(1).toDate() > now ? Pirate : Sympathizer;
+		if (type != query.value(2).toInt()) {
+			save.bindValue(":uid", query.value(0).toString());
+			save.bindValue(":type", type);
+			save.exec();
+		}
+	}
+}
+
 void PPSPerson::save() {
 	int i;
 	QSqlQuery query(db);
