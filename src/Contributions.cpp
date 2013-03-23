@@ -179,7 +179,7 @@ void Contributions::showOverview() {
 	dontContribute.removeAll("");
 	
 	// Request all payments in the selected daterange
-	query.prepare("SELECT SUM(amount_paid/2) as amount,for_section,recommendations FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
+	query.prepare("SELECT SUM(amount/2) as amount,for_section,recommendations FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
 	              " AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state GROUP BY for_section ORDER BY for_section ASC;");
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
