@@ -27,6 +27,7 @@
 #include <QSqlError>
 #include <QString>
 #include <QSqlQueryModel>
+#include <QTimerEvent>
 #include <QHash>
 
 class Contributions : public QWidget, private Ui::ContributionsForm {
@@ -37,6 +38,7 @@ private:
 	QSqlQueryModel *tableModel;
 	QSqlQueryModel *contributionsModel;
 	QHash<QString, QString> sectionQif;
+	int searchTimer;
 	
 	QSqlQuery createQuery();
 	void loadData();
@@ -52,12 +54,15 @@ public:
 
 public slots:
 	void searchData();
+	void searchDataTimeout();
 	void exportData();
 	void sendEmail();
 	void selectSection();
 	void selectYear();
 	void searchContributions();
-
+	
+protected:
+	void timerEvent(QTimerEvent *event);
 };
 
 #endif // Contributions_H

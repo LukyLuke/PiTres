@@ -32,9 +32,10 @@
 
 Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
-	
-	connect(dateFrom, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
-	connect(dateUntil, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
+
+	connect(spinYear, SIGNAL(valueChanged(int)), this, SLOT(searchDataTimeout()));
+	connect(dateFrom, SIGNAL(dateChanged(QDate)), this, SLOT(searchDataTimeout()));
+	connect(dateUntil, SIGNAL(dateChanged(QDate)), this, SLOT(searchDataTimeout()));
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	connect(btnEmail, SIGNAL(clicked()), this, SLOT(sendEmail()));
 	
@@ -51,6 +52,7 @@ Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 Contributions::~Contributions() {}
 
 void Contributions::loadData() {
+	spinYear->setValue(QDate::currentDate().year());
 	dateFrom->setDate(QDate::currentDate().addMonths(-4));
 	dateUntil->setDate(QDate::currentDate());
 	
@@ -59,13 +61,15 @@ void Contributions::loadData() {
 	tableModel->setQuery(query);
 	
 	tableModel->setHeaderData(0, Qt::Horizontal, tr("Paid Date"));
-	tableModel->setHeaderData(1, Qt::Horizontal, tr("Amount"));
-	tableModel->setHeaderData(2, Qt::Horizontal, tr("Person"));
-	tableModel->setHeaderData(3, Qt::Horizontal, tr("City"));
-	tableModel->setHeaderData(4, Qt::Horizontal, tr("Section"));
-	tableModel->setHeaderData(5, Qt::Horizontal, tr("Member UID"));
-	tableModel->setHeaderData(6, Qt::Horizontal, tr("Reference-Number"));
-	
+	tableModel->setHeaderData(1, Qt::Horizontal, tr("Requested"));
+	tableModel->setHeaderData(2, Qt::Horizontal, tr("Paid"));
+	tableModel->setHeaderData(3, Qt::Horizontal, tr("Person"));
+	tableModel->setHeaderData(4, Qt::Horizontal, tr("City"));
+	tableModel->setHeaderData(5, Qt::Horizontal, tr("Section"));
+	tableModel->setHeaderData(6, Qt::Horizontal, tr("Member UID"));
+	tableModel->setHeaderData(7, Qt::Horizontal, tr("Reference-Number"));
+
+	tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	tableView->setSortingEnabled(false);
 	tableView->setModel(tableModel);
 }
@@ -76,13 +80,15 @@ void Contributions::loadSectionContributions() {
 	contributionsModel->setQuery(query);
 	
 	contributionsModel->setHeaderData(0, Qt::Horizontal, tr("Paid Date"));
-	contributionsModel->setHeaderData(1, Qt::Horizontal, tr("Amount"));
-	contributionsModel->setHeaderData(2, Qt::Horizontal, tr("Person"));
-	contributionsModel->setHeaderData(3, Qt::Horizontal, tr("City"));
-	contributionsModel->setHeaderData(4, Qt::Horizontal, tr("Section"));
-	contributionsModel->setHeaderData(5, Qt::Horizontal, tr("Member UID"));
-	contributionsModel->setHeaderData(6, Qt::Horizontal, tr("Reference-Number"));
-	
+	contributionsModel->setHeaderData(1, Qt::Horizontal, tr("Requested"));
+	contributionsModel->setHeaderData(2, Qt::Horizontal, tr("Paid"));
+	contributionsModel->setHeaderData(3, Qt::Horizontal, tr("Person"));
+	contributionsModel->setHeaderData(4, Qt::Horizontal, tr("City"));
+	contributionsModel->setHeaderData(5, Qt::Horizontal, tr("Section"));
+	contributionsModel->setHeaderData(6, Qt::Horizontal, tr("Member UID"));
+	contributionsModel->setHeaderData(7, Qt::Horizontal, tr("Reference-Number"));
+
+	contributionTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	contributionTable->setSortingEnabled(false);
 	contributionTable->setModel(contributionsModel);
 	
@@ -97,13 +103,15 @@ void Contributions::loadSectionContributions() {
 
 QSqlQuery Contributions::createQuery() {
 	QSqlQuery query(db);
-	query.prepare("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
-	              " paid_date>=:start AND paid_date<=:end AND payable_date<=:year AND state=:state ORDER BY for_section ASC;");
+	query.prepare("SELECT paid_date,amount,amount_paid,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
+	              " paid_date>=:start AND paid_date<=:end AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state"
+	              " ORDER BY for_section,paid_date ASC;");
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
-	// only contribute payments til the end of the year - those have to be in the balance of the next year
-	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
+	// only contribute payments til the end of the year
+	query.bindValue(":year_begin", QDate(spinYear->value(), 1, 1).toString("yyyy-MM-dd"));
+	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
 	return query;
 }
 
@@ -119,7 +127,7 @@ QSqlQuery Contributions::createContributionsQuery() {
 		to = QDate::currentDate();
 	}
 	
-	query.prepare(QString("SELECT paid_date,amount,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
+	query.prepare(QString("SELECT paid_date,amount,amount_paid,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
 	                      " for_section%1:section AND paid_date>=:start"
 	                      " AND paid_date<=:end AND state=:state ORDER BY for_section ASC;").arg(
 	                         (sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "=")
@@ -129,6 +137,16 @@ QSqlQuery Contributions::createContributionsQuery() {
 	query.bindValue(":state", Invoice::StateContributed);
 	query.bindValue(":section", sectionList->currentText());
 	return query;
+}
+
+void Contributions::timerEvent(QTimerEvent * /*event*/) {
+	killTimer(searchTimer);
+	searchData();
+}
+
+void Contributions::searchDataTimeout() {
+	killTimer(searchTimer);
+	searchTimer = startTimer(1000);
 }
 
 void Contributions::searchData() {
@@ -160,13 +178,15 @@ void Contributions::showOverview() {
 	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
 	dontContribute.removeAll("");
 	
-	// Refill with Data
-	query.prepare("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end AND payable_date<=:year AND state=:state GROUP BY for_section;");
+	// Request all payments in the selected daterange
+	query.prepare("SELECT SUM(amount_paid/2) as amount,for_section,recommendations FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
+	              " AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state GROUP BY for_section ORDER BY for_section ASC;");
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
-	// only contribute payments til the end of the year - those have to be in the balance of the next year
-	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
+	// only contribute payments till the end of the selected year
+	query.bindValue(":year_begin", QDate(spinYear->value(), 1, 1).toString("yyyy-MM-dd"));
+	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
 	query.exec();
 	
 	double sum = 0.0;
