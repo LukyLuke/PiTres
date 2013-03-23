@@ -44,8 +44,8 @@ HEADERS += src/item/budget_TreeItem.h
 SOURCES += src/item/budget_TreeItem.cpp
 
 # Helper Classes and Functions
-HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/Smtp.h
-SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.cpp src/helper/Smtp.cpp
+HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/Smtp.h src/helper/FIOCalc.h
+SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.cpp src/helper/Smtp.cpp src/helper/FIOCalc.cpp
 
 # Config
 CONFIG += qt thread sql

@@ -179,8 +179,18 @@ void Contributions::showOverview() {
 	dontContribute.removeAll("");
 	
 	// Request all payments in the selected daterange
-	query.prepare("SELECT SUM(amount/2) as amount,for_section,recommendations FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
-	              " AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state GROUP BY for_section ORDER BY for_section ASC;");
+	query.prepare("SELECT"
+#ifndef FIO
+		" SUM(amount/2) as amount,for_section"
+#else
+		" amount,amount_paid,recommendations"
+#endif
+		" FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
+		" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state"
+#ifndef FIO
+		" GROUP BY for_section"
+#endif
+		" ORDER BY for_section ASC;");
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
@@ -191,6 +201,8 @@ void Contributions::showOverview() {
 	
 	double sum = 0.0;
 	int row = 0;
+	
+#ifndef FIO
 	while (query.next()) {
 		QLabel *s = new QLabel( tr("Section: %1").arg(query.value(1).toString()) );
 		QLabel *a = new QLabel( tr("%1 sFr.").arg(query.value(0).toDouble(), 0, 'f', 2) );
@@ -205,6 +217,65 @@ void Contributions::showOverview() {
 		overviewLayout->addWidget(a, row, 1);
 		row++;
 	}
+#else
+	// First calculate all recommendated values from all payments
+	FIOCalc *fio = new FIOCalc;
+	QList< contribution_data * > cdata;
+	contribution_data *data;
+	while (query.next()) {
+		QStringList tmp;
+		QStringList recom = query.value(2).toString().split(";");
+
+		// Calculate the sections parts - do not regard invalid sections
+		for (int i = 0; i < recom.size(); i++) {
+			tmp = recom.at(i).split(":");
+			if (tmp.size() == 2) {
+				fio->addSection( tmp.at(0), tmp.at(1).toFloat() );
+			}
+		}
+		QHash<QString, float> result = fio->calculate(query.value(1).toFloat());
+
+		// Go through all section from this payment and register the amounts.
+		QHash<QString, float>::const_iterator it = result.constBegin();
+		while (it != result.constEnd()) {
+			for (int i = 0; i < cdata.size(); i++) {
+				if (cdata.at(i)->section == it.key()) {
+					data = cdata.at(i);
+					break;
+				}
+			}
+
+			if (!data) {
+				data = new contribution_data;
+				data->section = it.key();
+				data->sum = 0;
+				cdata.append(data);
+			}
+			data->amount_list.append(it.value());
+			data->sum += it.value();
+
+			it++;
+		}
+	}
+
+	// Fill the details with the calculated recommend values
+	while (!cdata.isEmpty()) {
+		contribution_data *cd = cdata.takeFirst();
+		QLabel *s = new QLabel( tr("Section: %1").arg( cd->section ) );
+		QLabel *a = new QLabel( tr("%1 sFr.").arg( cd->sum, 0, 'f', 2) );
+		a->setAlignment(Qt::AlignRight);
+		if (dontContribute.contains( cd->section )) {
+			s->setStyleSheet("QLabel { color: darkRed }");
+			a->setStyleSheet("QLabel { color: darkRed }");
+		} else {
+			sum += cd->sum;
+		}
+		overviewLayout->addWidget(s, row, 0);
+		overviewLayout->addWidget(a, row, 1);
+		row++;
+		delete cd;
+	}
+#endif
 	
 	// Total
 	QLabel *s = new QLabel( tr("<b>Total:</b>") );

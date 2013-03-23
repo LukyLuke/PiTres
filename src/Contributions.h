@@ -20,6 +20,7 @@
 #define Contributions_H
 
 #include "ui_contributions.h"
+#include "helper/FIOCalc.h"
 
 #include <QWidget>
 #include <QSqlDatabase>
@@ -34,6 +35,13 @@ class Contributions : public QWidget, private Ui::ContributionsForm {
 Q_OBJECT
 
 private:
+#ifdef FIO
+	struct contribution_data {
+		QString section;
+		float sum;
+		QList<float> amount_list;
+	};
+#endif
 	QSqlDatabase db;
 	QSqlQueryModel *tableModel;
 	QSqlQueryModel *contributionsModel;
