@@ -218,14 +218,14 @@ void PiTres::showSettings() {
 	settingsForm.pdfStatistic->setText(settings.value("pdf/statistic_template", "data/statistic.xml").toString());
 	
 	settingsForm.assetType->setText(settings.value("qif/account_asset", "Oth A").toString());
-	settingsForm.assetLabel->setText(settings.value("qif/payee_label", "Membership: ").toString());
+	settingsForm.assetLabel->setText(settings.value("qif/invoice_label", "Membership: %1 (%2)").toString());
 	settingsForm.assetMemo->setText(settings.value("qif/memo", "Member UID: ").toString());
-	settingsForm.assetAccountFull->setText(settings.value("qif/income_limited", "Membership Limited").toString());
-	settingsForm.assetAccountLimited->setText(settings.value("qif/income_default", "Membership Default").toString());
+	settingsForm.assetAccountFull->setText(settings.value("qif/income_limited", "Membership Limited %1").toString());
+	settingsForm.assetAccountLimited->setText(settings.value("qif/income_default", "Membership Default %2").toString());
 	
 	settingsForm.paymentType->setText(settings.value("qif/account_bank", "Bank").toString());
-	settingsForm.paymentLabel->setText(settings.value("qif/payee_label", "Payment: ").toString());
-	settingsForm.paymentMemo->setText(settings.value("qif/memo", "Member UID: ").toString());
+	settingsForm.paymentLabel->setText(settings.value("qif/payee_label", "Payment:  %1 (%2)").toString());
+	settingsForm.paymentMemo->setText(settings.value("qif/memo", "Member UID: %1").toString());
 	settingsForm.paymentAccount->setText(settings.value("qif/account_income", "Membership Fee").toString());
 	
 	settingsForm.ldapHost->setText(settings.value("ldap/server", "localhost").toString());
@@ -303,7 +303,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("pdf/statistic_template", settingsForm.pdfStatistic->text());
 	
 	settings.setValue("qif/account_asset", settingsForm.assetType->text());
-	settings.setValue("qif/payee_label", settingsForm.assetLabel->text());
+	settings.setValue("qif/invoice_label", settingsForm.assetLabel->text());
 	settings.setValue("qif/memo", settingsForm.assetMemo->text());
 	settings.setValue("qif/income_limited", settingsForm.assetAccountFull->text());
 	settings.setValue("qif/income_default", settingsForm.assetAccountLimited->text());
