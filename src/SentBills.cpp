@@ -291,7 +291,7 @@ void SentBills::doExportQifPayments() {
 		qif.append("\nP").append(settings.value("qif/payee_label", tr("Payment: %1 (%2)")).toString().arg( query.value(4).toString(), member ) );
 		qif.append("\nN").append(query.value(1).toString());
 		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
-		qif.append("\nL").append(settings.value("qif/account_income", "Membership Fee").toString());
+		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
 		qif.append("\n^\n");
 	}
 

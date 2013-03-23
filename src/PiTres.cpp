@@ -226,7 +226,7 @@ void PiTres::showSettings() {
 	settingsForm.paymentType->setText(settings.value("qif/account_bank", "Bank").toString());
 	settingsForm.paymentLabel->setText(settings.value("qif/payee_label", "Payment:  %1 (%2)").toString());
 	settingsForm.paymentMemo->setText(settings.value("qif/memo", "Member UID: %1").toString());
-	settingsForm.paymentAccount->setText(settings.value("qif/account_income", "Membership Fee").toString());
+	settingsForm.paymentAccount->setText(settings.value("qif/account_income", "Membership fee %1").toString());
 	
 	settingsForm.ldapHost->setText(settings.value("ldap/server", "localhost").toString());
 	settingsForm.ldapPort->setValue(settings.value("ldap/port", 389).toInt());
