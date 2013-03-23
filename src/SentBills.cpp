@@ -228,32 +228,36 @@ void SentBills::exportQifPayments() {
 void SentBills::doExportQifAssets() {
 	QSettings settings;
 	QString qif("!Type:" + settings.value("qif/account_asset", "Oth A").toString());
+#ifndef FIO
 	float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
-	//float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
+#endif
 
 	QSqlQuery query(db);
-	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
+	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name,for_section FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
 	query.bindValue(":date1", exportInvoiceQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportInvoiceQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
 
 	while (query.next()) {
 		QString member = query.value(0).toString();
-		QString ref = query.value(1).toString();
-		QString amount = query.value(2).toString();
-		QString valuta = query.value(3).toString();
-		QString name = query.value(4).toString();
+#ifndef FIO
+		float amount = query.value(2).toFloat();
+#endif
 
-		qif.append("\nD" + valuta);
-		qif.append("\nT" + amount);
-		qif.append("\nP" + settings.value("qif/payee_label", tr("Membership: ")).toString() + name + "("+member+")");
-		qif.append("\nN" + ref);
-		qif.append("\nM"+ settings.value("qif/memo", tr("Member UID: ")).toString() + member);
-		if (amount.toFloat() > amountLimited) {
-			qif.append("\nL" + settings.value("qif/income_limited", "Membership Limited").toString());
+		qif.append("\nD").append(query.value(3).toString());
+		qif.append("\nT").append(query.value(2).toString());
+		qif.append("\nP").append(settings.value("qif/invoice_label", tr("Membership: %1 (%2)")).toString().arg( query.value(4).toString(), member ));
+		qif.append("\nN").append(query.value(1).toString());
+		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
+#ifndef FIO
+		if (amount > amountLimited) {
+			qif.append("\nL").append(settings.value("qif/income_limited", "Membership Limited %1").toString().arg( query.value(5).toString() ));
 		} else {
-			qif.append("\nL" + settings.value("qif/income_default", "Membership Default").toString());
+			qif.append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
 		}
+#else
+		qif.append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
+#endif
 		qif.append("\n^\n");
 	}
 
@@ -273,25 +277,21 @@ void SentBills::doExportQifPayments() {
 	QString qif("!Type:" + settings.value("qif/account_cash", "Cash").toString());
 
 	QSqlQuery query(db);
-	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
+	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name,for_section FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
 	query.bindValue(":date1", exportPaymentQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportPaymentQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
 
 	while (query.next()) {
 		QString member = query.value(0).toString();
-		QString ref = query.value(1).toString();
-		QString amount = query.value(2).toString();
-		QString valuta = query.value(3).toString();
-		QString name = query.value(4).toString();
 
 		// Payment QIF
-		qif.append("\nD" + valuta);
-		qif.append("\nT" + amount);
-		qif.append("\nP"+ settings.value("qif/payee_label", tr("Payment: ")).toString() + name + "("+member+")");
-		qif.append("\nN" + ref);
-		qif.append("\nM"+ settings.value("qif/memo", tr("Member UID: ")).toString() + member);
-		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
+		qif.append("\nD").append(query.value(3).toString());
+		qif.append("\nT").append(query.value(2).toString());
+		qif.append("\nP").append(settings.value("qif/payee_label", tr("Payment: %1 (%2)")).toString().arg( query.value(4).toString(), member ) );
+		qif.append("\nN").append(query.value(1).toString());
+		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
+		qif.append("\nL").append(settings.value("qif/account_income", "Membership Fee").toString());
 		qif.append("\n^\n");
 	}
 
