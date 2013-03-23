@@ -217,7 +217,8 @@ void Contributions::showOverview() {
 		overviewLayout->addWidget(a, row, 1);
 		row++;
 	}
-#else
+#endif
+//#else
 	// First calculate all recommendated values from all payments
 	FIOCalc *fio = new FIOCalc;
 	QList< contribution_data * > cdata;
@@ -238,6 +239,7 @@ void Contributions::showOverview() {
 		// Go through all section from this payment and register the amounts.
 		QHash<QString, float>::const_iterator it = result.constBegin();
 		while (it != result.constEnd()) {
+			data = NULL;
 			for (int i = 0; i < cdata.size(); i++) {
 				if (cdata.at(i)->section == it.key()) {
 					data = cdata.at(i);
@@ -275,7 +277,7 @@ void Contributions::showOverview() {
 		row++;
 		delete cd;
 	}
-#endif
+//#endif
 	
 	// Total
 	QLabel *s = new QLabel( tr("<b>Total:</b>") );
