@@ -54,6 +54,8 @@ public:
 	static void createTables();
 	static void getNameParentHash(QHash<QString, QString> *hash);
 	static void getSectionList(QList<QString> *list);
+	static QString getSectionName(const QString key);
+	static QString getSectionDescription(const QString key);
 	
 	// enums
 	enum AmountType { AmountPercent=0, AmountMoney=1 };
@@ -112,6 +114,8 @@ private:
 	QString s_invoiceLogo;
 	QMap<QString, QString> m_invoiceLanguage;
 	QString s_email;
+	static QHash<QString, QString> m_namecache;
+	static QHash<QString, QString> m_desccache;
 	
 	void clear();
 };

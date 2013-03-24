@@ -29,6 +29,10 @@
 #include <QSqlError>
 #include <QDebug>
 
+// Initialize static members
+QHash<QString, QString> Section::m_namecache = QHash<QString, QString>();
+QHash<QString, QString> Section::m_desccache = QHash<QString, QString>();
+
 Section::Section(QObject *parent) : QObject(parent) {
 	clear();
 }
@@ -91,6 +95,36 @@ void Section::getSectionList(QList<QString> *list) {
 			}
 		}
 	}
+}
+
+QString Section::getSectionName(const QString key) {
+	if (!m_namecache.contains(key)) {
+		QSqlDatabase db;
+		QSqlQuery query(db);
+		query.prepare("SELECT name FROM pps_sections WHERE name=? OR description=?;");
+		query.bindValue(0, key);
+		query.bindValue(1, key);
+		
+		if (query.exec() && query.first()) {
+			m_namecache.insert( key, query.value(0).toString() );
+		}
+	}
+	return m_namecache.value(key);
+}
+
+QString Section::getSectionDescription(const QString key) {
+	if (!m_desccache.contains(key)) {
+		QSqlDatabase db;
+		QSqlQuery query(db);
+		query.prepare("SELECT description FROM pps_sections WHERE name=:? OR description=:?;");
+		query.bindValue(0, key);
+		query.bindValue(1, key);
+
+		if (query.exec() && query.first()) {
+			m_desccache.insert( key, query.value(0).toString() );
+		}
+	}
+	return m_desccache.value(key);
 }
 
 void Section::load(const QString name) {
