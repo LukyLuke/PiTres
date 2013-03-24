@@ -224,10 +224,10 @@ void Contributions::showOverview() {
 	QList< contribution_data * > cdata;
 	contribution_data *data;
 	while (query.next()) {
-		QStringList tmp;
-		QStringList recom = query.value(2).toString().split(";");
+		QStringList tmp, recom = query.value(2).toString().split(";");
 
 		// Calculate the sections parts - do not regard invalid sections
+		fio->reset();
 		for (int i = 0; i < recom.size(); i++) {
 			tmp = recom.at(i).split(":");
 			if (tmp.size() == 2) {
@@ -259,6 +259,7 @@ void Contributions::showOverview() {
 			it++;
 		}
 	}
+	delete fio;
 
 	// Fill the details with the calculated recommend values
 	while (!cdata.isEmpty()) {
