@@ -21,6 +21,7 @@
 
 #include "ui_contributions.h"
 #include "helper/FIOCalc.h"
+#include "data/Section.h"
 
 #include <QWidget>
 #include <QSqlDatabase>

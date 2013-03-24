@@ -199,7 +199,7 @@ void Contributions::showOverview() {
 	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
 	query.exec();
 	
-	double sum = 0.0;
+	double sum = 0.0, held_back = 0.0;
 	int row = 0;
 	
 #ifndef FIO
@@ -210,6 +210,7 @@ void Contributions::showOverview() {
 		if (dontContribute.contains(query.value(1).toString())) {
 			s->setStyleSheet("QLabel { color: darkRed }");
 			a->setStyleSheet("QLabel { color: darkRed }");
+			held_back += query.value(0).toDouble();
 		} else {
 			sum += query.value(0).toDouble();
 		}
@@ -220,6 +221,7 @@ void Contributions::showOverview() {
 #endif
 //#else
 	// First calculate all recommendated values from all payments
+	QString name;
 	FIOCalc *fio = new FIOCalc;
 	QList< contribution_data * > cdata;
 	contribution_data *data;
@@ -231,7 +233,9 @@ void Contributions::showOverview() {
 		for (int i = 0; i < recom.size(); i++) {
 			tmp = recom.at(i).split(":");
 			if (tmp.size() == 2) {
-				fio->addSection( tmp.at(0), tmp.at(1).toFloat() );
+				name = Section::getSectionName(tmp.at(0));
+				name = name.isEmpty() ? tmp.at(0) : name;
+				fio->addSection( name, tmp.at(1).toFloat() );
 			}
 		}
 		QHash<QString, float> result = fio->calculate(query.value(1).toFloat());
@@ -270,6 +274,7 @@ void Contributions::showOverview() {
 		if (dontContribute.contains( cd->section )) {
 			s->setStyleSheet("QLabel { color: darkRed }");
 			a->setStyleSheet("QLabel { color: darkRed }");
+			held_back += cd->sum;
 		} else {
 			sum += cd->sum;
 		}
@@ -279,10 +284,34 @@ void Contributions::showOverview() {
 		delete cd;
 	}
 //#endif
+
+	// Add a blank line
+	overviewLayout->addWidget(new QLabel(""), row, 0);
+	overviewLayout->addWidget(new QLabel(""), row, 1);
+	row++;
 	
-	// Total
-	QLabel *s = new QLabel( tr("<b>Total:</b>") );
+	// Totals
+	QLabel *s = new QLabel( tr("<b>Total pay out:</b>") );
 	QLabel *a = new QLabel( tr("<b>%1 sFr.</b>").arg(sum, 0, 'f', 2) );
+	a->setAlignment(Qt::AlignRight);
+	overviewLayout->addWidget(s, row, 0);
+	overviewLayout->addWidget(a, row, 1);
+	row++;
+	
+	s = new QLabel( tr("<b>Held back:</b>") );
+	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back, 0, 'f', 2) );
+	a->setAlignment(Qt::AlignRight);
+	overviewLayout->addWidget(s, row, 0);
+	overviewLayout->addWidget(a, row, 1);
+	row++;
+
+	// Add a blank line
+	overviewLayout->addWidget(new QLabel(""), row, 0);
+	overviewLayout->addWidget(new QLabel(""), row, 1);
+	row++;
+	
+	s = new QLabel( tr("<b>Total contributions:</b>") );
+	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back + sum, 0, 'f', 2) );
 	a->setAlignment(Qt::AlignRight);
 	overviewLayout->addWidget(s, row, 0);
 	overviewLayout->addWidget(a, row, 1);
