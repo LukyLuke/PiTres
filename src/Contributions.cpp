@@ -207,6 +207,8 @@ void Contributions::showOverview() {
 		QLabel *s = new QLabel( tr("Section: %1").arg(query.value(1).toString()) );
 		QLabel *a = new QLabel( tr("%1 sFr.").arg(query.value(0).toDouble(), 0, 'f', 2) );
 		a->setAlignment(Qt::AlignRight);
+		s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+		a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 		if (dontContribute.contains(query.value(1).toString())) {
 			s->setStyleSheet("QLabel { color: darkRed }");
 			a->setStyleSheet("QLabel { color: darkRed }");
@@ -271,6 +273,8 @@ void Contributions::showOverview() {
 		QLabel *s = new QLabel( tr("Section: %1").arg( cd->section ) );
 		QLabel *a = new QLabel( tr("%1 sFr.").arg( cd->sum, 0, 'f', 2) );
 		a->setAlignment(Qt::AlignRight);
+		s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+		a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 		if (dontContribute.contains( cd->section )) {
 			s->setStyleSheet("QLabel { color: darkRed }");
 			a->setStyleSheet("QLabel { color: darkRed }");
@@ -294,6 +298,8 @@ void Contributions::showOverview() {
 	QLabel *s = new QLabel( tr("<b>Total pay out:</b>") );
 	QLabel *a = new QLabel( tr("<b>%1 sFr.</b>").arg(sum, 0, 'f', 2) );
 	a->setAlignment(Qt::AlignRight);
+	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 	overviewLayout->addWidget(s, row, 0);
 	overviewLayout->addWidget(a, row, 1);
 	row++;
@@ -301,6 +307,8 @@ void Contributions::showOverview() {
 	s = new QLabel( tr("<b>Held back:</b>") );
 	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back, 0, 'f', 2) );
 	a->setAlignment(Qt::AlignRight);
+	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 	overviewLayout->addWidget(s, row, 0);
 	overviewLayout->addWidget(a, row, 1);
 	row++;
@@ -313,6 +321,8 @@ void Contributions::showOverview() {
 	s = new QLabel( tr("<b>Total contributions:</b>") );
 	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back + sum, 0, 'f', 2) );
 	a->setAlignment(Qt::AlignRight);
+	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 	overviewLayout->addWidget(s, row, 0);
 	overviewLayout->addWidget(a, row, 1);
 }
