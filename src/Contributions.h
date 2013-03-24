@@ -42,6 +42,7 @@ private:
 		float sum;
 		QList<float> amount_list;
 	};
+	QList< contribution_data * > l_contrib_data;
 #endif
 	QSqlDatabase db;
 	QSqlQueryModel *tableModel;
@@ -56,6 +57,9 @@ private:
 	void loadSectionContributions();
 	QSqlQuery createContributionsQuery();
 	void showContributionsDetails();
+#ifdef FIO
+	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom );
+#endif
 
 public:
 	Contributions(QWidget *parent = 0);

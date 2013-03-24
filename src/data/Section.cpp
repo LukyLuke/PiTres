@@ -116,7 +116,7 @@ QString Section::getSectionDescription(const QString key) {
 	if (!m_desccache.contains(key)) {
 		QSqlDatabase db;
 		QSqlQuery query(db);
-		query.prepare("SELECT description FROM pps_sections WHERE name=:? OR description=:?;");
+		query.prepare("SELECT description FROM pps_sections WHERE name=? OR description=?;");
 		query.bindValue(0, key);
 		query.bindValue(1, key);
 

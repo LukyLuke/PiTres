@@ -127,7 +127,7 @@ QSqlQuery Contributions::createContributionsQuery() {
 		to = QDate::currentDate();
 	}
 	
-	query.prepare(QString("SELECT paid_date,amount,amount_paid,address_name,address_city,for_section,member_uid,reference FROM pps_invoice WHERE"
+	query.prepare(QString("SELECT paid_date,amount,amount_paid,address_name,address_city,for_section,member_uid,reference,recommendations FROM pps_invoice WHERE"
 	                      " for_section%1:section AND paid_date>=:start"
 	                      " AND paid_date<=:end AND state=:state ORDER BY for_section ASC;").arg(
 	                         (sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "=")
@@ -150,6 +150,11 @@ void Contributions::searchDataTimeout() {
 }
 
 void Contributions::searchData() {
+#ifdef FIO
+	while (!l_contrib_data.isEmpty()) {
+		delete l_contrib_data.takeFirst();
+	}
+#endif
 	QSqlQuery query = createQuery();
 	query.exec();
 	tableModel->setQuery(query);
@@ -178,10 +183,10 @@ void Contributions::showOverview() {
 	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
 	dontContribute.removeAll("");
 	
-	// Request all payments in the selected daterange
+	// Get all payments in the selected daterange
 	query.prepare("SELECT"
 #ifndef FIO
-		" SUM(amount/2) as amount,for_section"
+		" SUM(amount/2) as amount,for_section,COUNT(for_section)"
 #else
 		" amount,amount_paid,recommendations"
 #endif
@@ -200,35 +205,134 @@ void Contributions::showOverview() {
 	query.exec();
 	
 	double sum = 0.0, held_back = 0.0;
-	int row = 0;
-	
+	int row = 0, num_total = 0, num_paid = 0, num_held = 0;
+	QString section, num_members;
+	float amount;
+
 #ifndef FIO
 	while (query.next()) {
-		QLabel *s = new QLabel( tr("Section: %1").arg(query.value(1).toString()) );
-		QLabel *a = new QLabel( tr("%1 sFr.").arg(query.value(0).toDouble(), 0, 'f', 2) );
+		section = query.value(1).toString();
+		amount = query.value(0).toFloat();
+		num_members = query.value(2).toString();
+		num_total += query.value(2).toInt();
+#else
+	QList< contribution_data * > cdata;
+	calculateFioContribution(&cdata, &query, 1, 2);
+
+	while (!cdata.isEmpty()) {
+		contribution_data *cd = cdata.takeFirst();
+		section = cd->section;
+		amount = cd->sum;
+		num_members = QString::number(cd->amount_list.size());
+		num_total += cd->amount_list.size();
+#endif
+		QLabel *s = new QLabel( tr("<b>%1</b>").arg( Section::getSectionDescription(section) ) );
+		QLabel *a = new QLabel( tr("%1 sFr.").arg(amount, 0, 'f', 2) );
+		QLabel *n = new QLabel( tr("%1 payments").arg(num_members) );
 		a->setAlignment(Qt::AlignRight);
+		n->setAlignment(Qt::AlignRight);
 		s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 		a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-		if (dontContribute.contains(query.value(1).toString())) {
+		n->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+
+		if ( dontContribute.contains(section) ) {
 			s->setStyleSheet("QLabel { color: darkRed }");
 			a->setStyleSheet("QLabel { color: darkRed }");
-			held_back += query.value(0).toDouble();
-		} else {
-			sum += query.value(0).toDouble();
-		}
-		overviewLayout->addWidget(s, row, 0);
-		overviewLayout->addWidget(a, row, 1);
-		row++;
-	}
+			n->setStyleSheet("QLabel { color: darkRed }");
+			held_back += amount;
+#ifdef FIO
+			num_held += cd->amount_list.size();
+#else
+			num_held += query.value(2).toInt();
 #endif
-//#else
-	// First calculate all recommendated values from all payments
+		} else {
+			sum += amount;
+#ifdef FIO
+			num_paid += cd->amount_list.size();
+#else
+			num_paid += query.value(2).toInt();
+#endif
+		}
+
+		overviewLayout->addWidget(s, row, 0);
+		overviewLayout->addWidget(n, row, 1);
+		overviewLayout->addWidget(a, row, 2);
+		row++;
+#ifdef FIO
+		delete cd;
+#endif
+	}
+
+	// Add a blank line
+	overviewLayout->addWidget(new QLabel(""), row, 0);
+	row++;
+
+	// Totals
+	QLabel *s = new QLabel( tr("<b>Total pay out:</b>") );
+	QLabel *a = new QLabel( tr("<b>%1 sFr.</b>").arg(sum, 0, 'f', 2) );
+	QLabel *n = new QLabel( tr("<b>%1 payments</b>").arg(num_paid) );
+	a->setAlignment(Qt::AlignRight);
+	n->setAlignment(Qt::AlignRight);
+	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	n->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	overviewLayout->addWidget(s, row, 0);
+	overviewLayout->addWidget(n, row, 1);
+	overviewLayout->addWidget(a, row, 2);
+	row++;
+
+	s = new QLabel( tr("<b>Held back:</b>") );
+	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back, 0, 'f', 2) );
+	n = new QLabel( tr("<b>%1 payments</b>").arg(num_held) );
+	a->setAlignment(Qt::AlignRight);
+	n->setAlignment(Qt::AlignRight);
+	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	n->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	overviewLayout->addWidget(s, row, 0);
+	overviewLayout->addWidget(n, row, 1);
+	overviewLayout->addWidget(a, row, 2);
+	row++;
+
+	// Add a blank line
+	overviewLayout->addWidget(new QLabel(""), row, 0);
+	row++;
+	
+	s = new QLabel( tr("<b>Total contributions:</b>") );
+	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back + sum, 0, 'f', 2) );
+	n = new QLabel( tr("<b>%1 payments</b>").arg(num_total) );
+	a->setAlignment(Qt::AlignRight);
+	n->setAlignment(Qt::AlignRight);
+	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	n->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	overviewLayout->addWidget(s, row, 0);
+	overviewLayout->addWidget(n, row, 1);
+	overviewLayout->addWidget(a, row, 2);
+}
+
+#ifdef FIO
+void Contributions::calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom ) {
+	contribution_data *data, *odata;
+
+	// we cache this to not calculate this each time
+	if (!l_contrib_data.isEmpty()) {
+		contribution_data *orig;
+		for (int i = 0; i < l_contrib_data.size(); i++) {
+			orig = l_contrib_data.at(i);
+			data = new contribution_data;
+			data->section = QString(orig->section);
+			data->sum = float(orig->sum);
+			data->amount_list = QList<float>(orig->amount_list);
+			cdata->append(data);
+		}
+		return;
+	}
+
 	QString name;
 	FIOCalc *fio = new FIOCalc;
-	QList< contribution_data * > cdata;
-	contribution_data *data;
-	while (query.next()) {
-		QStringList tmp, recom = query.value(2).toString().split(";");
+	while (query->next()) {
+		QStringList tmp, recom = query->value(col_recom).toString().split(";");
 
 		// Calculate the sections parts - do not regard invalid sections
 		fio->reset();
@@ -240,92 +344,42 @@ void Contributions::showOverview() {
 				fio->addSection( name, tmp.at(1).toFloat() );
 			}
 		}
-		QHash<QString, float> result = fio->calculate(query.value(1).toFloat());
+		QHash<QString, float> result = fio->calculate(query->value(col_amount).toFloat());
 
 		// Go through all section from this payment and register the amounts.
 		QHash<QString, float>::const_iterator it = result.constBegin();
 		while (it != result.constEnd()) {
 			data = NULL;
-			for (int i = 0; i < cdata.size(); i++) {
-				if (cdata.at(i)->section == it.key()) {
-					data = cdata.at(i);
+			odata = NULL;
+			for (int i = 0; i < cdata->size(); i++) {
+				if (cdata->at(i)->section == it.key()) {
+					data = cdata->at(i);
+					odata = l_contrib_data.at(i);
 					break;
 				}
 			}
 
 			if (!data) {
 				data = new contribution_data;
+				odata = new contribution_data;
 				data->section = it.key();
+				odata->section = it.key();
 				data->sum = 0;
-				cdata.append(data);
+				odata->sum = 0;
+				cdata->append(data);
+				l_contrib_data.append(odata);
 			}
 			data->amount_list.append(it.value());
+			odata->amount_list.append(it.value());
 			data->sum += it.value();
+			odata->sum += it.value();
 
 			it++;
 		}
 	}
 	delete fio;
-
-	// Fill the details with the calculated recommend values
-	while (!cdata.isEmpty()) {
-		contribution_data *cd = cdata.takeFirst();
-		QLabel *s = new QLabel( tr("Section: %1").arg( cd->section ) );
-		QLabel *a = new QLabel( tr("%1 sFr.").arg( cd->sum, 0, 'f', 2) );
-		a->setAlignment(Qt::AlignRight);
-		s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-		a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-		if (dontContribute.contains( cd->section )) {
-			s->setStyleSheet("QLabel { color: darkRed }");
-			a->setStyleSheet("QLabel { color: darkRed }");
-			held_back += cd->sum;
-		} else {
-			sum += cd->sum;
-		}
-		overviewLayout->addWidget(s, row, 0);
-		overviewLayout->addWidget(a, row, 1);
-		row++;
-		delete cd;
-	}
-//#endif
-
-	// Add a blank line
-	overviewLayout->addWidget(new QLabel(""), row, 0);
-	overviewLayout->addWidget(new QLabel(""), row, 1);
-	row++;
-	
-	// Totals
-	QLabel *s = new QLabel( tr("<b>Total pay out:</b>") );
-	QLabel *a = new QLabel( tr("<b>%1 sFr.</b>").arg(sum, 0, 'f', 2) );
-	a->setAlignment(Qt::AlignRight);
-	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	overviewLayout->addWidget(s, row, 0);
-	overviewLayout->addWidget(a, row, 1);
-	row++;
-	
-	s = new QLabel( tr("<b>Held back:</b>") );
-	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back, 0, 'f', 2) );
-	a->setAlignment(Qt::AlignRight);
-	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	overviewLayout->addWidget(s, row, 0);
-	overviewLayout->addWidget(a, row, 1);
-	row++;
-
-	// Add a blank line
-	overviewLayout->addWidget(new QLabel(""), row, 0);
-	overviewLayout->addWidget(new QLabel(""), row, 1);
-	row++;
-	
-	s = new QLabel( tr("<b>Total contributions:</b>") );
-	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back + sum, 0, 'f', 2) );
-	a->setAlignment(Qt::AlignRight);
-	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	a->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	overviewLayout->addWidget(s, row, 0);
-	overviewLayout->addWidget(a, row, 1);
 }
+#endif
 
 void Contributions::showContributionsDetails() {
 	QSettings settings;
@@ -342,9 +396,10 @@ void Contributions::showContributionsDetails() {
 	// Refill with Data
 	QHash<QString, double> sum;
 	QHash<QString, int> num;
+#ifndef FIO
 	QString section;
 	while (query.next()) {
-		section = query.value(4).toString();
+		section = query.value(5).toString();
 		if (!sum.contains(section)) {
 			sum.insert(section, 0);
 			num.insert(section, 0);
@@ -352,48 +407,62 @@ void Contributions::showContributionsDetails() {
 		num.find(section).value()++;
 		sum.find(section).value() += query.value(1).toDouble() / 2;
 	}
+#else
+	QList< contribution_data * > cdata;
+	calculateFioContribution(&cdata, &query, 2, 8);
+
+	// Fill the details with the calculated recommend values
+	while (!cdata.isEmpty()) {
+		contribution_data *cd = cdata.takeFirst();
+		if (!sum.contains(cd->section)) {
+			sum.insert(cd->section, 0);
+			num.insert(cd->section, 0);
+		}
+		num.find(cd->section).value() += cd->amount_list.size();
+		sum.find(cd->section).value() += cd->sum;
+		delete cd;
+	}
+#endif
 	
 	int row = 0;
 	int ctotal = 0;
 	double stotal = 0.0;
 	QHash<QString, double>::const_iterator iter = sum.constBegin();
 	while (iter != sum.constEnd()) {
-		QLabel *t = new QLabel( tr("<b>Section %1</b>").arg(iter.key()) );
-		detailsLayout->addWidget(t, row++, 0);
-		
 		stotal += iter.value();
 		ctotal += num.find(iter.key()).value();
 		
-		QLabel *kp = new QLabel( tr("Payments:") );
-		QLabel *vp = new QLabel( QString("%1").arg(num.find(iter.key()).value()) );
-		kp->setAlignment(Qt::AlignRight);
-		vp->setAlignment(Qt::AlignRight);
-		detailsLayout->addWidget(kp, row, 0);
-		detailsLayout->addWidget(vp, row++, 1);
+		QLabel *t = new QLabel( tr("<b>%1</b>").arg( Section::getSectionDescription(iter.key()) ) );
+		t->setAlignment(Qt::AlignLeft);
+		t->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+		detailsLayout->addWidget(t, row, 0);
+
+		QLabel *p = new QLabel( tr("%2 payments").arg( num.find(iter.key()).value() ) );
+		p->setAlignment(Qt::AlignRight);
+		p->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+		detailsLayout->addWidget(p, row, 1);
 		
-		QLabel *kt = new QLabel( tr("Total:") );
-		QLabel *vt = new QLabel( QString("%1").arg(iter.value(), 0, 'f', 2) );
-		kt->setAlignment(Qt::AlignRight);
-		vt->setAlignment(Qt::AlignRight);
-		detailsLayout->addWidget(kt, row, 0);
-		detailsLayout->addWidget(vt, row++, 1);
+		QLabel *v = new QLabel( QString("%1 sFr.").arg(iter.value(), 0, 'f', 2) );
+		v->setAlignment(Qt::AlignRight);
+		v->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+		detailsLayout->addWidget(v, row, 2);
+		row++;
 		iter++;
 	}
 	
 	// Totals
-	QLabel *kp = new QLabel( tr("<b>Payments:</b>") );
-	QLabel *vp = new QLabel( QString("<b>%1</b>").arg(ctotal) );
+	QLabel *kp = new QLabel( tr("<b>Total:</b>") );
+	QLabel *vp = new QLabel( QString("<b>%1 payments</b>").arg(ctotal) );
+	QLabel *vt = new QLabel( QString("<b>%1 sFr.</b>").arg(stotal, 0, 'f', 2) );
 	kp->setAlignment(Qt::AlignLeft);
 	vp->setAlignment(Qt::AlignRight);
-	detailsLayout->addWidget(kp, row, 0);
-	detailsLayout->addWidget(vp, row++, 1);
-	
-	QLabel *kt = new QLabel( tr("<b>Total:</b>") );
-	QLabel *vt = new QLabel( QString("<b>%1</b>").arg(stotal, 0, 'f', 2) );
-	kt->setAlignment(Qt::AlignLeft);
 	vt->setAlignment(Qt::AlignRight);
-	detailsLayout->addWidget(kt, row, 0);
-	detailsLayout->addWidget(vt, row++, 1);
+	kp->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	vp->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	vt->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	detailsLayout->addWidget(kp, row, 0);
+	detailsLayout->addWidget(vp, row, 1);
+	detailsLayout->addWidget(vt, row, 2);
 }
 
 void Contributions::createQif() {
@@ -404,43 +473,62 @@ void Contributions::createQif() {
 	QString section, amount;
 	QSqlQuery query2(db);
 	QSqlQuery query(db);
-	
-	// Load "do not contribute this sections" list
-	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
-	dontContribute.removeAll("");
-	QString notIn = QString(",?").repeated(dontContribute.size());
-	if (!dontContribute.empty()) {
-		notIn.remove(0, 1).append(")").prepend("AND for_section NOT IN (");
-	}
-	
+
 	// Initialize the QIF and the list with all Section-QIFs
 	sectionQif.clear();
 	QString qif_national("!Type:" + settings.value("qif/account_liability", "Oth L").toString());
 	if (!memoText->text().isEmpty()) {
 		memo = memoText->text();
 	}
-	
-	// Get all Data
-	query.prepare(QString("SELECT SUM(amount/2) AS amount,for_section FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
-	                      " AND state=:state AND payable_date<=:year %1 GROUP BY for_section;").arg(notIn));
+
+	// Load "do not contribute this sections" list and create a "WHERE" part to append to the query
+	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
+	dontContribute.removeAll("");
+	QString notIn = QString(",?").repeated(dontContribute.size());
+	if (!dontContribute.empty()) {
+		notIn.remove(0, 1).append(")").prepend("AND for_section NOT IN (");
+	}
+
+	// Get all payments in the selected daterange
+	query.prepare(QString("SELECT"
+#ifndef FIO
+		" SUM(amount/2) as amount,for_section"
+#else
+		" amount,amount_paid,recommendations"
+#endif
+		" FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
+		" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state %1"
+#ifndef FIO
+		" GROUP BY for_section"
+#endif
+		" ORDER BY for_section ASC;").arg(notIn));
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
-	// only contribute payments til the end of the year - those have to be in the balance of the next year
-	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
+	// only contribute payments till the end of the selected year
+	query.bindValue(":year_begin", QDate(spinYear->value(), 1, 1).toString("yyyy-MM-dd"));
+	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
+	query.exec();
 	
 	for (int i = 0; i < dontContribute.size(); i++) {
-		query.bindValue(i+4, dontContribute.at(i));
+		query.bindValue(i+5, dontContribute.at(i));
 	}
 	query.exec();
-	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
-	}
+
+#ifndef FIO
 	while (query.next()) {
 		amount = query.value(0).toString();
 		section = query.value(1).toString();
-		
+#else
+	QList< contribution_data * > cdata;
+	calculateFioContribution(&cdata, &query, 1, 2);
+
+	// Fill the details with the calculated recommend values
+	while (!cdata.isEmpty()) {
+		contribution_data *cd = cdata.takeFirst();
+		section = cd->section;
+		amount = QString::number(cd->sum);
+#endif
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
 		qif_national.append("\nT" + amount);
@@ -461,6 +549,9 @@ void Contributions::createQif() {
 		qif_section.append("\n^\n");
 		
 		sectionQif.insert(section, qif_section);
+#ifdef FIO
+		delete cd;
+#endif
 	}
 	
 	// Safe the Liabilities-QIF
@@ -476,16 +567,18 @@ void Contributions::createQif() {
 	}
 	
 	// Mark all Invoices as Contributed - Don't use the Invoice-Class here in case of one vs. lot of queries
-	query.prepare(QString("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end AND payable_date<=:year AND state=:state %1;").arg(notIn));
+	query.prepare(QString("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end"
+		"AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state %1;").arg(notIn));
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", Invoice::StatePaid);
 	query.bindValue(":newstate", Invoice::StateContributed);
 	// only contribute payments til the end of the year - those have to be in the balance of the next year
-	query.bindValue(":year", QDate(dateUntil->date().year(), 12, 31).toString("yyyy-MM-dd"));
+	query.bindValue(":year_begin", QDate(spinYear->value(), 1, 1).toString("yyyy-MM-dd"));
+	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
 	
 	for (int i = 0; i < dontContribute.size(); i++) {
-		query.bindValue(i+5, dontContribute.at(i));
+		query.bindValue(i+6, dontContribute.at(i));
 	}
 	query.exec();
 }
