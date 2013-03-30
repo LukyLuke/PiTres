@@ -17,23 +17,6 @@
 */
 
 #include "PaymentImport.h"
-#include "data/Invoice.h"
-
-#include <QVariant>
-#include <QDate>
-#include <QSettings>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QSqlError>
-#include <QFileInfo>
-#include <QFile>
-#include <QDir>
-#include <QRegExp>
-#include <QListWidgetItem>
-#include <QTableWidgetItem>
-#include <QFileDialog>
-#include <QTextStream>
-#include <QDebug>
 
 PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	QSettings settings;
@@ -47,7 +30,12 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continuePayment()));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addSelectedInvoice()));
-	connect(listAvailable, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(invoiceSelected(QListWidgetItem*)));
+	connect(listAvailable, SIGNAL(currentRowChanged(int)), this, SLOT(invoiceRowChange(int)));
+
+	// Helper EventFilter for returnPressed in SpinBox
+	CatchKeyPress *amountKeyPress = new CatchKeyPress(this);
+	editAmount->installEventFilter(amountKeyPress);
+	connect(amountKeyPress, SIGNAL(returnPressed()), this, SLOT(addSelectedInvoice()));
 }
 
 PaymentImport::~PaymentImport() {
@@ -88,8 +76,6 @@ void PaymentImport::searchData() {
 	
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
 		return;
 	}
 	
@@ -116,6 +102,12 @@ void PaymentImport::searchData() {
 void PaymentImport::searchDataTimeout(QString /*data*/) {
 	killTimer(searchTimer);
 	searchTimer = startTimer(1000);
+}
+
+void PaymentImport::invoiceRowChange(int row) {
+	if (row > 0) {
+		invoiceSelected(listAvailable->item(row));
+	}
 }
 
 void PaymentImport::invoiceSelected(QListWidgetItem *item) {
@@ -153,6 +145,8 @@ void PaymentImport::addSelectedInvoice() {
 			qDebug() << "Could not parse the TextLine, sorry...";
 		}
 	}
+	searchEdit->selectAll();
+	searchEdit->setFocus();
 }
 
 void PaymentImport::continuePayment() {
@@ -201,4 +195,3 @@ void PaymentImport::continuePayment() {
 		}
 	}
 }
-

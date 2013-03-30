@@ -277,6 +277,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>searchEdit</tabstop>
+  <tabstop>listAvailable</tabstop>
+  <tabstop>dateEdit</tabstop>
+  <tabstop>datePaidDue</tabstop>
+  <tabstop>editAmount</tabstop>
+  <tabstop>btnAdd</tabstop>
+  <tabstop>tablePay</tabstop>
+  <tabstop>btnContinue</tabstop>
+ </tabstops>
  <resources>
   <include location="../PiTres.qrc"/>
  </resources>

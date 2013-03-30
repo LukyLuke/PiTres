@@ -21,12 +21,26 @@
 
 #include "../ui_paymentimport.h"
 #include "data/Person.h"
+#include "data/Invoice.h"
+#include "helper/CatchKeyPress.h"
 
 #include <QWidget>
+#include <QVariant>
+#include <QDate>
+#include <QSettings>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlError>
-#include <QString>
+#include <QFileInfo>
+#include <QFile>
+#include <QDir>
+#include <QRegExp>
+#include <QListWidgetItem>
+#include <QTableWidgetItem>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QDebug>
 #include <QTimerEvent>
 
 // For QIF-Spec see http://www.respmech.com/mym2qifw/qif_new.htm
@@ -49,6 +63,7 @@ public slots:
 	void continuePayment();
 	void addSelectedInvoice();
 	void invoiceSelected(QListWidgetItem *item);
+	void invoiceRowChange(int row);
 	
 protected:
 	void timerEvent(QTimerEvent *event);
