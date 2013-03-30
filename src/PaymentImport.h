@@ -23,6 +23,8 @@
 #include "data/Person.h"
 #include "data/Invoice.h"
 #include "helper/CatchKeyPress.h"
+#include "item/payment_PaymentItem.h"
+#include "model/payment_PaymentImportModel.h"
 
 #include <QWidget>
 #include <QVariant>
@@ -52,6 +54,8 @@ private:
 	int searchTimer;
 	QString listString;
 	QString reString;
+	payment::PaymentImportModel listModel;
+	payment::PaymentImportModel tableModel;
 
 public:
 	PaymentImport(QWidget *parent = 0);
@@ -62,8 +66,8 @@ public slots:
 	void searchDataTimeout(QString data);
 	void continuePayment();
 	void addSelectedInvoice();
-	void invoiceSelected(QListWidgetItem *item);
-	void invoiceRowChange(int row);
+	void invoiceSelected(payment::PaymentItem item);
+	void invoiceRowChange(const QModelIndex &current, const QModelIndex &previous);
 	
 protected:
 	void timerEvent(QTimerEvent *event);

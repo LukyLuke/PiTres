@@ -23,19 +23,28 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	reString = "^([\\d ]+) \\(([\\d-]+)\\): ([^(]+)\\((\\d+)\\) \\/ Section ([^\\s\\/]+) \\/ (\\d+) of (\\d+) paid$";
 	listString = "%1 (%2): %3 (%4) / Section %5 / %6 of %7 paid";
 	setupUi(this);
-	dateEdit->setDate(QDate::currentDate());
+	dateValuta->setDate(QDate::currentDate());
 	datePaidDue->setDate( QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd") );
 	
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continuePayment()));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addSelectedInvoice()));
-	connect(listAvailable, SIGNAL(currentRowChanged(int)), this, SLOT(invoiceRowChange(int)));
 
 	// Helper EventFilter for returnPressed in SpinBox
 	CatchKeyPress *amountKeyPress = new CatchKeyPress(this);
 	editAmount->installEventFilter(amountKeyPress);
 	connect(amountKeyPress, SIGNAL(returnPressed()), this, SLOT(addSelectedInvoice()));
+
+	// List view displays all seacrh results and select the payed one.
+	listAvailable->setModel(&listModel);
+	listAvailable->setModelColumn(payment::PaymentItem::NUM_PROPERTIES);
+	QItemSelectionModel *selectionModel = listAvailable->selectionModel();
+	connect(selectionModel, SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(invoiceRowChange(QModelIndex, QModelIndex)));
+
+	// Table to display all payments getting imported.
+	tablePay->setModel(&tableModel);
+	tablePay->setColumnHidden(payment::PaymentItem::NUM_PROPERTIES, TRUE);
 }
 
 PaymentImport::~PaymentImport() {
@@ -47,7 +56,7 @@ void PaymentImport::timerEvent(QTimerEvent * /*event*/) {
 }
 
 void PaymentImport::searchData() {
-	listAvailable->clear();
+	listModel.clear();
 	if (searchEdit->text().isEmpty()) {
 		return;
 	}
@@ -86,16 +95,17 @@ void PaymentImport::searchData() {
 	int fieldPayable = query.record().indexOf("payable_date");
 	int fieldAmount = query.record().indexOf("amount");
 	int fieldAmountPaid = query.record().indexOf("amount_paid");
+	
 	while (query.next()) {
-		listAvailable->addItem(listString.arg(
-			query.value(fieldReference).toString(),
-			query.value(fieldPayable).toDate().toString("yyyy-MM-dd"),
-			query.value(fieldName).toString(),
-			query.value(fieldMember).toString(),
-			query.value(fieldSection).toString(),
-			query.value(fieldAmountPaid).toString(),
-			query.value(fieldAmount).toString()
-		));
+		payment::PaymentItem *entity = new payment::PaymentItem();
+		entity->setReference( query.value(fieldReference).toString() );
+		entity->setPayable( query.value(fieldPayable).toDate() );
+		entity->setName( query.value(fieldName).toString() );
+		entity->setMember( query.value(fieldMember).toInt() );
+		entity->setSection( query.value(fieldSection).toString() );
+		entity->setAmountPaidTotal( query.value(fieldAmountPaid).toFloat() );
+		entity->setAmount( query.value(fieldAmount).toFloat() );
+		listModel.insert(entity);
 	}
 }
 
@@ -104,13 +114,14 @@ void PaymentImport::searchDataTimeout(QString /*data*/) {
 	searchTimer = startTimer(1000);
 }
 
-void PaymentImport::invoiceRowChange(int row) {
-	if (row > 0) {
-		invoiceSelected(listAvailable->item(row));
+void PaymentImport::invoiceRowChange(const QModelIndex &current, const QModelIndex & /*previous*/) {
+	if (current.isValid()) {
+		payment::PaymentItem entity = qvariant_cast< payment::PaymentItem >(listModel.index(current.row()).data(Qt::EditRole));
+		invoiceSelected(entity);
 	}
 }
 
-void PaymentImport::invoiceSelected(QListWidgetItem *item) {
+void PaymentImport::invoiceSelected(payment::PaymentItem item) {
 	QSettings settings;
 	QRegExp re(reString);
 	QDate paidDue = QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd");
@@ -118,33 +129,22 @@ void PaymentImport::invoiceSelected(QListWidgetItem *item) {
 	if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
 		paidDue = paidDue.addYears(1);
 	}
-	
-	if (re.indexIn(item->text()) > -1) {
-		editAmount->setValue(re.cap(7).toFloat() - re.cap(6).toFloat());
-		datePaidDue->setDate(QDate::fromString(re.cap(2), "yyyy-MM-dd"));
-		datePaidDue->setDate(paidDue);
-	 }
+	if (item.valuta().isValid()) {
+		dateValuta->setDate(item.valuta());
+	}
+	datePaidDue->setDate(paidDue);
+	editAmount->setValue(item.amount() - item.amountPaidTotal());
 }
 
 void PaymentImport::addSelectedInvoice() {
-	if ((listAvailable->currentRow() > -1) && !editAmount->text().isEmpty()) {
-		QString text = listAvailable->currentItem()->text();
-		QRegExp re(reString);
-		if (re.indexIn(text) > -1) {
-			int row = tablePay->rowCount();
-			tablePay->insertRow(row);
-			tablePay->setItem(row, 0, new QTableWidgetItem( re.cap(1) ));
-			tablePay->setItem(row, 1, new QTableWidgetItem(editAmount->text()));
-			tablePay->setItem(row, 2, new QTableWidgetItem( re.cap(4) ));
-			tablePay->setItem(row, 3, new QTableWidgetItem(dateEdit->date().toString("yyyy-MM-dd")));
-			tablePay->setItem(row, 4, new QTableWidgetItem( re.cap(3) ));
-			tablePay->setItem(row, 5, new QTableWidgetItem( re.cap(2) ));
-			tablePay->setItem(row, 6, new QTableWidgetItem( re.cap(5) ));
-			tablePay->setItem(row, 7, new QTableWidgetItem(datePaidDue->date().toString("yyyy-MM-dd")));
-		} else {
-			qDebug() << "Could not parse the TextLine, sorry...";
-		}
-	}
+	QModelIndex idx = listAvailable->selectionModel()->currentIndex();
+	payment::PaymentItem entity = qvariant_cast< payment::PaymentItem >( listModel.data(idx, Qt::EditRole) );
+	
+	entity.setAmountPaid( editAmount->value() );
+	entity.setValuta( dateValuta->date() );
+	entity.setPaidDue( datePaidDue->date() );
+	tableModel.insert(new payment::PaymentItem(entity));
+
 	searchEdit->selectAll();
 	searchEdit->setFocus();
 }
@@ -154,33 +154,25 @@ void PaymentImport::continuePayment() {
 	QString fileName;
 	PPSPerson person;
 	Invoice invoice;
-	QDate valuta_date;
-	//float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
-	//float amountDefault = settings.value("invoice/amount_default", 60.0).toFloat();
+	QDate valuta;
 	QString qif("!Type:" + settings.value("qif/account_bank", "Bank").toString());
 	
-	for (int i = 0; i < tablePay->rowCount(); i++) {
-		QString ref = tablePay->item(i, 0)->text();
-		QString amount = tablePay->item(i, 1)->text();
-		QString member = tablePay->item(i, 2)->text();
-		QString valuta = tablePay->item(i, 3)->text();
-		QString name = tablePay->item(i, 4)->text();
-		//QString section = tablePay->item(i, 6)->text();
+	for (int i = 0; i < tableModel.rowCount(); i++) {
+		payment::PaymentItem item = qvariant_cast<payment::PaymentItem>( tableModel.index(i).data(Qt::EditRole) );
 		
-		// Payment QIF
-		qif.append("\nD" + valuta);
-		qif.append("\nT" + amount);
-		qif.append("\nP"+ settings.value("qif/payee_label", "Payment: ").toString() + name + "("+member+")");
-		qif.append("\nN" + ref);
-		qif.append("\nM"+ settings.value("qif/memo", "Member UID: ").toString() + member);
-		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee").toString());
+		qif.append("\nD" + item.valuta().toString("yy-MM-dd") );
+		qif.append("\nT" + QString::number(item.amountPaid()) );
+		qif.append("\nP"+ settings.value("qif/payee_label", "Payment: %1 (%2)").toString().arg(item.name(), item.member()) );
+		qif.append("\nN" + item.reference());
+		qif.append("\nM"+ settings.value("qif/memo", "Member UID: %1").toString().arg(item.member()) );
+		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee %1").toString().arg(item.section()));
 		qif.append("\n^\n");
-		
-		valuta_date = QDate::fromString(valuta, "yyyy-MM-dd");
-		invoice.load(ref);
-		if (invoice.pay(invoice.amountPaid() + amount.toFloat(), &valuta_date) && invoice.isPaid()) {
-			person.load(member.toInt());
-			person.setPaidDue(QDate::fromString(tablePay->item(i, 7)->text(), "yyyy-MM-dd"));
+
+		valuta = item.valuta();
+		invoice.load(item.reference());
+		if (invoice.pay( item.amountPaidTotal(), &valuta ) && invoice.isPaid()) {
+			person.load( item.member() );
+			person.setPaidDue( item.paidDue() );
 			person.save();
 		}
 	}
