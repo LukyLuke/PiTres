@@ -32,16 +32,16 @@ HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Sec
 SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp src/data/Section.cpp src/data/BudgetEntity.cpp src/data/Donation.cpp
 
 # Models
-HEADERS += src/model/budget_BudgetEntityModel.h src/model/budget_TreeModel.h
-SOURCES += src/model/budget_BudgetEntityModel.cpp src/model/budget_TreeModel.cpp
+HEADERS += src/model/budget_BudgetEntityModel.h src/model/budget_TreeModel.h src/model/payment_PaymentImportModel.h
+SOURCES += src/model/budget_BudgetEntityModel.cpp src/model/budget_TreeModel.cpp src/model/payment_PaymentImportModel.cpp
 
 # Delegates
 HEADERS += src/delegate/budget_BudgetEntityDelegate.h src/delegate/budget_TreeItemDelegate.h
 SOURCES += src/delegate/budget_BudgetEntityDelegate.cpp src/delegate/budget_TreeItemDelegate.cpp
 
 # Model-Items
-HEADERS += src/item/budget_TreeItem.h
-SOURCES += src/item/budget_TreeItem.cpp
+HEADERS += src/item/budget_TreeItem.h src/item/payment_PaymentItem.h
+SOURCES += src/item/budget_TreeItem.cpp src/item/payment_PaymentItem.cpp
 
 # Helper Classes and Functions
 HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/Smtp.h src/helper/FIOCalc.h src/helper/CatchKeyPress.h
