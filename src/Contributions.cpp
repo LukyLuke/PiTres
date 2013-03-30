@@ -218,17 +218,24 @@ void Contributions::showOverview() {
 #else
 	QList< contribution_data * > cdata;
 	calculateFioContribution(&cdata, &query, 1, 2);
+	num_total = query.size();
+	if (num_total < 0) {
+		num_total = 0;
+		query.seek(-1);
+		while (query.next()) {
+			num_total++;
+		}
+	}
 
 	while (!cdata.isEmpty()) {
 		contribution_data *cd = cdata.takeFirst();
 		section = cd->section;
 		amount = cd->sum;
 		num_members = QString::number(cd->amount_list.size());
-		num_total += cd->amount_list.size();
 #endif
 		QLabel *s = new QLabel( tr("<b>%1</b>").arg( Section::getSectionDescription(section) ) );
 		QLabel *a = new QLabel( tr("%1 sFr.").arg(amount, 0, 'f', 2) );
-		QLabel *n = new QLabel( tr("%1 payments").arg(num_members) );
+		QLabel *n = new QLabel( tr("%1 members").arg(num_members) );
 		a->setAlignment(Qt::AlignRight);
 		n->setAlignment(Qt::AlignRight);
 		s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
@@ -270,7 +277,7 @@ void Contributions::showOverview() {
 	// Totals
 	QLabel *s = new QLabel( tr("<b>Total pay out:</b>") );
 	QLabel *a = new QLabel( tr("<b>%1 sFr.</b>").arg(sum, 0, 'f', 2) );
-	QLabel *n = new QLabel( tr("<b>%1 payments</b>").arg(num_paid) );
+	QLabel *n = new QLabel( tr("<b>%1 dues</b>").arg(num_paid) );
 	a->setAlignment(Qt::AlignRight);
 	n->setAlignment(Qt::AlignRight);
 	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
@@ -283,7 +290,7 @@ void Contributions::showOverview() {
 
 	s = new QLabel( tr("<b>Held back:</b>") );
 	a = new QLabel( tr("<b>%1 sFr.</b>").arg(held_back, 0, 'f', 2) );
-	n = new QLabel( tr("<b>%1 payments</b>").arg(num_held) );
+	n = new QLabel( tr("<b>%1 dues</b>").arg(num_held) );
 	a->setAlignment(Qt::AlignRight);
 	n->setAlignment(Qt::AlignRight);
 	s->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
@@ -331,6 +338,7 @@ void Contributions::calculateFioContribution( QList< contribution_data * > *cdat
 
 	QString name;
 	FIOCalc *fio = new FIOCalc;
+	query->seek(-1);
 	while (query->next()) {
 		QStringList tmp, recom = query->value(col_recom).toString().split(";");
 
@@ -437,7 +445,7 @@ void Contributions::showContributionsDetails() {
 		t->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 		detailsLayout->addWidget(t, row, 0);
 
-		QLabel *p = new QLabel( tr("%2 payments").arg( num.find(iter.key()).value() ) );
+		QLabel *p = new QLabel( tr("%1 payments").arg( num.find(iter.key()).value() ) );
 		p->setAlignment(Qt::AlignRight);
 		p->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 		detailsLayout->addWidget(p, row, 1);
