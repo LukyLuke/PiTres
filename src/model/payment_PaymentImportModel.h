@@ -22,12 +22,12 @@
 
 #include "item/payment_PaymentItem.h"
 
-#include <QAbstractListModel>
+#include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QList>
 
 namespace payment {
-	class PaymentImportModel:public QAbstractListModel {
+	class PaymentImportModel:public QAbstractItemModel {
 	Q_OBJECT
 	
 	public:
@@ -43,6 +43,11 @@ namespace payment {
 		bool removeRows(qint32 pos, qint32 count, const QModelIndex &parent = QModelIndex());
 		Qt::ItemFlags flags(const QModelIndex &index) const;
 		void sort(qint32 column, Qt::SortOrder order = Qt::AscendingOrder);
+
+		QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+		qint32 columnCount(const QModelIndex &parent = QModelIndex()) const;
+		QModelIndex index(qint32 row, qint32 column = 0, const QModelIndex &parent = QModelIndex()) const;
+		QModelIndex parent(const QModelIndex &child) const;
 
 	private:
 		QList< PaymentItem * > l_items;

@@ -19,15 +19,22 @@
 #include "payment_PaymentImportModel.h"
 
 namespace payment {
-	PaymentImportModel::PaymentImportModel(QObject *parent) : QAbstractListModel(parent) {
+	PaymentImportModel::PaymentImportModel(QObject *parent) : QAbstractItemModel(parent) {
 	}
 
 	PaymentImportModel::~PaymentImportModel() {
 		clear();
 	}
 
+	QVariant PaymentImportModel::headerData(int section, Qt::Orientation orientation, int role) const {
+		if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+			return PaymentItem::headerData(section);
+		}
+		return QVariant();
+	}
+
 	QVariant PaymentImportModel::data(const QModelIndex &index, qint32 role) const {
-		if (!index.isValid() || role != Qt::DisplayRole) {
+		if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::EditRole)) {
 			return QVariant();
 		}
 		if (l_items.size() <= index.row()) {
@@ -36,28 +43,38 @@ namespace payment {
 
 		PaymentItem *entity = l_items.at(index.row());
 		QVariant ret;
-		ret.setValue<PaymentItem>(*entity);
+
+		// EditRole means we need all data, while DisplayRole is for showing a string.
+		if (role == Qt::EditRole) {
+			ret.setValue<PaymentItem>(*entity);
+		} else {
+			ret.setValue<QString>(entity->getData(index.column()));
+		}
 		return ret;
 	}
 
 	void PaymentImportModel::insert(PaymentItem *entity) {
-		beginResetModel();
+		beginInsertRows(QModelIndex(), l_items.size(), l_items.size());
 		l_items.append(entity);
-		endResetModel();
+		endInsertRows();
 	}
 
 	void PaymentImportModel::clear() {
-		beginResetModel();
+		beginRemoveRows(QModelIndex(), 0, l_items.size());
 		while (!l_items.isEmpty()) {
 			PaymentItem *entity = l_items.takeFirst();
 			delete entity;
 		}
-		endResetModel();
+		endRemoveRows();
 	}
 
 
 	qint32 PaymentImportModel::rowCount(const QModelIndex & /*parent*/) const {
 		return l_items.size();
+	}
+
+	qint32 PaymentImportModel::columnCount(const QModelIndex & /*parent*/) const {
+		return PaymentItem::NUM_PROPERTIES + 1;
 	}
 
 	bool PaymentImportModel::insertRows(qint32 pos, qint32 count, const QModelIndex &parent) {
@@ -92,5 +109,16 @@ namespace payment {
 
 	void PaymentImportModel::sort(qint32 column, Qt::SortOrder order) {
 		QAbstractItemModel::sort(column, order);
+	}
+
+	QModelIndex PaymentImportModel::index(qint32 row, qint32 column, const QModelIndex & /*parent*/) const {
+		if (l_items.size() > row && row >= 0) {
+			return createIndex(row, column, l_items.at(row));
+		}
+		return QModelIndex();
+	}
+
+	QModelIndex PaymentImportModel::parent(const QModelIndex & /*child*/) const {
+		return QModelIndex();
 	}
 }
