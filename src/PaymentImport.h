@@ -23,6 +23,7 @@
 #include "data/Person.h"
 #include "data/Invoice.h"
 #include "helper/CatchKeyPress.h"
+#include "helper/ESRParser.h"
 #include "item/payment_PaymentItem.h"
 #include "model/payment_PaymentImportModel.h"
 
