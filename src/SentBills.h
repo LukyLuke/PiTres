@@ -20,7 +20,6 @@
 #define SentBills_H
 
 #include "ui_sentbills.h"
-#include "ui_adjustpaiddate.h"
 #include "ui_fromtodates.h"
 #include "ui_dateform.h"
 #include "ui_invoiceedit.h"

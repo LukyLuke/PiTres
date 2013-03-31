@@ -49,14 +49,17 @@ HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h sr
 SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.cpp src/helper/Smtp.cpp src/helper/FIOCalc.cpp src/helper/CatchKeyPress.cpp \
            src/helper/ESRParser.cpp
 
+# Forms
+FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
+        forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
+        forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui \
+        forms/donations.ui forms/donation_import.ui forms/statistics.ui forms/invoiceexportcsv.ui \
+        forms/paymentimport_file.ui
+
 # Config
 CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml svg
-FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport.ui forms/LDAPImport.ui \
-        forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
-        forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui \
-        forms/donations.ui forms/donation_import.ui forms/statistics.ui forms/invoiceexportcsv.ui
 OUT_PWD = build
 
 # Translations

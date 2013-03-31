@@ -30,6 +30,7 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
 	connect(btnContinue, SIGNAL(clicked()), this, SLOT(continuePayment()));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addSelectedInvoice()));
+	connect(btnImport, SIGNAL(clicked()), this, SLOT(showPaymentsImportDialog()));
 
 	// Helper EventFilter for returnPressed in SpinBox
 	CatchKeyPress *amountKeyPress = new CatchKeyPress(this);
@@ -45,9 +46,21 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	// Table to display all payments getting imported.
 	tablePay->setModel(&tableModel);
 	tablePay->setColumnHidden(payment::PaymentItem::NUM_PROPERTIES, TRUE);
+
+	// Prepare the FileImport dialog
+	importDialog = new QDialog(this);
+	import.setupUi(importDialog);
+	import.importType->addItem(tr("ESR Record v3"), QVariant(0));
+	import.importType->addItem(tr("ESR Record v4"), QVariant(1));
+	import.paidDue->setDate( datePaidDue->date() );
+	connect(import.actionImport, SIGNAL(triggered()), this, SLOT(importPaymentsFromDialog()));
+	connect(import.actionParse, SIGNAL(triggered()), this, SLOT(parsePaymentsFromDialog()));
+	connect(import.actionFile, SIGNAL(triggered()), this, SLOT(showPaymentsImportFilesDialog()));
+	connect(btnImport, SIGNAL(clicked()), this, SLOT(showPaymentsImportDialog()));
 }
 
 PaymentImport::~PaymentImport() {
+	delete importDialog;
 }
 
 void PaymentImport::timerEvent(QTimerEvent * /*event*/) {
@@ -185,5 +198,139 @@ void PaymentImport::continuePayment() {
 			QTextStream out(&f);
 			out << qif;
 		}
+	}
+}
+
+void PaymentImport::showPaymentsImportDialog() {
+	importDialog->show();
+}
+
+void PaymentImport::importPaymentsFromDialog() {
+	QFile file(import.editFile->text());
+	payment::PaymentItem *entity;
+	Invoice invoice;
+	
+	if (file.open(QFile::ReadOnly)) {
+		switch (import.importType->itemData( import.importType->currentIndex() ).toInt()) {
+			case 0:
+			{
+				esr_record_3 record = parse_esr3(QString(file.readAll()));
+				import.tableWidget->setRowCount(record.data.size());
+				for (qint32 i = 0; i < record.data.size(); i++) {
+					invoice.loadByReference(record.data.at(i).reference_number);
+					if (invoice.memberUid() > 0) {
+						entity = new payment::PaymentItem;
+						entity->setReference( invoice.reference() );
+						entity->setPayable( invoice.payableDue() );
+						entity->setName( invoice.addressName() );
+						entity->setMember( invoice.memberUid() );
+						entity->setSection( invoice.forSection() );
+						entity->setAmountPaidTotal( invoice.amountPaid() );
+						entity->setAmount( invoice.amount() );
+
+						entity->setAmountPaid( record.data.at(i).amount );
+						entity->setValuta( record.data.at(i).valuta_date );
+						entity->setPaidDue( import.paidDue->date() );
+
+						tableModel.insert(entity);
+						entity = NULL;
+					} else {
+						qDebug() << "Invoice not found: " << record.data.at(i).reference_number;
+					}
+				}
+			}
+				break;
+
+			case 1:
+			{
+				esr_record_4 record = parse_esr4(QString(file.readAll()));
+				import.tableWidget->setRowCount(record.data.size());
+				for (qint32 i = 0; i < record.data.size(); i++) {
+					invoice.loadByReference(record.data.at(i).reference_number);
+					if (invoice.memberUid() > 0) {
+						entity = new payment::PaymentItem;
+						entity->setReference( invoice.reference() );
+						entity->setPayable( invoice.payableDue() );
+						entity->setName( invoice.addressName() );
+						entity->setMember( invoice.memberUid() );
+						entity->setSection( invoice.forSection() );
+						entity->setAmountPaidTotal( invoice.amountPaid() );
+						entity->setAmount( invoice.amount() );
+
+						entity->setAmountPaid( record.data.at(i).amount );
+						entity->setValuta( record.data.at(i).valuta_date );
+						entity->setPaidDue( import.paidDue->date() );
+
+						tableModel.insert(entity);
+						entity = NULL;
+					} else {
+						qDebug() << "Invoice not found: " << record.data.at(i).reference_number;
+					}
+				}
+			}
+				break;
+
+			default:
+				QMessageBox::information(this, tr("Unknown file type selected"), tr("The selected Record-Type is currently not known."));
+				break;
+		}
+	} else {
+		QMessageBox::warning(this, tr("Cannot open selected File"), tr("The file you selected is not readable by your user.\nPlease correct the access rules or select an other file."), QMessageBox::Ok);
+	}
+	
+	importDialog->hide();
+}
+
+void PaymentImport::showPaymentsImportFilesDialog() {
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Payments import file"), "", tr("ESR-File Postfinance (*.v11);;Plaintext, CSV (*.txt,*.csv)"));
+	if (!fileName.isEmpty()) {
+		import.editFile->setText(fileName);
+		import.actionParse->trigger();
+	}
+}
+
+void PaymentImport::parsePaymentsFromDialog() {
+	QFile file(import.editFile->text());
+	
+	import.tableWidget->clear();
+	import.tableWidget->setRowCount(0);
+	import.tableWidget->setColumnCount(3);
+	import.tableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("Valuta")));
+	import.tableWidget->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("Amount")));
+	import.tableWidget->setHorizontalHeaderItem(2, new QTableWidgetItem(tr("Reference")));
+	import.tableWidget->horizontalHeader()->setStretchLastSection(TRUE);
+	
+	if (file.open(QFile::ReadOnly)) {
+		switch (import.importType->itemData( import.importType->currentIndex() ).toInt()) {
+			case 0:
+			{
+				esr_record_3 record = parse_esr3(QString(file.readAll()));
+				import.tableWidget->setRowCount(record.data.size());
+				for (qint32 i = 0; i < record.data.size(); i++) {
+					import.tableWidget->setItem(i, 0, new QTableWidgetItem( record.data.at(i).valuta_date.toString("yyyy-MM-dd") ));
+					import.tableWidget->setItem(i, 1, new QTableWidgetItem( tr("%1 sFr.").arg(record.data.at(i).amount, 0, 'f', 2) ));
+					import.tableWidget->setItem(i, 2, new QTableWidgetItem( record.data.at(i).reference_number ));
+				}
+			}
+				break;
+
+			case 1:
+			{
+				esr_record_4 record = parse_esr4(QString(file.readAll()));
+				import.tableWidget->setRowCount(record.data.size());
+				for (qint32 i = 0; i < record.data.size(); i++) {
+					import.tableWidget->setItem(i, 0, new QTableWidgetItem( record.data.at(i).valuta_date.toString("yyyy-MM-dd") ));
+					import.tableWidget->setItem(i, 1, new QTableWidgetItem( tr("%1 sFr.").arg(record.data.at(i).amount, 0, 'f', 2) ));
+					import.tableWidget->setItem(i, 2, new QTableWidgetItem( record.data.at(i).reference_number ));
+				}
+			}
+				break;
+
+			default:
+				QMessageBox::information(this, tr("Unknown file type selected"), tr("The selected Record-Type is currently not known."));
+				break;
+		}
+	} else {
+		QMessageBox::warning(this, tr("Cannot open selected File"), tr("The file you selected is not readable by your user.\nPlease correct the access rules or select an other file."), QMessageBox::Ok);
 	}
 }

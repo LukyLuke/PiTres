@@ -16,10 +16,15 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+ * For QIF-Spec see http://www.respmech.com/mym2qifw/qif_new.htm
+ */
+
 #ifndef PaymentImport_H
 #define PaymentImport_H
 
 #include "../ui_paymentimport.h"
+#include "../ui_paymentimport_file.h"
 #include "data/Person.h"
 #include "data/Invoice.h"
 #include "helper/CatchKeyPress.h"
@@ -35,6 +40,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -45,8 +51,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QTimerEvent>
-
-// For QIF-Spec see http://www.respmech.com/mym2qifw/qif_new.htm
+#include <QMessageBox>
 
 class PaymentImport : public QWidget, private Ui::PaymentImportForm {
 Q_OBJECT
@@ -57,6 +62,8 @@ private:
 	QString reString;
 	payment::PaymentImportModel listModel;
 	payment::PaymentImportModel tableModel;
+	QDialog *importDialog;
+	Ui::PaymentImportDialog import;
 
 public:
 	PaymentImport(QWidget *parent = 0);
@@ -69,6 +76,10 @@ public slots:
 	void addSelectedInvoice();
 	void invoiceSelected(payment::PaymentItem item);
 	void invoiceRowChange(const QModelIndex &current, const QModelIndex &previous);
+	void showPaymentsImportDialog();
+	void showPaymentsImportFilesDialog();
+	void parsePaymentsFromDialog();
+	void importPaymentsFromDialog();
 	
 protected:
 	void timerEvent(QTimerEvent *event);

@@ -148,8 +148,6 @@ void Invoice::save() {
 	query.exec();
 
 	if (query.lastError().type() != QSqlError::NoError) {
-		qDebug() << query.lastQuery();
-		qDebug() << query.lastError();
 		setIsLoaded(false);
 	} else {
 		setIsLoaded(true);
@@ -231,6 +229,7 @@ void Invoice::loadByReference(QString reference) {
 		ref.insert(9, " ");
 		ref.insert(14, " ");
 	}
+
 	QSqlQuery query(db);
 	query.prepare("SELECT * FROM pps_invoice WHERE reference=?;");
 	query.bindValue(0, ref);

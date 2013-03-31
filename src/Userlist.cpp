@@ -48,6 +48,7 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 Userlist::~Userlist() {
 	delete actionManualPayment;
 	delete actionEditDueDate;
+	delete editDateDialog;
 }
 
 void Userlist::createContextMenu() {

@@ -165,6 +165,10 @@
            <property name="text">
             <string>Add</string>
            </property>
+           <property name="icon">
+            <iconset resource="../PiTres.qrc">
+             <normaloff>:/icons/resources/icons/income.png</normaloff>:/icons/resources/icons/income.png</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -196,6 +200,26 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QToolButton" name="btnImport">
+           <property name="text">
+            <string>Import</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../PiTres.qrc">
+             <normaloff>:/icons/resources/icons/mime-csv.png</normaloff>:/icons/resources/icons/mime-csv.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
@@ -245,6 +269,7 @@
   <tabstop>editAmount</tabstop>
   <tabstop>btnAdd</tabstop>
   <tabstop>tablePay</tabstop>
+  <tabstop>btnImport</tabstop>
   <tabstop>btnContinue</tabstop>
  </tabstops>
  <resources>
