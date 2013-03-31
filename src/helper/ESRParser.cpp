@@ -28,9 +28,9 @@ esr_record_3 parse_esr3(const QString data) {
 		if (i <= list.size()) {
 			esr_data_type3 data;
 			data.type = (esr_type3)line.mid(0, 3).toInt();
-			data.esr_account = line.mid(3, 9);
-			data.reference_number = line.mid(12, 27);
-			data.amount = line.mid(39, 10).toFloat() * 0.01;
+			data.esr_account = QString::number(line.mid(3, 9).toUInt());
+			data.reference_number = QString::number(line.mid(12, 27).toLongLong());
+			data.amount = line.mid(39, data.esr_account.length() > 5 ? 10 : 8 ).toFloat() * 0.01;
 			data.office_reference = line.mid(49, 10);
 			data.deposit_date = QDate::fromString(line.mid(59, 6), "yyMMdd");
 			data.processing_date = QDate::fromString(line.mid(65, 6), "yyMMdd");
@@ -43,7 +43,7 @@ esr_record_3 parse_esr3(const QString data) {
 
 		} else {
 			back.total.type = (esr_type3)line.mid(0, 3).toInt();
-			back.total.esr_account = line.mid(3, 9);
+			back.total.esr_account = QString::number(line.mid(3, 9).toUInt());
 			back.total.amount = line.mid(39, 10).toFloat() * 0.01;
 			back.total.num_transactions = line.mid(51, 12).toInt();
 			back.total.date = QDate::fromString(line.mid(63, 6), "yyMMdd");
@@ -68,8 +68,8 @@ esr_record_4 parse_esr4(const QString data) {
 			data.transaction = (esr_trans_type4)line.mid(2, 1).toInt();
 			data.origin = (esr_origin)line.mid(3, 2).toInt();
 			data.delivery_type = (esr_delivery)line.mid(5, 1).toInt();
-			data.esr_account = line.mid(6, 9);
-			data.reference_number = line.mid(15, 27);
+			data.esr_account = QString::number(line.mid(6, 9).toUInt());
+			data.reference_number = QString::number(line.mid(15, 27).toLongLong());
 			data.currency = line.mid(42, 3).toUpper();
 			data.amount = line.mid(45, 10).toFloat() * 0.01;
 			data.office_reference = line.mid(57, 35);
@@ -87,8 +87,8 @@ esr_record_4 parse_esr4(const QString data) {
 			back.total.transaction = (esr_trans_type4)line.mid(2, 1).toInt();
 			back.total.origin = (esr_origin)line.mid(3, 2).toInt();
 			back.total.delivery_type = (esr_delivery)line.mid(5, 1).toInt();
-			back.total.esr_account = line.mid(6, 9);
-			back.total.reference_number = line.mid(15, 27);
+			back.total.esr_account = QString::number(line.mid(6, 9).toUInt());
+			back.total.reference_number = QString::number(line.mid(15, 27).toLongLong());
 			back.total.currency = line.mid(42, 3).toUpper();
 			back.total.amount = line.mid(45, 10).toFloat() * 0.01;
 			back.total.num_transactions = line.mid(57, 12).toInt();
