@@ -641,8 +641,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>629</width>
+            <height>489</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -923,8 +923,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>400</width>
-            <height>390</height>
+            <width>769</width>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -972,21 +972,21 @@
               <item row="1" column="1">
                <widget class="QLineEdit" name="paymentLabel">
                 <property name="text">
-                 <string>Payment: </string>
+                 <string>Payment: %1 (%2)</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
                <widget class="QLineEdit" name="paymentMemo">
                 <property name="text">
-                 <string>Member UID: </string>
+                 <string>Member UID: %1</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
                <widget class="QLineEdit" name="paymentAccount">
                 <property name="text">
-                 <string>Membership Fee</string>
+                 <string>Membership Fee %1</string>
                 </property>
                </widget>
               </item>
@@ -1021,14 +1021,14 @@
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QLabel" name="label_5">
+               <widget class="QLabel" name="labelAssetsAccount">
                 <property name="text">
                  <string>Default Account</string>
                 </property>
                </widget>
               </item>
               <item row="4" column="0">
-               <widget class="QLabel" name="label_6">
+               <widget class="QLabel" name="labelAssetsAccountLimited">
                 <property name="text">
                  <string>Limited Account</string>
                 </property>
@@ -1044,28 +1044,28 @@
               <item row="1" column="1">
                <widget class="QLineEdit" name="assetLabel">
                 <property name="text">
-                 <string>Membership: </string>
+                 <string>Membership: %1 (%2)</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
                <widget class="QLineEdit" name="assetMemo">
                 <property name="text">
-                 <string>Member UID: </string>
+                 <string>Member UID: %1</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
                <widget class="QLineEdit" name="assetAccountFull">
                 <property name="text">
-                 <string>Membership Default</string>
+                 <string>Membership Default %1</string>
                 </property>
                </widget>
               </item>
               <item row="4" column="1">
                <widget class="QLineEdit" name="assetAccountLimited">
                 <property name="text">
-                 <string>Membership Limited</string>
+                 <string>Membership Limited %1</string>
                 </property>
                </widget>
               </item>
@@ -1116,14 +1116,14 @@
               <item row="2" column="1">
                <widget class="QLineEdit" name="contributionAccount">
                 <property name="text">
-                 <string>Contribution_%1</string>
+                 <string>Contribution %1</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1">
                <widget class="QLineEdit" name="contributionIncome">
                 <property name="text">
-                 <string>Membership fee</string>
+                 <string>Membership fee %1</string>
                 </property>
                </widget>
               </item>
@@ -1181,7 +1181,7 @@
               <item row="2" column="1">
                <widget class="QLineEdit" name="donationAccount">
                 <property name="text">
-                 <string>Donation_%1</string>
+                 <string>Donation %1</string>
                 </property>
                </widget>
               </item>
@@ -1195,7 +1195,7 @@
               <item row="3" column="1">
                <widget class="QLineEdit" name="donationIncome">
                 <property name="text">
-                 <string>Donation</string>
+                 <string>Donation %1</string>
                 </property>
                </widget>
               </item>

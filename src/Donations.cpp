@@ -143,7 +143,7 @@ void Donations::showOverview() {
 	}
 	
 	// Load "do not contribute this sections" list
-	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
+	QStringList dontContribute = settings.value("donation/dontpay", "members").toStringList();
 	dontContribute.removeAll("");
 	
 	// Refill with Data
@@ -251,13 +251,13 @@ void Donations::createQif() {
 	QSettings settings;
 	QString valuta = QDate::currentDate().toString("yyyy-MM-dd");
 	QString date = QDate::currentDate().toString("yyyyMMdd");
-	QString memo = settings.value("contribution/memo", "Contribution: %1").toString();
+	QString memo = settings.value("donation/memo", "Donation: %1").toString();
 	QString section, amount;
 	QSqlQuery query2(db);
 	QSqlQuery query(db);
 	
 	// Load "do not contribute this sections" list
-	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
+	QStringList dontContribute = settings.value("donation/dontpay", "members").toStringList();
 	dontContribute.removeAll("");
 	QString notIn = QString(",?").repeated(dontContribute.size());
 	if (!dontContribute.empty()) {
@@ -290,20 +290,20 @@ void Donations::createQif() {
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
 		qif_national.append("\nT" + amount);
-		qif_national.append("\nP"+ settings.value("contribution/payer", "Pirateparty Switzerland").toString().arg(section));
+		qif_national.append("\nP"+ settings.value("donation/payer", "Pirateparty Switzerland").toString().arg(section));
 		qif_national.append("\nNCONT-" + date + "-" + section.toUpper());
 		qif_national.append("\nM" + memo.arg(section));
-		qif_national.append("\nL" + settings.value("contribution/account_donation", "Donation_%1").toString().arg(section));
+		qif_national.append("\nL" + settings.value("donation/account", "Donation_%1").toString().arg(section));
 		qif_national.append("\n^\n");
 		
 		// Section Income QIF
 		QString qif_section("!Type:" + settings.value("qif/account_bank", "Bank").toString());
 		qif_section.append("\nD" + valuta);
 		qif_section.append("\nT" + amount);
-		qif_section.append("\nP"+ settings.value("contribution/payer", "Pirateparty Switzerland").toString().arg(section));
+		qif_section.append("\nP"+ settings.value("donation/payer", "Pirateparty Switzerland").toString().arg(section));
 		qif_section.append("\nNCONT-" + date + "-" + section.toUpper());
 		qif_section.append("\nM" + memo.arg(section));
-		qif_section.append("\nL" + settings.value("contribution/income_donation", "Donations").toString());
+		qif_section.append("\nL" + settings.value("donation/income", "Donations").toString());
 		qif_section.append("\n^\n");
 		
 		sectionQif.insert(section, qif_section);
@@ -336,8 +336,8 @@ void Donations::createQif() {
 void Donations::exportData() {
 	createQif();
 	
-	// Safe the Contributions-QIF
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Contributions for the receiver"), "", tr("Quicken Interchange Format (*.qif)"));
+	// Safe the Donation-QIF
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Donaitions for the receiver"), "", tr("Quicken Interchange Format (*.qif)"));
 	if (!fileName.isEmpty()) {
 		QList<QString>::const_iterator section;
 		QList<QString> keys = sectionQif.keys();
@@ -367,7 +367,7 @@ void Donations::sendEmail() {
 		mail.authPlain(settings.value("smtp/username", "").toString(), settings.value("smtp/password", "").toString());
 	}
 	
-	// Send the Contributions by EMail
+	// Send the Donations by EMail
 	createQif();
 	QList<QString>::const_iterator section;
 	QList<QString> keys = sectionQif.keys();
@@ -391,13 +391,13 @@ void Donations::sendEmail() {
 		pers.load(sec.treasurer());
 		
 		// TODO: Load Subject and Texts
-		subject = QString("Donation contributions for %1").arg(*section);
+		subject = QString("Donations for %1").arg(*section);
 		message = "Ahoi Treasurer,\n"
-		          "This time still in a not verry beautifull Mailing.\n"
-		          "In future you will also receive an additional PDF-Evidence with all information included. This time, the evidence from your Bank has to be be enough.\n\n"
-		          "Attatched you'l find the contribution of the donations of the Pirate Party Switzerland for your section as a Quicken-Interchange File. This you can easily import with GnuCash in your accounting through 'File' -> 'Import' -> 'Import QIF...'.\n"
-		          "You will receive the settlement during next days, change the valuta after in the imported booking.\n\n"
-		          "Greetings,\nLukas Zurschmiede\nTreasurer Pirate Party Switzerland\n";
+			"This time still in a not verry beautifull Mailing.\n"
+			"In future you will also receive an additional PDF-Evidence with all information included. This time, the evidence from your Bank has to be be enough.\n\n"
+			"Attatched you'l find the contribution of the donations of the Pirate Party Switzerland for your section as a Quicken-Interchange File. This you can easily import with GnuCash in your accounting through 'File' -> 'Import' -> 'Import QIF...'.\n"
+			"You will receive the settlement during next days, change the valuta after in the imported booking.\n\n"
+			"Greetings,\nLukas Zurschmiede\nTreasurer Pirate Party Switzerland\n";
 		
 		// Set the Mailtext and send the mail
 		mail.setTextMessage(message);
@@ -408,7 +408,7 @@ void Donations::sendEmail() {
 		
 		// If sending was not successfull (or no treasurer was found), let the user save the QIF
 		if (email.isEmpty() || !mail.send(settings.value("smtp/from", "me@noreply.dom").toString(), email, subject)) {
-			QString fileName = QFileDialog::getSaveFileName(this, tr("Save Contribution for the section"), "", tr("Quicken Interchange Format (*.qif)"));
+			QString fileName = QFileDialog::getSaveFileName(this, tr("Save donations for the section"), "", tr("Quicken Interchange Format (*.qif)"));
 			if (!fileName.isEmpty()) {
 				if (QFile::exists(fileName)) {
 					QFile::remove(fileName);

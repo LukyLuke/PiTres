@@ -543,7 +543,7 @@ void Contributions::createQif() {
 		qif_national.append("\nP"+ settings.value("contribution/payer", "Pirateparty Switzerland").toString().arg(section));
 		qif_national.append("\nNCONT-" + date + "-" + section.toUpper());
 		qif_national.append("\nM" + memo.arg(section));
-		qif_national.append("\nL" + settings.value("contribution/account", "Contribution_%1").toString().arg(section));
+		qif_national.append("\nL" + settings.value("contribution/account", "Contribution %1").toString().arg(section));
 		qif_national.append("\n^\n");
 		
 		// Section Income QIF
@@ -553,7 +553,7 @@ void Contributions::createQif() {
 		qif_section.append("\nP"+ settings.value("contribution/payer", "Pirateparty Switzerland").toString().arg(section));
 		qif_section.append("\nNCONT-" + date + "-" + section.toUpper());
 		qif_section.append("\nM" + memo.arg(section));
-		qif_section.append("\nL" + settings.value("contribution/income", "Membership fee").toString());
+		qif_section.append("\nL" + settings.value("contribution/income", "Membership fee %1").toString());
 		qif_section.append("\n^\n");
 		
 		sectionQif.insert(section, qif_section);

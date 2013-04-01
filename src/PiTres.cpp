@@ -209,7 +209,6 @@ void PiTres::showSettings() {
 	settingsForm.labelMemberAmountFull->setText(tr("Maximum recommendation per Section"));
 	settingsForm.labelMemberAmountLimited->setText(tr("Default recommendation"));
 	settingsForm.memberAmountMin->setValue(settings.value("invoice/minimum_amount", 30.0).toFloat());
-	
 #endif
 	
 	settingsForm.pdfInvoice->setText(settings.value("pdf/invoice_template", "data/invoice.xml").toString());
@@ -220,8 +219,14 @@ void PiTres::showSettings() {
 	settingsForm.assetType->setText(settings.value("qif/account_asset", "Oth A").toString());
 	settingsForm.assetLabel->setText(settings.value("qif/invoice_label", "Membership: %1 (%2)").toString());
 	settingsForm.assetMemo->setText(settings.value("qif/memo", "Member UID: ").toString());
-	settingsForm.assetAccountFull->setText(settings.value("qif/income_limited", "Membership Limited %1").toString());
-	settingsForm.assetAccountLimited->setText(settings.value("qif/income_default", "Membership Default %2").toString());
+	settingsForm.assetAccountFull->setText(settings.value("qif/income_default", "Membership Default %1").toString());
+#ifdef FIO
+	delete settingsForm.assetAccountLimited;
+	delete settingsForm.labelAssetsAccountLimited;
+	settingsForm.labelAssetsAccount->setText(tr("Assets Account"));
+#else
+	settingsForm.assetAccountLimited->setText(settings.value("qif/income_limited", "Membership Limited %2").toString());
+#endif
 	
 	settingsForm.paymentType->setText(settings.value("qif/account_bank", "Bank").toString());
 	settingsForm.paymentLabel->setText(settings.value("qif/payee_label", "Payment:  %1 (%2)").toString());
@@ -245,14 +250,14 @@ void PiTres::showSettings() {
 	
 	settingsForm.contributionPayer->setText(settings.value("contribution/payer", "Pirateparty Switzerland").toString());
 	settingsForm.contributionMemo->setText(settings.value("contribution/memo", "Contribution: %1").toString());
-	settingsForm.contributionAccount->setText(settings.value("contribution/account", "contribution_%1").toString());
-	settingsForm.contributionIncome->setText(settings.value("contribution/income", "Membership fee").toString());
+	settingsForm.contributionAccount->setText(settings.value("contribution/account", "Contribution %1").toString());
+	settingsForm.contributionIncome->setText(settings.value("contribution/income", "Membership fee %1").toString());
 	settingsForm.contributionDontpay->setPlainText(settings.value("contribution/dontpay", "members").toStringList().join("\n"));
 	
 	settingsForm.donationPayer->setText(settings.value("donation/payer", "Pirateparty Switzerland").toString());
 	settingsForm.donationMemo->setText(settings.value("donation/memo", "Donation: %1").toString());
-	settingsForm.donationAccount->setText(settings.value("donation/account", "donation_%1").toString());
-	settingsForm.donationIncome->setText(settings.value("donation/income", "Donation").toString());
+	settingsForm.donationAccount->setText(settings.value("donation/account", "Donation %1").toString());
+	settingsForm.donationIncome->setText(settings.value("donation/income", "Donation %1").toString());
 	settingsForm.donationDontpay->setPlainText(settings.value("donation/dontpay", "members").toStringList().join("\n"));
 	
 	settingsForm.smtpHost->setText(settings.value("smtp/host", "localhost").toString());
@@ -305,8 +310,10 @@ void PiTres::doSaveSettings() {
 	settings.setValue("qif/account_asset", settingsForm.assetType->text());
 	settings.setValue("qif/invoice_label", settingsForm.assetLabel->text());
 	settings.setValue("qif/memo", settingsForm.assetMemo->text());
-	settings.setValue("qif/income_limited", settingsForm.assetAccountFull->text());
-	settings.setValue("qif/income_default", settingsForm.assetAccountLimited->text());
+	settings.setValue("qif/income_default", settingsForm.assetAccountFull->text());
+#ifndef FIO
+	settings.setValue("qif/income_limited", settingsForm.assetAccountLimited->text());
+#endif
 	
 	settings.setValue("qif/account_bank", settingsForm.paymentType->text());
 	settings.setValue("qif/payee_label", settingsForm.paymentLabel->text());
