@@ -46,6 +46,7 @@ private slots:
 	void resetSectionData();
 	void showData(QModelIndex index);
 	void reassignInvoices();
+	void setReassignQuery();
 	
 private:
 	quint32 i_index;
@@ -58,8 +59,7 @@ private:
 	QCompleter *completer;
 	
 	void initComboBoxes();
-	void setReassignQuery();
-	
+		
 protected:
 	void timerEvent(QTimerEvent *event);
 };

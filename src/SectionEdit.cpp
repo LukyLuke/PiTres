@@ -22,20 +22,24 @@ SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 	i_index = 0;
 	_loading = TRUE;
-	
+
 	connect(actionSave, SIGNAL(triggered()), this, SLOT(saveSectionTrigger()));
 	connect(sectionList, SIGNAL(clicked(QModelIndex)), this, SLOT(showData(QModelIndex)));
 	connect(btnReassign, SIGNAL(clicked()), this, SLOT(reassignInvoices()));
-	
+
+
 	QSqlQuery query(db);
 	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL OR parent IS '' THEN '' ELSE ' (' || parent || ')' END AS label,"
-	           "name FROM pps_sections ORDER BY parent,name ASC;");
+		"name FROM pps_sections ORDER BY parent,name ASC;");
 	listModel = new QSqlQueryModel;
 	listModel->setQuery(query);
 	sectionList->setModel(listModel);
 	sectionList->setModelColumn(0);
+
+	// Reassignment date and table
+	paidDateAfter->setDate(QDate::fromString(QString::number(QDate::currentDate().year()).append("-01-01"), "yyyy-01-01"));
+	connect(paidDateAfter, SIGNAL(dateChanged(QDate)), this, SLOT(setReassignQuery()));
 	
-	// Reassignment table
 	reassignModel = new QSqlQueryModel(tableInvoices);
 	setReassignQuery();
 	reassignModel->setHeaderData(0, Qt::Horizontal, tr("Section"));
@@ -45,7 +49,7 @@ SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 	reassignModel->setHeaderData(4, Qt::Horizontal, tr("Issued"));
 	reassignModel->setHeaderData(5, Qt::Horizontal, tr("Reference"));
 	tableInvoices->setModel(reassignModel);
-	
+
 	initComboBoxes();
 }
 
@@ -59,12 +63,13 @@ void SectionEdit::setReassignQuery() {
 	Section s(listModel->index(i_index, 1).data().toString());
 	QSqlQuery query(db);
 	query.prepare("SELECT pps_invoice.for_section, ldap_persons.section, pps_invoice.address_name, pps_invoice.paid_date, pps_invoice.issue_date, pps_invoice.reference"
-	              " FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
-	              " WHERE ldap_persons.section = :section AND pps_invoice.for_section != ldap_persons.section"
-	              " AND (pps_invoice.paid_date = '' OR pps_invoice.paid_date > :founded) AND pps_invoice.issue_date >= :year;");
+		" FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
+		" WHERE ldap_persons.section = :section AND pps_invoice.for_section != ldap_persons.section"
+		" AND (pps_invoice.paid_date = '' OR pps_invoice.paid_date IS NULL OR pps_invoice.paid_date >= :founded)"
+		" AND pps_invoice.paid_date >= :date;");
 	query.bindValue(":section", s.name());
 	query.bindValue(":founded", s.founded());
-	query.bindValue(":year", s.founded().toString("yyyy-01-01"));
+	query.bindValue(":date", paidDateAfter->date());
 	query.exec();
 	reassignModel->setQuery(query);
 }
@@ -86,7 +91,7 @@ void SectionEdit::initComboBoxes() {
 	// The Parent-Combobox
 	QSqlQuery query(db);
 	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections "
-	           "ORDER BY parent,name ASC;");
+		"ORDER BY parent,name ASC;");
 	editParent->addItem(tr("No Member section"), "");
 	while (query.next()) {
 		editParent->addItem(query.value(0).toString(), query.value(1).toString());
