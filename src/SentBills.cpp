@@ -315,9 +315,18 @@ void SentBills::doExportQifPayments() {
 	while (query.next()) {
 		// Build the QIF
 		QString member = query.value(0).toString();
-#ifdef FIO
+		qif.append("\nD").append(query.value(3).toString());
+		qif.append("\nT").append(query.value(2).toString());
+		qif.append("\nP").append(settings.value("qif/payee_label", tr("Payment: %1 (%2)")).toString().arg( query.value(4).toString(), member ) );
+		qif.append("\nN").append(query.value(1).toString());
+		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
+#ifndef FIO
+		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
+#else
 		QString section;
 		fio->reset();
+		
+		// Add all invloved sections with their recommendations.
 		QStringList tmp, recom = query.value(6).toString().split(";");
 		for (int i = 0; i < recom.size(); i++) {
 			tmp = recom.at(i).split(":");
@@ -327,26 +336,23 @@ void SentBills::doExportQifPayments() {
 				fio->addSection( section, tmp.at(1).toFloat() );
 			}
 		}
+		
 		QHash<QString, float> result = fio->calculate(query.value(2).toFloat());
-		QHash<QString, float>::const_iterator it = result.constBegin();
-		while (it != result.constEnd()) {
-#endif
-		qif.append("\nD").append(query.value(3).toString());
-#ifdef FIO
-		qif.append("\nT").append(QString::number(it.value()));
-		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( it.key() ));
-#else
-		qif.append("\nT").append(query.value(2).toString());
-		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
-#endif
-		qif.append("\nP").append(settings.value("qif/payee_label", tr("Payment: %1 (%2)")).toString().arg( query.value(4).toString(), member ) );
-		qif.append("\nN").append(query.value(1).toString());
-		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
-		qif.append("\n^\n");
-#ifdef FIO
-			it++;
+		
+		// Create a split-booking if there are more sections than one involved.
+		if (result.size() > 1) {
+			QHash<QString, float>::const_iterator it = result.constBegin();
+			while (it != result.constEnd()) {
+				qif.append("\nS").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( it.key() ));
+				qif.append("\nE").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
+				qif.append("\n$").append(QString::number(it.value()));
+				it++;
+			}
+		} else {
+			qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
 		}
 #endif
+		qif.append("\n^\n");
 	}
 #ifdef FIO
 	delete fio;
