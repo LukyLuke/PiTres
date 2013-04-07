@@ -261,22 +261,19 @@ void SentBills::doExportQifAssets() {
 		qif = list.value(section);
 		qif->append("\nD").append(query.value(3).toString());
 #ifdef FIO
-				qif->append("\nT").append( QString::number(tmp.at(1).toFloat()) );
+		qif->append("\nT").append( QString::number(tmp.at(1).toFloat()) );
+		qif->append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg(section));
 #else
 		qif->append("\nT").append(query.value(2).toString());
-#endif
-		qif->append("\nP").append(settings.value("qif/invoice_label", tr("Membership: %1 (%2)")).toString().arg( query.value(4).toString(), member ));
-		qif->append("\nN").append(query.value(1).toString());
-		qif->append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
-#ifndef FIO
 		if (amount > amountLimited) {
 			qif->append("\nL").append(settings.value("qif/income_limited", "Membership Limited %1").toString().arg( query.value(5).toString() ));
 		} else {
 			qif->append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
 		}
-#else
-		qif->append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
 #endif
+		qif->append("\nP").append(settings.value("qif/invoice_label", tr("Membership: %1 (%2)")).toString().arg( query.value(4).toString(), member ));
+		qif->append("\nN").append(query.value(1).toString());
+		qif->append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
 		qif->append("\n^\n");
 		qif = NULL;
 #ifdef FIO
@@ -336,18 +333,15 @@ void SentBills::doExportQifPayments() {
 #endif
 		qif.append("\nD").append(query.value(3).toString());
 #ifdef FIO
-			qif.append("\nT").append(QString::number(it.value()));
+		qif.append("\nT").append(QString::number(it.value()));
+		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( it.key() ));
 #else
 		qif.append("\nT").append(query.value(2).toString());
+		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
 #endif
 		qif.append("\nP").append(settings.value("qif/payee_label", tr("Payment: %1 (%2)")).toString().arg( query.value(4).toString(), member ) );
 		qif.append("\nN").append(query.value(1).toString());
 		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
-#ifdef FIO
-			qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( it.key() ));
-#else
-		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
-#endif
 		qif.append("\n^\n");
 #ifdef FIO
 			it++;
