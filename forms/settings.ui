@@ -317,8 +317,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>362</width>
-            <height>727</height>
+            <width>769</width>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -641,8 +641,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>629</width>
-            <height>489</height>
+            <width>769</width>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -965,7 +965,7 @@
               <item row="3" column="0">
                <widget class="QLabel" name="label_9">
                 <property name="text">
-                 <string>Acount Name</string>
+                 <string>Debitor Account</string>
                 </property>
                </widget>
               </item>
@@ -986,7 +986,7 @@
               <item row="3" column="1">
                <widget class="QLineEdit" name="paymentAccount">
                 <property name="text">
-                 <string>Membership Fee %1</string>
+                 <string>Membership Debitor %1</string>
                 </property>
                </widget>
               </item>
@@ -1123,7 +1123,7 @@
               <item row="3" column="1">
                <widget class="QLineEdit" name="contributionIncome">
                 <property name="text">
-                 <string>Membership fee %1</string>
+                 <string>Membership Debitor %1</string>
                 </property>
                </widget>
               </item>
@@ -1195,7 +1195,7 @@
               <item row="3" column="1">
                <widget class="QLineEdit" name="donationIncome">
                 <property name="text">
-                 <string>Donation %1</string>
+                 <string>Donation Debitor %1</string>
                 </property>
                </widget>
               </item>

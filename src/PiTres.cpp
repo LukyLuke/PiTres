@@ -223,7 +223,7 @@ void PiTres::showSettings() {
 #ifdef FIO
 	delete settingsForm.assetAccountLimited;
 	delete settingsForm.labelAssetsAccountLimited;
-	settingsForm.labelAssetsAccount->setText(tr("Assets Account"));
+	settingsForm.labelAssetsAccount->setText(tr("Income Account"));
 #else
 	settingsForm.assetAccountLimited->setText(settings.value("qif/income_limited", "Membership Limited %2").toString());
 #endif

@@ -227,7 +227,9 @@ void SentBills::exportQifPayments() {
 
 void SentBills::doExportQifAssets() {
 	QSettings settings;
-	QString qif("!Type:" + settings.value("qif/account_asset", "Oth A").toString());
+	QHash<QString, QString * > list;
+	QString qif_init("!Type:" + settings.value("qif/account_asset", "Oth A").toString());
+	QString *qif;
 #ifndef FIO
 	float amountLimited = settings.value("invoice/amount_limited", 30.0).toFloat();
 #endif
@@ -240,33 +242,45 @@ void SentBills::doExportQifAssets() {
 
 	while (query.next()) {
 		QString member = query.value(0).toString();
+		QString section = query.value(5).toString();
 #ifndef FIO
 		float amount = query.value(2).toFloat();
 #endif
 
-		qif.append("\nD").append(query.value(3).toString());
-		qif.append("\nT").append(query.value(2).toString());
-		qif.append("\nP").append(settings.value("qif/invoice_label", tr("Membership: %1 (%2)")).toString().arg( query.value(4).toString(), member ));
-		qif.append("\nN").append(query.value(1).toString());
-		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
+		if (!list.contains(section)) {
+			list.insert(section, new QString(qif_init));
+		}
+		qif = list.value(section);
+		qif->append("\nD").append(query.value(3).toString());
+		qif->append("\nT").append(query.value(2).toString());
+		qif->append("\nP").append(settings.value("qif/invoice_label", tr("Membership: %1 (%2)")).toString().arg( query.value(4).toString(), member ));
+		qif->append("\nN").append(query.value(1).toString());
+		qif->append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
 #ifndef FIO
 		if (amount > amountLimited) {
-			qif.append("\nL").append(settings.value("qif/income_limited", "Membership Limited %1").toString().arg( query.value(5).toString() ));
+			qif->append("\nL").append(settings.value("qif/income_limited", "Membership Limited %1").toString().arg( query.value(5).toString() ));
 		} else {
-			qif.append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
+			qif->append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
 		}
 #else
-		qif.append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
+		qif->append("\nL").append(settings.value("qif/income_default", "Membership Default %1").toString().arg( query.value(5).toString() ));
 #endif
-		qif.append("\n^\n");
+		qif->append("\n^\n");
+		qif = NULL;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif)"));
 	if (!fileName.isEmpty()) {
-		QFile f(fileName);
-		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
-			QTextStream out(&f);
-			out << qif;
+		QList<QString> keys = list.keys();
+		for (int i = 0; i < keys.size(); i++) {
+			QFile f( QString(fileName).replace(".qif", "_" + keys.at(i) + ".qif") );
+			if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+				QTextStream out(&f);
+				out << *(list.value(keys.at(i)));
+				
+				delete list.value(keys.at(i));
+				list.remove(keys.at(i));
+			}
 		}
 	}
 	invoiceQifDialog->hide();
