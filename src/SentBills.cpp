@@ -235,16 +235,24 @@ void SentBills::doExportQifAssets() {
 #endif
 
 	QSqlQuery query(db);
-	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name,for_section FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
+	query.prepare("SELECT member_uid,reference,amount,issue_date,address_name,for_section,recommendations FROM pps_invoice WHERE issue_date >= :date1 AND issue_date <= :date2;");
 	query.bindValue(":date1", exportInvoiceQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportInvoiceQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
 
 	while (query.next()) {
 		QString member = query.value(0).toString();
-		QString section = query.value(5).toString();
+		QString section;
 #ifndef FIO
+		section = query.value(5).toString();
 		float amount = query.value(2).toFloat();
+#else
+		QStringList tmp, recom = query.value(6).toString().split(";");
+		for (int i = 0; i < recom.size(); i++) {
+			tmp = recom.at(i).split(":");
+			if (tmp.size() == 2) {
+				section = Section::getSectionName(tmp.at(0));
+				section = section.isEmpty() ? tmp.at(0) : section;
 #endif
 
 		if (!list.contains(section)) {
@@ -252,7 +260,11 @@ void SentBills::doExportQifAssets() {
 		}
 		qif = list.value(section);
 		qif->append("\nD").append(query.value(3).toString());
+#ifdef FIO
+				qif->append("\nT").append( QString::number(tmp.at(1).toFloat()) );
+#else
 		qif->append("\nT").append(query.value(2).toString());
+#endif
 		qif->append("\nP").append(settings.value("qif/invoice_label", tr("Membership: %1 (%2)")).toString().arg( query.value(4).toString(), member ));
 		qif->append("\nN").append(query.value(1).toString());
 		qif->append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
@@ -267,6 +279,10 @@ void SentBills::doExportQifAssets() {
 #endif
 		qif->append("\n^\n");
 		qif = NULL;
+#ifdef FIO
+			}
+		}
+#endif
 	}
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif)"));
@@ -291,7 +307,7 @@ void SentBills::doExportQifPayments() {
 	QString qif("!Type:" + settings.value("qif/account_cash", "Cash").toString());
 
 	QSqlQuery query(db);
-	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name,for_section FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
+	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name,for_section,recommendations FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
 	query.bindValue(":date1", exportPaymentQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportPaymentQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
@@ -333,9 +349,9 @@ void SentBills::exportCsvList() {
 void SentBills::doExportCsvList() {
 	QSqlQuery query(db);
 	QString sql("SELECT pps_invoice.member_uid, pps_invoice.reference, pps_invoice.amount, pps_invoice.address_prefix, pps_invoice.address_name,"
-	            "pps_invoice.address_street1, pps_invoice.address_street2, pps_invoice.address_city, ldap_persons.country"
-	            " FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
-	            " WHERE pps_invoice.issue_date >= :date1 AND pps_invoice.issue_date <= :date2");
+		"pps_invoice.address_street1, pps_invoice.address_street2, pps_invoice.address_city, ldap_persons.country"
+		" FROM pps_invoice LEFT JOIN ldap_persons ON (pps_invoice.member_uid = ldap_persons.uid)"
+		" WHERE pps_invoice.issue_date >= :date1 AND pps_invoice.issue_date <= :date2");
 	if (csvExport.radioEmail->isChecked()) {
 		sql.append(" AND (ldap_persons.notify_method=" + QString::number(PPSPerson::EMail) + " AND pps_invoice.address_email<>\"\")");
 	} else if (csvExport.radioSnailMail->isChecked()) {

@@ -27,7 +27,7 @@
 #include "data/Reminder.h"
 #include "data/Person.h"
 #include "data/Invoice.h"
-#include "data/Reminder.h"
+#include "data/Section.h"
 #include "helper/XmlPdf.h"
 
 #include <QWidget>
