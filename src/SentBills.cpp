@@ -305,25 +305,58 @@ void SentBills::doExportQifAssets() {
 void SentBills::doExportQifPayments() {
 	QSettings settings;
 	QString qif("!Type:" + settings.value("qif/account_cash", "Cash").toString());
+#ifdef FIO
+	FIOCalc *fio = new FIOCalc;
+#endif
 
 	QSqlQuery query(db);
-	query.prepare("SELECT member_uid,reference,amount,paid_date,address_name,for_section,recommendations FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
+	query.prepare("SELECT member_uid,reference,amount_paid,paid_date,address_name,for_section,recommendations FROM pps_invoice WHERE paid_date >= :date1 AND paid_date <= :date2;");
 	query.bindValue(":date1", exportPaymentQifForm.fromDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":date2", exportPaymentQifForm.toDate->date().toString("yyyy-MM-dd"));
 	query.exec();
 
 	while (query.next()) {
+		// Build the QIF
 		QString member = query.value(0).toString();
-
-		// Payment QIF
+#ifdef FIO
+		QString section;
+		fio->reset();
+		QStringList tmp, recom = query.value(6).toString().split(";");
+		for (int i = 0; i < recom.size(); i++) {
+			tmp = recom.at(i).split(":");
+			if (tmp.size() == 2) {
+				section = Section::getSectionName(tmp.at(0));
+				section = section.isEmpty() ? tmp.at(0) : section;
+				fio->addSection( section, tmp.at(1).toFloat() );
+			}
+		}
+		QHash<QString, float> result = fio->calculate(query.value(2).toFloat());
+		QHash<QString, float>::const_iterator it = result.constBegin();
+		while (it != result.constEnd()) {
+#endif
 		qif.append("\nD").append(query.value(3).toString());
+#ifdef FIO
+			qif.append("\nT").append(QString::number(it.value()));
+#else
 		qif.append("\nT").append(query.value(2).toString());
+#endif
 		qif.append("\nP").append(settings.value("qif/payee_label", tr("Payment: %1 (%2)")).toString().arg( query.value(4).toString(), member ) );
 		qif.append("\nN").append(query.value(1).toString());
 		qif.append("\nM").append(settings.value("qif/memo", tr("Member UID: %1")).toString().arg(member));
+#ifdef FIO
+			qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( it.key() ));
+#else
 		qif.append("\nL").append(settings.value("qif/account_income", "Membership fee %1").toString().arg( query.value(5).toString() ));
+#endif
 		qif.append("\n^\n");
+#ifdef FIO
+			it++;
+		}
+#endif
 	}
+#ifdef FIO
+	delete fio;
+#endif
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
