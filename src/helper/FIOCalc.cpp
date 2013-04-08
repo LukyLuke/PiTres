@@ -52,6 +52,24 @@ QHash<QString, float> FIOCalc::calculate(float amount) {
 
 	// calculate all parts
 	_calc(&copy, &payments, amount);
+
+	// Recalculate all entries to prevent endless amounts like 33.333333
+	QHash<QString, float>::iterator _it, it = payments.begin();
+	int _sum = 0, _amount = (int)(amount * 100), tmp;
+	while (it != payments.end()) {
+		// round all values.
+		tmp = (int)round(it.value() * 100);
+		payments.insert(it.key(), (float)tmp / 100);
+
+		// the last value is calculated based on the rounded values.
+		_it = it;
+		if (++it == payments.end()) {
+			payments.insert(_it.key(), ((float)_amount - _sum) / 100);
+		} else {
+			_sum += tmp;
+		}
+	}
+
 	return payments;
 }
 

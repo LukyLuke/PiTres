@@ -29,7 +29,9 @@
 #include "data/Invoice.h"
 #include "data/Section.h"
 #include "helper/XmlPdf.h"
+#ifdef FIO
 #include "helper/FIOCalc.h"
+#endif
 
 #include <QWidget>
 #include <QSettings>

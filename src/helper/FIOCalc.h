@@ -20,6 +20,8 @@
 #ifndef FIOCALC_H
 #define FIOCALC_H
 
+#include "math.h"
+
 #include <QString>
 #include <QHash>
 
