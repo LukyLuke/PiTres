@@ -83,6 +83,7 @@ public slots:
 	
 protected:
 	void timerEvent(QTimerEvent *event);
+	void _addParsedImportLine(qint32 row, QDate valuta, float amount, QString reference);
 };
 
 #endif // PaymentImport_H

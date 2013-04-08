@@ -291,6 +291,8 @@ void PaymentImport::showPaymentsImportFilesDialog() {
 
 void PaymentImport::parsePaymentsFromDialog() {
 	QFile file(import.editFile->text());
+	esr_record_3 record3;
+	esr_record_4 record4;
 	
 	import.tableWidget->clear();
 	import.tableWidget->setRowCount(0);
@@ -303,27 +305,19 @@ void PaymentImport::parsePaymentsFromDialog() {
 	if (file.open(QFile::ReadOnly)) {
 		switch (import.importType->itemData( import.importType->currentIndex() ).toInt()) {
 			case 0:
-			{
-				esr_record_3 record = parse_esr3(QString(file.readAll()));
-				import.tableWidget->setRowCount(record.data.size());
-				for (qint32 i = 0; i < record.data.size(); i++) {
-					import.tableWidget->setItem(i, 0, new QTableWidgetItem( record.data.at(i).valuta_date.toString("yyyy-MM-dd") ));
-					import.tableWidget->setItem(i, 1, new QTableWidgetItem( tr("%1 sFr.").arg(record.data.at(i).amount, 0, 'f', 2) ));
-					import.tableWidget->setItem(i, 2, new QTableWidgetItem( record.data.at(i).reference_number ));
+				record3 = parse_esr3(QString(file.readAll()));
+				import.tableWidget->setRowCount(record3.data.size());
+				for (qint32 i = 0; i < record3.data.size(); i++) {
+					_addParsedImportLine( i, record3.data.at(i).valuta_date, record3.data.at(i).amount, record3.data.at(i).reference_number );
 				}
-			}
 				break;
 
 			case 1:
-			{
-				esr_record_4 record = parse_esr4(QString(file.readAll()));
-				import.tableWidget->setRowCount(record.data.size());
-				for (qint32 i = 0; i < record.data.size(); i++) {
-					import.tableWidget->setItem(i, 0, new QTableWidgetItem( record.data.at(i).valuta_date.toString("yyyy-MM-dd") ));
-					import.tableWidget->setItem(i, 1, new QTableWidgetItem( tr("%1 sFr.").arg(record.data.at(i).amount, 0, 'f', 2) ));
-					import.tableWidget->setItem(i, 2, new QTableWidgetItem( record.data.at(i).reference_number ));
+				record4 = parse_esr4(QString(file.readAll()));
+				import.tableWidget->setRowCount(record4.data.size());
+				for (qint32 i = 0; i < record4.data.size(); i++) {
+					_addParsedImportLine( i, record4.data.at(i).valuta_date, record4.data.at(i).amount, record4.data.at(i).reference_number );
 				}
-			}
 				break;
 
 			default:
@@ -333,4 +327,29 @@ void PaymentImport::parsePaymentsFromDialog() {
 	} else {
 		QMessageBox::warning(this, tr("Cannot open selected File"), tr("The file you selected is not readable by your user.\nPlease correct the access rules or select an other file."), QMessageBox::Ok);
 	}
+}
+
+void PaymentImport::_addParsedImportLine(qint32 row, QDate valuta, float amount, QString reference) {
+	QTableWidgetItem *item;
+	QColor color(255, 190, 160);
+	Invoice invoice;
+	invoice.loadByReference(reference);
+	
+	item = new QTableWidgetItem( valuta.toString("yyyy-MM-dd") );
+	if (invoice.memberUid() > 0) {
+		item->setBackgroundColor(color);
+	}
+	import.tableWidget->setItem(row, 0, item);
+	
+	item = new QTableWidgetItem( tr("%1 sFr.").arg(amount, 0, 'f', 2) );
+	if (invoice.memberUid() > 0) {
+		item->setBackgroundColor(color);
+	}
+	import.tableWidget->setItem(row, 1, item);
+	
+	item = new QTableWidgetItem( reference );
+	if (invoice.memberUid() > 0) {
+		item->setBackgroundColor(color);
+	}
+	import.tableWidget->setItem(row, 2, item);
 }
