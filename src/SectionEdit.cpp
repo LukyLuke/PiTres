@@ -29,7 +29,7 @@ SectionEdit::SectionEdit(QWidget *parent) : QWidget(parent) {
 
 
 	QSqlQuery query(db);
-	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL OR parent IS '' THEN '' ELSE ' (' || parent || ')' END AS label,"
+	query.exec("SELECT UPPER(name) || ', ' || CASE WHEN description IS NULL THEN '' ELSE description END || CASE WHEN parent IS NULL OR parent IS '' THEN '' ELSE ' (' || parent || ')' END AS label,"
 		"name FROM pps_sections ORDER BY parent,name ASC;");
 	listModel = new QSqlQueryModel;
 	listModel->setQuery(query);
@@ -90,7 +90,7 @@ void SectionEdit::reassignInvoices() {
 void SectionEdit::initComboBoxes() {
 	// The Parent-Combobox
 	QSqlQuery query(db);
-	query.exec("SELECT UPPER(name) || ', ' || description || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections "
+	query.exec("SELECT UPPER(name) || ', ' || CASE WHEN description IS NULL THEN '' ELSE description END || CASE WHEN parent IS NULL THEN '' ELSE ' (' || parent || ')' END AS label, name FROM pps_sections "
 		"ORDER BY parent,name ASC;");
 	editParent->addItem(tr("No Member section"), "");
 	while (query.next()) {

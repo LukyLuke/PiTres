@@ -203,6 +203,7 @@ void PPSPerson::clear() {
 	m_type = Pirate;
 	m_notify = EMail;
 	_invoice.clear();
+	l_paidDue.append(QDate(1970, 1, 1));
 }
 
 bool PPSPerson::load(int uid) {

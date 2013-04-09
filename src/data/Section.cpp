@@ -196,7 +196,7 @@ void Section::save() {
 	QSqlQuery query(db);
 	if (loaded()) {
 		query.prepare("UPDATE pps_sections SET description=:description,amount=:amount,parent=:parent,address=:address"
-		              ",bank_account=:account,treasurer=:treasurer,founded=:founded,invoice_text=:text,invoice_logo=:logo"
+		              ",bank_account=:account,treasurer=:treasurer,founded=:founded,invoice_logo=:logo"
 		              ",email=:email WHERE name=:name;");
 	} else {
 		query.prepare("INSERT INTO pps_sections (name,description,amount,parent,address,bank_account,treasurer,founded,invoice_logo,email)"
