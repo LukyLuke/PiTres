@@ -20,31 +20,36 @@
 #define INVOICEWIZARD_H
 
 #include "ui_invoicewizard.h"
+#include "data/Section.h"
+#include "model/invoice_InvoiceCreateModel.h"
 
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QString>
+#include <QList>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QDebug>
 
 class InvoiceWizard : public QWidget, private Ui::InvoiceForm {
 Q_OBJECT
 public:
 	InvoiceWizard(QWidget *parent = 0);
 	virtual ~InvoiceWizard();
+	enum InvoiceImportType { INVOICE_IMPORTTYPE_UNKNOWN, INVOICE_IMPORTTYPE_NEW, INVOICE_IMPORTTYPE_OUTSTANDING, INVOICE_IMPORTTYPE_REMINDER, INVOICE_IMPORTTYPE_ALL };
 
 private:
 	QSqlDatabase db;
+	InvoiceImportType _importType;
+	invoice::InvoiceCreateModel _previewModel;
+	void fillSectionList();
 	void doCreateInvoices(QSqlQuery *query);
 	QString getSaveFileName();
 	
 public slots:
 	void insertMemberUid();
 	void invoiceMembers();
-	void invoiceNewMembers();
-	void invoiceUntilDate();
-	void invoiceAllMembers();
-	void sendReminders();
+	void updatePreviewTable();
 };
 
 #endif // INVOICEWIZARD_H

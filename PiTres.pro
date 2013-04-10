@@ -32,8 +32,8 @@ HEADERS += src/data/Person.h src/data/Invoice.h src/data/Reminder.h src/data/Sec
 SOURCES += src/data/Person.cpp src/data/Invoice.cpp src/data/Reminder.cpp src/data/Section.cpp src/data/BudgetEntity.cpp src/data/Donation.cpp
 
 # Models
-HEADERS += src/model/budget_BudgetEntityModel.h src/model/budget_TreeModel.h src/model/payment_PaymentImportModel.h
-SOURCES += src/model/budget_BudgetEntityModel.cpp src/model/budget_TreeModel.cpp src/model/payment_PaymentImportModel.cpp
+HEADERS += src/model/budget_BudgetEntityModel.h src/model/budget_TreeModel.h src/model/payment_PaymentImportModel.h src/model/invoice_InvoiceCreateModel.h
+SOURCES += src/model/budget_BudgetEntityModel.cpp src/model/budget_TreeModel.cpp src/model/payment_PaymentImportModel.cpp src/model/invoice_InvoiceCreateModel.cpp
 
 # Delegates
 HEADERS += src/delegate/budget_BudgetEntityDelegate.h src/delegate/budget_TreeItemDelegate.h

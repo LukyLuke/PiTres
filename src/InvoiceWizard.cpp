@@ -41,10 +41,19 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	connect(memberUid, SIGNAL(returnPressed()), this, SLOT(insertMemberUid()));
 	connect(btnAddMember, SIGNAL(clicked()), this, SLOT(insertMemberUid()));
 	connect(btnUidInvoice, SIGNAL(clicked()), this, SLOT(invoiceMembers()));
-	connect(btnInvoiceNew, SIGNAL(clicked()), this, SLOT(invoiceNewMembers()));
-	connect(btnInvoiceUntil, SIGNAL(clicked()), this, SLOT(invoiceUntilDate()));
-	connect(btnInvoiceAll, SIGNAL(clicked()), this, SLOT(invoiceAllMembers()));
-	connect(btnSendReminder, SIGNAL(clicked()), this, SLOT(sendReminders()));
+
+	connect(radioNew, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+	connect(radioAll, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+	connect(radioPaidDue, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+	connect(radioReminder, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+
+	connect(newMemberDate, SIGNAL(dateChanged(QDate)), this, SLOT(updatePreviewTable()));
+	connect(memberUntil, SIGNAL(dateChanged(QDate)), this, SLOT(updatePreviewTable()));
+	connect(reminderChooser, SIGNAL(valueChanged(int)), this, SLOT(updatePreviewTable()));
+	connect(sectionList, SIGNAL(currentRowChanged(int)), this, SLOT(updatePreviewTable()));
+
+	previewTable->setModel(&_previewModel);
+	fillSectionList();
 }
 
 InvoiceWizard::~InvoiceWizard() {
@@ -99,38 +108,95 @@ void InvoiceWizard::invoiceMembers() {
 	bar.setValue(max);
 }
 
-void InvoiceWizard::invoiceNewMembers() {
+void InvoiceWizard::updatePreviewTable() {
+	_previewModel.clear();
+	_importType = radioNew->isChecked() ? INVOICE_IMPORTTYPE_NEW :
+		radioAll->isChecked() ? INVOICE_IMPORTTYPE_ALL :
+		radioPaidDue->isChecked() ? INVOICE_IMPORTTYPE_OUTSTANDING :
+		radioReminder->isChecked() ? INVOICE_IMPORTTYPE_REMINDER :
+		INVOICE_IMPORTTYPE_UNKNOWN;
+
+	// Enable/Disable elements
+	newMemberDate->setEnabled(_importType == INVOICE_IMPORTTYPE_NEW);
+	memberUntil->setEnabled(_importType == INVOICE_IMPORTTYPE_OUTSTANDING);
+	reminderChooser->setEnabled(_importType == INVOICE_IMPORTTYPE_REMINDER);
+
+	// Prepare values for the query.
+	QString section = sectionList->currentIndex().isValid() ? sectionList->currentItem()->text() : "";
+	QDate paid = QDate::currentDate();
+	paid.addMonths(0 - reminderChooser->value());
+	if (section == tr("All")) {
+		section = "";
+	}
+
+	// Create the query and fill the table model.
 	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE joining >= ? AND type <= ?;");
-	query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
-	query.bindValue(1, PPSPerson::Pirate);
-	query.exec();
-	doCreateInvoices(&query);
+	switch (_importType) {
+		case INVOICE_IMPORTTYPE_ALL:
+			query.prepare(QString("SELECT ldap_personsuid FROM ldap_persons"
+			" WHERE ldap_personstype<=? %1;").arg(section.isEmpty() ? "" : "AND section=?"));
+			query.bindValue(0, PPSPerson::Pirate);
+			if (!section.isEmpty()) {
+				query.bindValue(1, section);
+			}
+			break;
+
+		case INVOICE_IMPORTTYPE_NEW:
+			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
+			" WHERE ldap_persons.joining>=? AND ldap_persons.type<=? %1;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
+			query.bindValue(1, PPSPerson::Pirate);
+			if (!section.isEmpty()) {
+				query.bindValue(2, section);
+			}
+			break;
+
+		case INVOICE_IMPORTTYPE_OUTSTANDING:
+			query.prepare(QString("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
+				" WHERE (ldap_persons_dates.paid_due<? OR ldap_persons_dates.paid_due IS NULL OR ldap_persons_dates.paid_due='')"
+				" AND ldap_persons.type<=? %1;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			query.bindValue(0, memberUntil->date().toString("yyyy-MM-dd"));
+			query.bindValue(1, PPSPerson::Pirate);
+			if (!section.isEmpty()) {
+				query.bindValue(2, section);
+			}
+			break;
+
+		case INVOICE_IMPORTTYPE_REMINDER:
+			query.prepare(QString("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN pps_invoice ON (ldap_persons.uid = pps_invoice.member_uid)"
+				" WHERE pps_invoice.state=? AND (pps_invoice.paid_date IS NULL OR pps_invoice.paid_date='') AND pps_invoice.issue_date<=?"
+				" AND ldap_persons.type<=? %1;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			query.bindValue(0, Invoice::StateOpen);
+			query.bindValue(1, paid.toString("yyyy-MM-dd"));
+			query.bindValue(2, PPSPerson::Pirate);
+			if (!section.isEmpty()) {
+				query.bindValue(3, section);
+			}
+			break;
+
+		default:
+			// Clear table model and return.
+			return;
+	}
+
+	if (query.exec()) {
+		PPSPerson *person = new PPSPerson;
+		while (query.next()) {
+			if (person->load(query.value(0).toInt())) {
+				_previewModel.insert(person);
+			}
+		}
+		delete person;
+	}
 }
 
-void InvoiceWizard::invoiceUntilDate() {
-	QSqlQuery query(db);
-	query.prepare("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
-	              " WHERE (ldap_persons_dates.paid_due < ? OR ldap_persons_dates.paid_due IS NULL OR ldap_persons_dates.paid_due = '')"
-	              " AND ldap_persons.type <= ?;");
-	query.bindValue(0, memberUntil->date().toString("yyyy-MM-dd"));
-	query.bindValue(1, PPSPerson::Pirate);
-	query.exec();
-	doCreateInvoices(&query);
-}
-
-void InvoiceWizard::invoiceAllMembers() {
-	QSqlQuery query(db);
-	query.prepare("SELECT uid FROM ldap_persons WHERE type <= ?;");
-	query.bindValue(0, PPSPerson::Pirate);
-	query.exec();
-	doCreateInvoices(&query);
-}
-
-void InvoiceWizard::sendReminders() {
-	// TODO: implement sending reminders for invoices not paid during last X months
-	qint32 months = reminderChooser->value();
-	qDebug() << "TODO: Sending Rmeinders...";
+void InvoiceWizard::fillSectionList() {
+	QList<QString> list;
+	Section::getSectionList(&list);
+	sectionList->addItem(new QListWidgetItem(tr("All")));
+	for (qint32 i = 0; i < list.length(); i++) {
+		sectionList->addItem(new QListWidgetItem(list.at(i)));
+	}
 }
 
 void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
