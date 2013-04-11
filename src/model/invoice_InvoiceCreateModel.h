@@ -56,6 +56,9 @@ namespace invoice {
 			QString address_name;
 			QString address_city;
 			QString section;
+			QDate lastPaid;
+			QDate lastInvoiceDate;
+			QDate paidDue;
 		};
 		QList<InvoiceCreateData> l_items;
 	};

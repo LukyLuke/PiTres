@@ -43,13 +43,13 @@ private:
 	InvoiceImportType _importType;
 	invoice::InvoiceCreateModel _previewModel;
 	void fillSectionList();
-	void doCreateInvoices(QSqlQuery *query);
 	QString getSaveFileName();
 	
-public slots:
+private slots:
 	void insertMemberUid();
 	void invoiceMembers();
 	void updatePreviewTable();
+	void createInvoices();
 };
 
 #endif // INVOICEWIZARD_H

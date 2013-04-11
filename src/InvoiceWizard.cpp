@@ -39,8 +39,8 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	memberUntil->setDate(QDate(QDate::currentDate().year() + 1, 12, 31));
 
 	connect(memberUid, SIGNAL(returnPressed()), this, SLOT(insertMemberUid()));
-	connect(btnAddMember, SIGNAL(clicked()), this, SLOT(insertMemberUid()));
-	connect(btnUidInvoice, SIGNAL(clicked()), this, SLOT(invoiceMembers()));
+	connect(btnAddMember, SIGNAL(pressed()), this, SLOT(insertMemberUid()));
+	connect(btnUidInvoice, SIGNAL(pressed()), this, SLOT(invoiceMembers()));
 
 	connect(radioNew, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
 	connect(radioAll, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
@@ -51,6 +51,8 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	connect(memberUntil, SIGNAL(dateChanged(QDate)), this, SLOT(updatePreviewTable()));
 	connect(reminderChooser, SIGNAL(valueChanged(int)), this, SLOT(updatePreviewTable()));
 	connect(sectionList, SIGNAL(currentRowChanged(int)), this, SLOT(updatePreviewTable()));
+
+	connect(btnInvoice, SIGNAL(pressed()), this, SLOT(createInvoices()));
 
 	previewTable->setModel(&_previewModel);
 	fillSectionList();
@@ -199,13 +201,13 @@ void InvoiceWizard::fillSectionList() {
 	}
 }
 
-void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
+void InvoiceWizard::createInvoices() {
 	PPSPerson pers;
 	Invoice invoice;
 	XmlPdf *pdf;
 	QString fileName;
 
-	int num = query->size();
+	int num = _previewModel.rowCount();
 	int cnt = 0;
 	QProgressDialog bar(this);
 	bar.setRange(0, num);
@@ -214,17 +216,14 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 	bar.setWindowModality(Qt::WindowModal);
 	bar.show();
 
-	while (query->next()) {
+	for (qint32 i = 0; i < num; i++) {
 		if (bar.wasCanceled()) {
 			break;
 		}
 		bar.setValue(cnt++);
-		
-		if (num < 0 && cnt < 2 && query->isActive()) {
-			num = query->size();
-		}
 
-		if (pers.load(query->value(0).toInt())) {
+		qint32 uid = _previewModel.index(i, 0).data(Qt::DisplayRole).toInt();
+		if (pers.load(uid)) {
 			if (bar.wasCanceled()) break;
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
 			invoice.create(&pers);
@@ -244,6 +243,7 @@ void InvoiceWizard::doCreateInvoices(QSqlQuery *query) {
 		}
 	}
 	bar.setValue(num);
+	updatePreviewTable();
 }
 
 QString InvoiceWizard::getSaveFileName() {

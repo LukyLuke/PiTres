@@ -32,6 +32,9 @@ namespace invoice {
 				case 1:  return tr("Name");
 				case 2:  return tr("City");
 				case 3:  return tr("Section");
+				case 4:  return tr("Paid due");
+				case 5:  return tr("Last paid");
+				case 6:  return tr("Last invoice");
 			}
 		}
 		return QVariant();
@@ -51,6 +54,9 @@ namespace invoice {
 			case 1:  return entity.address_name;
 			case 2:  return entity.address_city;
 			case 3:  return entity.section;
+			case 4:  return entity.paidDue;
+			case 5:  return entity.lastPaid;
+			case 6:  return entity.lastInvoiceDate;
 		}
 		return QVariant();
 	}
@@ -60,11 +66,17 @@ namespace invoice {
 			return;
 		}
 		beginInsertRows(QModelIndex(), l_items.size(), l_items.size());
+
+		Invoice *invoice = person->getInvoice();
 		InvoiceCreateData entity;
+		
 		entity.uid = person->uid();
 		entity.address_name = person->givenName() + " " + person->familyName();
 		entity.address_city = person->postalCode() + " " + person->city();
 		entity.section = person->section();
+		entity.lastPaid = invoice->paidDate();
+		entity.lastInvoiceDate = invoice->issueDate();
+		entity.paidDue = person->paidDue();
 		l_items.append(entity);
 		endInsertRows();
 	}
@@ -80,7 +92,7 @@ namespace invoice {
 	}
 
 	int InvoiceCreateModel::columnCount(const QModelIndex &parent) const {
-		return 4; // Number of attributes in InvoiceCreateData.
+		return 7; // Number of attributes in InvoiceCreateData.
 	}
 	
 	bool InvoiceCreateModel::insertRows(int pos, int count, const QModelIndex &parent) {
