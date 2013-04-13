@@ -27,11 +27,11 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	maxDate->setDate(settings.value("sentbills/maxdate", QDate::currentDate().addDays(1)).toDate());
 
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
-	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout(QString)));
+	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout()));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
 	connect(checkOpen, SIGNAL(toggled(bool)), this, SLOT(searchData()));
-	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
-	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchData()));
+	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchDataTimeout()));
+	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchDataTimeout()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
 	connect(btnExportCsv, SIGNAL(clicked()), this, SLOT(exportCsvList()));
 	
@@ -154,7 +154,7 @@ void SentBills::timerEvent(QTimerEvent * /*event*/) {
 	searchData();
 }
 
-void SentBills::searchDataTimeout(QString /*data*/) {
+void SentBills::searchDataTimeout() {
 	killTimer(searchTimer);
 	searchTimer = startTimer(1000);
 }
@@ -212,16 +212,14 @@ void SentBills::searchData() {
 }
 
 void SentBills::exportQifAssets() {
-	QDate now = QDate::currentDate();
-	exportInvoiceQifForm.fromDate->setDate(QDate(now.year()-1, 1, 1));
-	exportInvoiceQifForm.toDate->setDate(QDate(now.year(), 1, 1));
+	exportInvoiceQifForm.fromDate->setDate( sinceDate->date() );
+	exportInvoiceQifForm.toDate->setDate( maxDate->date() );
 	invoiceQifDialog->show();
 }
 
 void SentBills::exportQifPayments() {
-	QDate now = QDate::currentDate();
-	exportPaymentQifForm.fromDate->setDate(now.addMonths(-1));
-	exportPaymentQifForm.toDate->setDate(now);
+	exportPaymentQifForm.fromDate->setDate( sinceDate->date() );
+	exportPaymentQifForm.toDate->setDate( maxDate->date() );
 	paymentQifDialog->show();
 }
 

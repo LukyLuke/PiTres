@@ -97,7 +97,7 @@ public:
 
 public slots:
 	void searchData();
-	void searchDataTimeout(QString data);
+	void searchDataTimeout();
 	void exportQifAssets();
 	void doExportQifAssets();
 	void exportQifPayments();
