@@ -29,6 +29,7 @@
 #include <QList>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QTimerEvent>
 #include <QDebug>
 
 class InvoiceWizard : public QWidget, private Ui::InvoiceForm {
@@ -42,14 +43,19 @@ private:
 	QSqlDatabase db;
 	InvoiceImportType _importType;
 	invoice::InvoiceCreateModel _previewModel;
+	int searchTimer;
 	void fillSectionList();
 	QString getSaveFileName();
 	
 private slots:
+	void startSearchTimer();
 	void insertMemberUid();
 	void invoiceMembers();
 	void updatePreviewTable();
 	void createInvoices();
+
+protected:
+	void timerEvent(QTimerEvent *event);
 };
 
 #endif // INVOICEWIZARD_H
