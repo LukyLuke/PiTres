@@ -37,7 +37,10 @@ namespace invoice {
 
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
 		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+		void append(PPSPerson *person);
+		void beginInsert();
 		void insert(PPSPerson *person);
+		void endInsert();
 		void clear();
 
 		bool insertRows(int pos, int count, const QModelIndex &parent = QModelIndex());
@@ -60,7 +63,9 @@ namespace invoice {
 			QDate lastInvoiceDate;
 			QDate paidDue;
 		};
+		QList<InvoiceCreateData> l_insertItems;
 		QList<InvoiceCreateData> l_items;
+		bool _do = TRUE;
 	};
 };
 #endif // Invoice_InvoiceCreateModel_H

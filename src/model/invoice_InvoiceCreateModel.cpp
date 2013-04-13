@@ -24,7 +24,7 @@ namespace invoice {
 	InvoiceCreateModel::~InvoiceCreateModel() {
 		clear();
 	}
-	
+
 	QVariant InvoiceCreateModel::headerData(int section, Qt::Orientation orientation, int role) const {
 		if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
 			switch (section) {
@@ -47,7 +47,7 @@ namespace invoice {
 		if (l_items.size() <= index.row()) {
 			return QVariant();
 		}
-		
+
 		InvoiceCreateData entity = l_items.at(index.row());
 		switch (index.column()) {
 			case 0:  return QString::number(entity.uid);
@@ -61,15 +61,24 @@ namespace invoice {
 		return QVariant();
 	}
 
+	void InvoiceCreateModel::append(PPSPerson *person) {
+		beginInsert();
+		insert(person);
+		endInsert();
+	}
+
+	void InvoiceCreateModel::beginInsert() {
+		l_insertItems.clear();
+	}
+
 	void InvoiceCreateModel::insert(PPSPerson *person) {
 		if (person->uid() <= 0) {
 			return;
 		}
-		beginInsertRows(QModelIndex(), l_items.size(), l_items.size());
 
 		Invoice *invoice = person->getInvoice();
 		InvoiceCreateData entity;
-		
+
 		entity.uid = person->uid();
 		entity.address_name = person->givenName() + " " + person->familyName();
 		entity.address_city = person->postalCode() + " " + person->city();
@@ -77,14 +86,21 @@ namespace invoice {
 		entity.lastPaid = invoice->paidDate();
 		entity.lastInvoiceDate = invoice->issueDate();
 		entity.paidDue = person->paidDue();
-		l_items.append(entity);
+		l_insertItems.append(entity);
+	}
+
+	void InvoiceCreateModel::endInsert() {
+		qint32 start = l_items.size();
+		qint32 num = l_insertItems.size();
+		beginInsertRows(QModelIndex(), start, start + num - 1);
+		while (!l_insertItems.isEmpty()) {
+			l_items.append( l_insertItems.takeFirst() );
+		}
 		endInsertRows();
 	}
 
 	void InvoiceCreateModel::clear() {
-		beginRemoveRows(QModelIndex(), 0, l_items.size());
-		l_items.clear();
-		endRemoveRows();
+		removeRows(0, l_items.size());
 	}
 
 	int InvoiceCreateModel::rowCount(const QModelIndex & /*parent*/) const {
@@ -94,7 +110,7 @@ namespace invoice {
 	int InvoiceCreateModel::columnCount(const QModelIndex & /*parent*/) const {
 		return 7; // Number of attributes in InvoiceCreateData.
 	}
-	
+
 	bool InvoiceCreateModel::insertRows(int pos, int count, const QModelIndex &parent) {
 		beginInsertRows(parent, pos, pos + count - 1);
 		for (qint32 i = 0; i < count; i++) {
@@ -103,7 +119,7 @@ namespace invoice {
 		endInsertRows();
 		return true;
 	}
-	
+
 	bool InvoiceCreateModel::removeRows(int pos, int count, const QModelIndex &parent) {
 		if (l_items.size() < pos + count) {
 			count = l_items.size() - pos;
@@ -116,7 +132,7 @@ namespace invoice {
 		endRemoveRows();
 		return true;
 	}
-	
+
 	Qt::ItemFlags InvoiceCreateModel::flags(const QModelIndex &index) const {
 		if (!index.isValid()) {
 			return 0;

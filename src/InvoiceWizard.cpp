@@ -117,7 +117,7 @@ void InvoiceWizard::timerEvent(QTimerEvent * /*event*/) {
 
 void InvoiceWizard::startSearchTimer() {
 	killTimer(searchTimer);
-	searchTimer = startTimer(500);
+	searchTimer = startTimer(1000);
 }
 
 void InvoiceWizard::updatePreviewTable() {
@@ -193,11 +193,13 @@ void InvoiceWizard::updatePreviewTable() {
 
 	if (query.exec()) {
 		PPSPerson *person = new PPSPerson;
+		_previewModel.beginInsert();
 		while (query.next()) {
 			if (person->load(query.value(0).toInt())) {
 				_previewModel.insert(person);
 			}
 		}
+		_previewModel.endInsert();
 		delete person;
 	}
 }
