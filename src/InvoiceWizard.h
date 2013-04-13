@@ -21,6 +21,7 @@
 
 #include "ui_invoicewizard.h"
 #include "data/Section.h"
+#include "delegate/DateDelegate.h"
 #include "model/invoice_InvoiceCreateModel.h"
 
 #include <QWidget>

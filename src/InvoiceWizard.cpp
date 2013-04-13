@@ -55,6 +55,9 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	connect(btnInvoice, SIGNAL(pressed()), this, SLOT(createInvoices()));
 
 	previewTable->setModel(&_previewModel);
+	previewTable->setItemDelegateForColumn(4, new DateDelegate("yyyy-MM-dd"));
+	previewTable->setItemDelegateForColumn(5, new DateDelegate("yyyy-MM-dd"));
+	previewTable->setItemDelegateForColumn(6, new DateDelegate("yyyy-MM-dd"));
 	fillSectionList();
 }
 
