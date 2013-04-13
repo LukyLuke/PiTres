@@ -60,14 +60,8 @@ namespace payment {
 	}
 
 	void PaymentImportModel::clear() {
-		beginRemoveRows(QModelIndex(), 0, l_items.size());
-		while (!l_items.isEmpty()) {
-			PaymentItem *entity = l_items.takeFirst();
-			delete entity;
-		}
-		endRemoveRows();
+		removeRows(0, l_items.size());
 	}
-
 
 	qint32 PaymentImportModel::rowCount(const QModelIndex & /*parent*/) const {
 		return l_items.size();
