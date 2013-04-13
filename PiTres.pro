@@ -36,8 +36,8 @@ HEADERS += src/model/budget_BudgetEntityModel.h src/model/budget_TreeModel.h src
 SOURCES += src/model/budget_BudgetEntityModel.cpp src/model/budget_TreeModel.cpp src/model/payment_PaymentImportModel.cpp src/model/invoice_InvoiceCreateModel.cpp
 
 # Delegates
-HEADERS += src/delegate/budget_BudgetEntityDelegate.h src/delegate/budget_TreeItemDelegate.h
-SOURCES += src/delegate/budget_BudgetEntityDelegate.cpp src/delegate/budget_TreeItemDelegate.cpp
+HEADERS += src/delegate/budget_BudgetEntityDelegate.h src/delegate/budget_TreeItemDelegate.h src/delegate/DateDelegate.h
+SOURCES += src/delegate/budget_BudgetEntityDelegate.cpp src/delegate/budget_TreeItemDelegate.cpp src/delegate/DateDelegate.cpp
 
 # Model-Items
 HEADERS += src/item/budget_TreeItem.h src/item/payment_PaymentItem.h
