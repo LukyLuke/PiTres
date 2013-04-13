@@ -87,11 +87,11 @@ namespace invoice {
 		endRemoveRows();
 	}
 
-	int InvoiceCreateModel::rowCount(const QModelIndex &parent) const {
+	int InvoiceCreateModel::rowCount(const QModelIndex & /*parent*/) const {
 		return l_items.size();
 	}
 
-	int InvoiceCreateModel::columnCount(const QModelIndex &parent) const {
+	int InvoiceCreateModel::columnCount(const QModelIndex & /*parent*/) const {
 		return 7; // Number of attributes in InvoiceCreateData.
 	}
 	

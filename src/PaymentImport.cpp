@@ -334,21 +334,25 @@ void PaymentImport::_addParsedImportLine(qint32 row, QDate valuta, float amount,
 	QColor color(255, 190, 160);
 	Invoice invoice;
 	invoice.loadByReference(reference);
+	bool _valid = invoice.memberUid() > 0;
 	
+	// Valuta column
 	item = new QTableWidgetItem( valuta.toString("yyyy-MM-dd") );
-	if (invoice.memberUid() > 0) {
+	if (!_valid) {
 		item->setBackgroundColor(color);
 	}
 	import.tableWidget->setItem(row, 0, item);
 	
+	// Paid amount column.
 	item = new QTableWidgetItem( tr("%1 sFr.").arg(amount, 0, 'f', 2) );
-	if (invoice.memberUid() > 0) {
+	if (!_valid) {
 		item->setBackgroundColor(color);
 	}
 	import.tableWidget->setItem(row, 1, item);
 	
+	// Reference column.
 	item = new QTableWidgetItem( reference );
-	if (invoice.memberUid() > 0) {
+	if (!_valid) {
 		item->setBackgroundColor(color);
 	}
 	import.tableWidget->setItem(row, 2, item);
