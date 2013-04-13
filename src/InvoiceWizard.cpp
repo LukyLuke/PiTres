@@ -42,15 +42,15 @@ InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	connect(btnAddMember, SIGNAL(pressed()), this, SLOT(insertMemberUid()));
 	connect(btnUidInvoice, SIGNAL(pressed()), this, SLOT(invoiceMembers()));
 
-	connect(radioNew, SIGNAL(toggled(bool)), this, SLOT(startSearchTimer()));
-	connect(radioAll, SIGNAL(toggled(bool)), this, SLOT(startSearchTimer()));
-	connect(radioPaidDue, SIGNAL(toggled(bool)), this, SLOT(startSearchTimer()));
-	connect(radioReminder, SIGNAL(toggled(bool)), this, SLOT(startSearchTimer()));
+	connect(radioNew, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+	connect(radioAll, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+	connect(radioPaidDue, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
+	connect(radioReminder, SIGNAL(toggled(bool)), this, SLOT(updatePreviewTable()));
 
 	connect(newMemberDate, SIGNAL(dateChanged(QDate)), this, SLOT(startSearchTimer()));
 	connect(memberUntil, SIGNAL(dateChanged(QDate)), this, SLOT(startSearchTimer()));
 	connect(reminderChooser, SIGNAL(valueChanged(int)), this, SLOT(startSearchTimer()));
-	connect(sectionList, SIGNAL(currentRowChanged(int)), this, SLOT(startSearchTimer()));
+	connect(sectionList, SIGNAL(currentRowChanged(int)), this, SLOT(updatePreviewTable()));
 
 	connect(btnInvoice, SIGNAL(pressed()), this, SLOT(createInvoices()));
 
