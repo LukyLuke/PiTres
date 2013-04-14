@@ -1,5 +1,5 @@
 # Where to install the binary
-DESTDIR = build
+DESTDIR = debug
 
 # Use SqLite as local Storage-Engine
 USE_SQLITE = yes
