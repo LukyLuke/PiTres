@@ -3,17 +3,17 @@
 ######################################################################
 
 # Enable debug?
-#DEBUG = True
+DEBUG = True
 
 # Uncomment to use the FIO-Calculation method where each section may make a membership fee recommendation
 DEFINES += "FIO"
 
 # Comment out to send EMails
-#DEFINES += "SMTP_DEBUG"
+DEFINES += "SMTP_DEBUG"
 
 # Comment out to save EMails in a debug folder - each mail wi get a folder with all needed data inside.
 # This takes affect only when you are in SMTP_DEBUG.
-#DEFINES += "SMTP_SAVE_DEBUG"
+DEFINES += "SMTP_SAVE_DEBUG"
 
 # Global parameters
 TEMPLATE = app
@@ -60,7 +60,7 @@ FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport
 CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml svg
-OUT_PWD = build
+OUT_PWD = debug
 
 # Translations
 TRANSLATIONS = i18n/pitres_de.ts \
