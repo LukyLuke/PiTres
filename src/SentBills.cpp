@@ -88,34 +88,34 @@ void SentBills::createContextMenu() {
 
 void SentBills::createMassChangeButton() {
 	actionStateChange = new QActionGroup(this);
-	
+
 	QAction *open = new QAction(tr("Open"), this);
 	open->setStatusTip(tr("Change the paid-state to open."));
 	open->setData(QVariant(Invoice::StateOpen));
 	actionStateChange->addAction(open);
-	
+
 	QAction *canceled = new QAction(tr("Canceled"), this);
 	canceled->setStatusTip(tr("Change the paid-state to canceled."));
 	canceled->setData(QVariant(Invoice::StateCanceled));
 	actionStateChange->addAction(canceled);
-	
+
 	QAction *paid = new QAction(tr("Paid"), this);
 	paid->setStatusTip(tr("Change the paid-state to paid."));
 	paid->setData(QVariant(Invoice::StatePaid));
 	actionStateChange->addAction(paid);
-	
+
 	QAction *unknown = new QAction(tr("Unknown"), this);
 	unknown->setStatusTip(tr("Change the paid-state to unknown."));
 	unknown->setData(QVariant(Invoice::StateUnknown));
 	actionStateChange->addAction(unknown);
-	
+
 	QAction *contributed = new QAction(tr("Contributed"), this);
 	contributed->setStatusTip(tr("Change the paid-state to contributed."));
 	contributed->setData(QVariant(Invoice::StateContributed));
 	actionStateChange->addAction(contributed);
-	
+
 	connect(actionStateChange, SIGNAL(triggered(QAction*)), this, SLOT(massChangeState(QAction*)));
-	
+
 	QMenu *menu = new QMenu(btnChangeStates);
 	menu->addAction(open);
 	menu->addAction(canceled);
@@ -323,7 +323,7 @@ void SentBills::doExportQifPayments() {
 #else
 		QString section;
 		fio->reset();
-		
+
 		// Add all invloved sections with their recommendations.
 		QStringList tmp, recom = query.value(6).toString().split(";");
 		for (int i = 0; i < recom.size(); i++) {
@@ -334,9 +334,8 @@ void SentBills::doExportQifPayments() {
 				fio->addSection( section, tmp.at(1).toFloat() );
 			}
 		}
-		
 		QHash<QString, float> result = fio->calculate(query.value(2).toFloat());
-		
+
 		// Create a split-booking if there are more sections than one involved.
 		if (result.size() > 1) {
 			QHash<QString, float>::const_iterator it = result.constBegin();
@@ -398,14 +397,14 @@ void SentBills::doExportCsvList() {
 		qDebug() << query.lastError().text();
 		qDebug() << query.lastQuery();
 	}
-	
+
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save list as CSV"), "", tr("Comma separated file (*.csv);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
 		QFile f(fileName);
 		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
 			QTextStream out(&f);
 			out << "\"member_uid\",\"reference\",\"amount\",\"prefix\",\"name\",\"address\",\"city\",\"country\"\n";
-			
+
 			while (query.next()) {
 				out << query.value(0).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
 				out << query.value(1).toString().replace('\n', "").replace('\r', "").replace('"',"\"\"").append("\",").prepend("\"");
@@ -446,20 +445,21 @@ void SentBills::massChangeState(QAction *action) {
 			tableModel->fetchMore();
 		}
 	}
+
 	int max = list.size() > 0 ? list.size() : tableModel->rowCount();
 	QMessageBox::StandardButton btn = QMessageBox::warning(this, tr("Change invoice states"), tr("You are to change about %1 invoices to the State %2.\n"
 		"If you are not sure, please cancel this action, you will not be able to undo this action!")
 	.arg(max).arg(state), QMessageBox::Ok | QMessageBox::Cancel);
-	
+
 	if (btn == QMessageBox::Cancel) {
 		return;
 	}
-	
+
 	QSqlRecord record;
 	QSqlQuery query(db);
 	query.prepare("UPDATE pps_invoice SET state=:state WHERE reference=:reference;");
 	query.bindValue(":state", action->data().toInt());
-	
+
 	// Check for select entries. If there are some, change only those. Otherwise change all visible.
 	if (list.size() > 0) {
 		foreach (const int &i, list) {
@@ -476,7 +476,6 @@ void SentBills::massChangeState(QAction *action) {
 	}
 	
 }
-
 
 void SentBills::showTableContextMenu(const QPoint &point) {
 	QMenu menu(tableView);
