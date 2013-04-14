@@ -175,9 +175,9 @@ void PaymentImport::continuePayment() {
 
 		qif.append("\nD" + item.valuta().toString("yy-MM-dd") );
 		qif.append("\nT" + QString::number(item.amountPaid()) );
-		qif.append("\nP"+ settings.value("qif/payee_label", "Payment: %1 (%2)").toString().arg(item.name(), item.member()) );
+		qif.append("\nP"+ settings.value("qif/payee_label", "Payment: %1 (%2)").toString().arg(item.name(), QString::number(item.member())) );
 		qif.append("\nN" + item.reference());
-		qif.append("\nM"+ settings.value("qif/memo", "Member UID: %1").toString().arg(item.member()) );
+		qif.append("\nM"+ settings.value("qif/memo", "Member UID: %1").toString().arg( QString::number(item.member()) ) );
 		qif.append("\nL" + settings.value("qif/account_income", "Membership Fee %1").toString().arg(item.section()));
 		qif.append("\n^\n");
 
