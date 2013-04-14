@@ -73,7 +73,7 @@ void PaymentImport::searchData() {
 	if (searchEdit->text().isEmpty()) {
 		return;
 	}
-	
+
 	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	QString search("reference LIKE :reference OR (");
 	for (int i = 0; i < sl.size(); i++) {
@@ -86,21 +86,21 @@ void PaymentImport::searchData() {
 		search.append(")");
 	}
 	search.append(")");
-	
+
 	QSqlQuery query(db);
 	query.prepare(QString("SELECT member_uid,reference,payable_date,address_name,for_section,amount,amount_paid FROM pps_invoice WHERE %1;").arg(search));
-	
+
 	query.bindValue(QString(":reference"), QString("%%1%").arg(sl.join(" ")));
 	for (int i = 0; i < sl.size(); i++) {
 		query.bindValue(QString(":uid_").append(QString::number(i)), sl.at(i));
 		query.bindValue(QString(":name_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
 	}
-	
+
 	query.exec();
 	if (query.lastError().type() != QSqlError::NoError) {
 		return;
 	}
-	
+
 	int fieldMember = query.record().indexOf("member_uid");
 	int fieldReference = query.record().indexOf("reference");
 	int fieldName = query.record().indexOf("address_name");
@@ -108,7 +108,7 @@ void PaymentImport::searchData() {
 	int fieldPayable = query.record().indexOf("payable_date");
 	int fieldAmount = query.record().indexOf("amount");
 	int fieldAmountPaid = query.record().indexOf("amount_paid");
-	
+
 	while (query.next()) {
 		payment::PaymentItem *entity = new payment::PaymentItem();
 		entity->setReference( query.value(fieldReference).toString() );
@@ -138,7 +138,7 @@ void PaymentImport::invoiceSelected(payment::PaymentItem item) {
 	QSettings settings;
 	QRegExp re(reString);
 	QDate paidDue = QDate::fromString(QDate::currentDate().toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd");
-	
+
 	if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
 		paidDue = paidDue.addYears(1);
 	}
@@ -152,7 +152,7 @@ void PaymentImport::invoiceSelected(payment::PaymentItem item) {
 void PaymentImport::addSelectedInvoice() {
 	QModelIndex idx = listAvailable->selectionModel()->currentIndex();
 	payment::PaymentItem entity = qvariant_cast< payment::PaymentItem >( listModel.data(idx, Qt::EditRole) );
-	
+
 	entity.setAmountPaid( editAmount->value() );
 	entity.setValuta( dateValuta->date() );
 	entity.setPaidDue( datePaidDue->date() );
@@ -169,10 +169,10 @@ void PaymentImport::continuePayment() {
 	Invoice invoice;
 	QDate valuta;
 	QString qif("!Type:" + settings.value("qif/account_bank", "Bank").toString());
-	
+
 	for (int i = 0; i < tableModel.rowCount(); i++) {
-		payment::PaymentItem item = qvariant_cast<payment::PaymentItem>( tableModel.index(i).data(Qt::EditRole) );
-		
+		payment::PaymentItem item = qvariant_cast< payment::PaymentItem >( tableModel.index(i).data(Qt::EditRole) );
+
 		qif.append("\nD" + item.valuta().toString("yy-MM-dd") );
 		qif.append("\nT" + QString::number(item.amountPaid()) );
 		qif.append("\nP"+ settings.value("qif/payee_label", "Payment: %1 (%2)").toString().arg(item.name(), item.member()) );
@@ -189,7 +189,7 @@ void PaymentImport::continuePayment() {
 			person.save();
 		}
 	}
-	
+
 	// Safe the QIF
 	fileName = QFileDialog::getSaveFileName(this, tr("Save QIF File"), "", tr("Quicken Interchange (*.qif);;Plaintext (*.txt)"));
 	if (!fileName.isEmpty()) {
@@ -209,7 +209,7 @@ void PaymentImport::importPaymentsFromDialog() {
 	QFile file(import.editFile->text());
 	payment::PaymentItem *entity;
 	Invoice invoice;
-	
+
 	if (file.open(QFile::ReadOnly)) {
 		switch (import.importType->itemData( import.importType->currentIndex() ).toInt()) {
 			case 0:
@@ -277,7 +277,6 @@ void PaymentImport::importPaymentsFromDialog() {
 	} else {
 		QMessageBox::warning(this, tr("Cannot open selected File"), tr("The file you selected is not readable by your user.\nPlease correct the access rules or select an other file."), QMessageBox::Ok);
 	}
-	
 	importDialog->hide();
 }
 
@@ -293,7 +292,7 @@ void PaymentImport::parsePaymentsFromDialog() {
 	QFile file(import.editFile->text());
 	esr_record_3 record3;
 	esr_record_4 record4;
-	
+
 	import.tableWidget->clear();
 	import.tableWidget->setRowCount(0);
 	import.tableWidget->setColumnCount(3);
@@ -301,7 +300,7 @@ void PaymentImport::parsePaymentsFromDialog() {
 	import.tableWidget->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("Amount")));
 	import.tableWidget->setHorizontalHeaderItem(2, new QTableWidgetItem(tr("Reference")));
 	import.tableWidget->horizontalHeader()->setStretchLastSection(TRUE);
-	
+
 	if (file.open(QFile::ReadOnly)) {
 		switch (import.importType->itemData( import.importType->currentIndex() ).toInt()) {
 			case 0:
@@ -335,21 +334,21 @@ void PaymentImport::_addParsedImportLine(qint32 row, QDate valuta, float amount,
 	Invoice invoice;
 	invoice.loadByReference(reference);
 	bool _valid = invoice.memberUid() > 0;
-	
+
 	// Valuta column
 	item = new QTableWidgetItem( valuta.toString("yyyy-MM-dd") );
 	if (!_valid) {
 		item->setBackgroundColor(color);
 	}
 	import.tableWidget->setItem(row, 0, item);
-	
+
 	// Paid amount column.
 	item = new QTableWidgetItem( tr("%1 sFr.").arg(amount, 0, 'f', 2) );
 	if (!_valid) {
 		item->setBackgroundColor(color);
 	}
 	import.tableWidget->setItem(row, 1, item);
-	
+
 	// Reference column.
 	item = new QTableWidgetItem( reference );
 	if (!_valid) {
