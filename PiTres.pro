@@ -60,7 +60,7 @@ FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport
 CONFIG += qt thread sql
 RESOURCES += PiTres.qrc
 QT = core gui network sql xml svg
-OUT_PWD = debug
+OUT_PWD = build
 
 # Translations
 TRANSLATIONS = i18n/pitres_de.ts \
