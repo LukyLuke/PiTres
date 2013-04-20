@@ -78,7 +78,7 @@ void Invoice::createTables() {
 		"amount FLOAT, amount_paid FLOAT, state INTEGER, address_prefix TEXT, address_company TEXT, address_name TEXT, address_street1 TEXT, "
 		"address_street2 TEXT, address_city TEXT, address_email TEXT, for_section TEXT, reminded INTEGER, last_reminder DATE, recommendations TEXT);");
 	
-	query.exec("CREATE TABLE IF NOT EXISTS pps_contribution (reference TEXT, section TEXT, amount FLOAT, state INTEGER, contribute_date DATE);");
+	query.exec("CREATE TABLE IF NOT EXISTS pps_contribution (reference TEXT, section TEXT, amount FLOAT, state INTEGER, contribute_date DATE, year INTEGER);");
 }
 
 void Invoice::setContributed(QString reference) {
