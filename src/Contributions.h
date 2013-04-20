@@ -22,7 +22,16 @@
 #include "ui_contributions.h"
 #include "helper/FIOCalc.h"
 #include "data/Section.h"
+#include "data/Invoice.h"
+#include "data/Person.h"
+#include "helper/Smtp.h"
 
+#include <cstdlib>
+#include <cstdio>
+#include <QFileDialog>
+#include <QFile>
+#include <QList>
+#include <QSettings>
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -30,7 +39,9 @@
 #include <QString>
 #include <QSqlQueryModel>
 #include <QTimerEvent>
+#include <QPair>
 #include <QHash>
+#include <QProgressDialog>
 
 class Contributions : public QWidget, private Ui::ContributionsForm {
 Q_OBJECT
@@ -40,7 +51,7 @@ private:
 	struct contribution_data {
 		QString section;
 		float sum;
-		QList<float> amount_list;
+		QList< QPair<QString, float> > amount_list;
 	};
 	QList< contribution_data * > l_contrib_data;
 #endif
@@ -58,7 +69,7 @@ private:
 	QSqlQuery createContributionsQuery();
 	void showContributionsDetails();
 #ifdef FIO
-	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom );
+	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference );
 #endif
 
 public:

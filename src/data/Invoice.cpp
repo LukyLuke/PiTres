@@ -74,10 +74,11 @@ void Invoice::setIsLoaded(bool loaded) {
 void Invoice::createTables() {
 	QSqlDatabase db;
 	QSqlQuery query(db);
-	query.prepare("CREATE TABLE IF NOT EXISTS pps_invoice (member_uid INTEGER, reference TEXT, issue_date DATE, payable_date DATE, paid_date DATE, "
-	              "amount FLOAT, amount_paid FLOAT, state INTEGER, address_prefix TEXT, address_company TEXT, address_name TEXT, address_street1 TEXT, "
-	              "address_street2 TEXT, address_city TEXT, address_email TEXT, for_section TEXT, reminded INTEGER, last_reminder DATE, recommendations TEXT);");
-	query.exec();
+	query.exec("CREATE TABLE IF NOT EXISTS pps_invoice (member_uid INTEGER, reference TEXT, issue_date DATE, payable_date DATE, paid_date DATE, "
+		"amount FLOAT, amount_paid FLOAT, state INTEGER, address_prefix TEXT, address_company TEXT, address_name TEXT, address_street1 TEXT, "
+		"address_street2 TEXT, address_city TEXT, address_email TEXT, for_section TEXT, reminded INTEGER, last_reminder DATE, recommendations TEXT);");
+	
+	query.exec("CREATE TABLE IF NOT EXISTS pps_contribution (reference TEXT, section TEXT, amount FLOAT, state INTEGER, contribute_date DATE);");
 }
 
 void Invoice::setContributed(QString reference) {
@@ -94,15 +95,15 @@ void Invoice::save() {
 	QSqlQuery query(db);
 	if (_loaded) {
 		query.prepare("UPDATE pps_invoice SET member_uid=:member,reference=:reference,issue_date=:issued,payable_date=:payable,paid_date=:paid,"
-		              "amount=:amount,amount_paid=:amount_paid,state=:state,address_prefix=:prefix,address_company=:company,address_name=:name,"
-		              "address_street1=:street1,address_street2=:street2,address_city=:city,address_email=:email,for_section=:section,"
-		              "reminded=:reminded,last_reminder=:last_reminder,recommendations=:recommendations WHERE reference=:reference_where;");
+			"amount=:amount,amount_paid=:amount_paid,state=:state,address_prefix=:prefix,address_company=:company,address_name=:name,"
+			"address_street1=:street1,address_street2=:street2,address_city=:city,address_email=:email,for_section=:section,"
+			"reminded=:reminded,last_reminder=:last_reminder,recommendations=:recommendations WHERE reference=:reference_where;");
 		query.bindValue(":reference_where", s_reference);
 	} else {
 		query.prepare("INSERT INTO pps_invoice (member_uid,reference,issue_date,payable_date,paid_date,amount,amount_paid,state,"
-		              "address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section,"
-		              "reminded,last_reminder,recommendations) VALUES (:member,:reference,:issued,:payable,:paid,:amount,:amount_paid,:state,:prefix,:company,:name,"
-		              ":street1,:street2,:city,:email,:section,:reminded,:last_reminder,:recommendations);");
+			"address_prefix,address_company,address_name,address_street1,address_street2,address_city,address_email,for_section,"
+			"reminded,last_reminder,recommendations) VALUES (:member,:reference,:issued,:payable,:paid,:amount,:amount_paid,:state,:prefix,:company,:name,"
+			":street1,:street2,:city,:email,:section,:reminded,:last_reminder,:recommendations);");
 	}
 
 	// This is for all old References
