@@ -472,7 +472,7 @@ void Contributions::createQif() {
 	// Get all payments in the selected daterange
 	query.prepare(QString("SELECT"
 #ifndef FIO
-		" SUM(amount/2) as amount,for_section"
+		" amount,amount_paid,for_section,reference"
 #else
 		" amount,amount_paid,recommendations,reference"
 #endif
@@ -502,11 +502,23 @@ void Contributions::createQif() {
 	// Show a Progressbar
 	QProgressDialog progress(tr("Preparing and save contribution..."), tr("Please wait..."), 0, 1, this);
 	progress.setWindowModality(Qt::WindowModal);
+	progress.setValue(0);
 
 #ifndef FIO
+	QHash<QString, float> contributions;
+	float famount;
 	while (query.next()) {
-		amount = query.value(0).toString();
+		num_contrib++;
+		famount = query.value(0).toFloat() / 2;
 		section = query.value(1).toString();
+		contributions.insert(section, contributions.value(section, 0) + famount);
+	}
+	progress.setMaximum(num_contrib);
+	
+	QHash<QString, float>::const_iterator it = contributions.constBegin();
+	while (it != contributions.constEnd()) {
+		amount = QString::number(it.value());
+		section = it.key();
 #else
 	bool do_contribute = FALSE;
 	QList< contribution_data * > cdata;
@@ -517,7 +529,6 @@ void Contributions::createQif() {
 		num_contrib += cdata.at(i)->amount_list.size();
 	}
 	progress.setMaximum(num_contrib);
-	progress.setValue(0);
 
 	// Fill the details with the calculated recommend values
 	while (!cdata.isEmpty()) {
@@ -544,6 +555,7 @@ void Contributions::createQif() {
 		}
 		amount = QString::number(cd->sum);
 #endif
+
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
 		qif_national.append("\nT-" + amount);
