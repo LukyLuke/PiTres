@@ -18,18 +18,6 @@
 
 #include "Contributions.h"
 
-#include "data/Invoice.h"
-#include "data/Section.h"
-#include "data/Person.h"
-#include "helper/Smtp.h"
-
-#include <cstdlib>
-#include <cstdio>
-#include <QFileDialog>
-#include <QFile>
-#include <QList>
-#include <QSettings>
-
 Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 
@@ -79,24 +67,22 @@ void Contributions::loadSectionContributions() {
 	contributionsModel->setQuery(query);
 
 	contributionsModel->setHeaderData(0, Qt::Horizontal, tr("Paid Date"));
-	contributionsModel->setHeaderData(1, Qt::Horizontal, tr("Requested"));
-	contributionsModel->setHeaderData(2, Qt::Horizontal, tr("Paid"));
-	contributionsModel->setHeaderData(3, Qt::Horizontal, tr("Person"));
-	contributionsModel->setHeaderData(4, Qt::Horizontal, tr("City"));
-	contributionsModel->setHeaderData(5, Qt::Horizontal, tr("Section"));
-	contributionsModel->setHeaderData(6, Qt::Horizontal, tr("Member UID"));
-	contributionsModel->setHeaderData(7, Qt::Horizontal, tr("Reference-Number"));
+	contributionsModel->setHeaderData(1, Qt::Horizontal, tr("Contributed"));
+	contributionsModel->setHeaderData(2, Qt::Horizontal, tr("Person"));
+	contributionsModel->setHeaderData(3, Qt::Horizontal, tr("City"));
+	contributionsModel->setHeaderData(4, Qt::Horizontal, tr("Section"));
+	contributionsModel->setHeaderData(5, Qt::Horizontal, tr("Member UID"));
+	contributionsModel->setHeaderData(6, Qt::Horizontal, tr("Reference-Number"));
 
 	contributionTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	contributionTable->setSortingEnabled(false);
 	contributionTable->setModel(contributionsModel);
 
-	QSqlQuery sections(db);
-	sections.prepare("SELECT for_section FROM pps_invoice GROUP BY for_section ORDER BY for_section ASC;");
-	sections.exec();
+	QList<QString> sections;
+	Section::getSectionList(&sections);
 	sectionList->addItem(tr("all"));
-	while (sections.next()) {
-		sectionList->addItem(sections.value(0).toString());
+	for (int i = 0; i < sections.size(); i++) {
+		sectionList->addItem(sections.at(i));
 	}
 }
 
@@ -115,26 +101,25 @@ QSqlQuery Contributions::createQuery() {
 }
 
 QSqlQuery Contributions::createContributionsQuery() {
-	QDate from, to;
+	qint32 year;
 	QSqlQuery query(db);
 
 	if (yearList->selectedItems().count() > 0 && yearList->currentRow() > 0) {
-		from.setDate(yearList->selectedItems().at(0)->text().toInt(), 01, 01);
-		to.setDate(yearList->selectedItems().at(0)->text().toInt(), 12, 31);
+		year = yearList->selectedItems().at(0)->text().toInt();
 	} else {
-		from.setDate(1900, 01, 01);
-		to = QDate::currentDate();
+		year = QDate::currentDate().year();
 	}
 
-	query.prepare(QString("SELECT paid_date,amount,amount_paid,address_name,address_city,for_section,member_uid,reference,recommendations FROM pps_invoice WHERE"
-		" for_section%1:section AND paid_date>=:start"
-		" AND paid_date<=:end AND state=:state ORDER BY for_section ASC;").arg(
+	query.prepare(QString("SELECT inv.paid_date,cont.amount,inv.address_name,inv.address_city,cont.section,"
+		"inv.member_uid,cont.reference FROM pps_invoice AS inv, pps_contribution cont"
+		" WHERE inv.reference = cont.reference AND cont.section %1 :section"
+		" AND cont.year=:year AND cont.state=:state"
+		" ORDER BY cont.section,inv.address_name ASC;").arg(
 			(sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "=")
 		));
-	query.bindValue(":start", from.toString("yyyy-MM-dd"));
-	query.bindValue(":end", to.toString("yyyy-MM-dd"));
-	query.bindValue(":state", (int)Invoice::StateContributed);
 	query.bindValue(":section", sectionList->currentText());
+	query.bindValue(":year", year);
+	query.bindValue(":state", (int)Invoice::StateContributed);
 	return query;
 }
 
@@ -187,7 +172,7 @@ void Contributions::showOverview() {
 #ifndef FIO
 		" SUM(amount/2) as amount,for_section,COUNT(for_section)"
 #else
-		" amount,amount_paid,recommendations"
+		" amount,amount_paid,recommendations,reference"
 #endif
 		" FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
 		" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state"
@@ -216,7 +201,7 @@ void Contributions::showOverview() {
 		num_total += query.value(2).toInt();
 #else
 	QList< contribution_data * > cdata;
-	calculateFioContribution(&cdata, &query, 1, 2);
+	calculateFioContribution(&cdata, &query, 1, 2, 3);
 	num_total = query.size();
 	if (num_total < 0) {
 		num_total = 0;
@@ -318,7 +303,7 @@ void Contributions::showOverview() {
 }
 
 #ifdef FIO
-void Contributions::calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom ) {
+void Contributions::calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference ) {
 	contribution_data *data, *odata;
 
 	// we cache this to not calculate this each time
@@ -329,17 +314,18 @@ void Contributions::calculateFioContribution( QList< contribution_data * > *cdat
 			data = new contribution_data;
 			data->section = QString(orig->section);
 			data->sum = float(orig->sum);
-			data->amount_list = QList<float>(orig->amount_list);
+			data->amount_list = QList< QPair<QString, float> >(orig->amount_list);
 			cdata->append(data);
 		}
 		return;
 	}
 
-	QString name;
+	QString name, reference;
 	FIOCalc *fio = new FIOCalc;
 	query->seek(-1);
 	while (query->next()) {
 		QStringList tmp, recom = query->value(col_recom).toString().split(";");
+		reference = query->value(col_reference).toString();
 
 		// Calculate the sections parts - do not regard invalid sections
 		fio->reset();
@@ -376,8 +362,8 @@ void Contributions::calculateFioContribution( QList< contribution_data * > *cdat
 				cdata->append(data);
 				l_contrib_data.append(odata);
 			}
-			data->amount_list.append(it.value());
-			odata->amount_list.append(it.value());
+			data->amount_list.append(QPair<QString, float>(reference, it.value()));
+			odata->amount_list.append(QPair<QString, float>(reference, it.value()));
 			data->sum += it.value();
 			odata->sum += it.value();
 
@@ -401,40 +387,23 @@ void Contributions::showContributionsDetails() {
 	}
 
 	// Refill with Data
-	QHash<QString, double> sum;
-	QHash<QString, int> num;
-#ifndef FIO
+	QMap<QString, double> sum;
+	QMap<QString, int> num;
 	QString section;
 	while (query.next()) {
-		section = query.value(5).toString();
+		section = query.value(4).toString();
 		if (!sum.contains(section)) {
 			sum.insert(section, 0);
 			num.insert(section, 0);
 		}
-		num.find(section).value()++;
-		sum.find(section).value() += query.value(1).toDouble() / 2;
+		num.insert(section, num.value(section) + 1);
+		sum.insert(section, sum.value(section) + query.value(1).toDouble());
 	}
-#else
-	QList< contribution_data * > cdata;
-	calculateFioContribution(&cdata, &query, 2, 8);
-
-	// Fill the details with the calculated recommend values
-	while (!cdata.isEmpty()) {
-		contribution_data *cd = cdata.takeFirst();
-		if (!sum.contains(cd->section)) {
-			sum.insert(cd->section, 0);
-			num.insert(cd->section, 0);
-		}
-		num.find(cd->section).value() += cd->amount_list.size();
-		sum.find(cd->section).value() += cd->sum;
-		delete cd;
-	}
-#endif
 
 	int row = 0;
 	int ctotal = 0;
 	double stotal = 0.0;
-	QHash<QString, double>::const_iterator iter = sum.constBegin();
+	QMap<QString, double>::const_iterator iter = sum.constBegin();
 	while (iter != sum.constEnd()) {
 		stotal += iter.value();
 		ctotal += num.find(iter.key()).value();
@@ -480,6 +449,7 @@ void Contributions::createQif() {
 	QString section, amount;
 	QSqlQuery query2(db);
 	QSqlQuery query(db);
+	qint32 num_contrib = 0, progress_contrib = 0;
 
 	// Initialize the QIF and the list with all Section-QIFs
 	sectionQif.clear();
@@ -488,35 +458,40 @@ void Contributions::createQif() {
 		memo = memoText->text();
 	}
 
-	// Load "do not contribute this sections" list and create a "WHERE" part to append to the query
 	// Load "do not contribute this sections" list
 	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
 	dontContribute.removeAll("");
-	QString notIn = QString(",?").repeated(dontContribute.size());
-	if (!dontContribute.empty()) {
-		notIn.remove(0, 1).append(")").prepend("AND for_section NOT IN (");
-	}
+#ifndef FIO
+	QString notIn(QString("?,").repeated( dontContribute.size() ));
+	notIn.remove(notIn.length()-2, 1); // remove last ','
+#endif
+
+	// Prepare query2 for insert all contribution in a separate table
+	query2.prepare("INSERT INTO pps_contribution (reference,state,section,amount,contribute_date,year) VALUES (:reference,:state,:section,:amount,:date,:year);");
 
 	// Get all payments in the selected daterange
 	query.prepare(QString("SELECT"
 #ifndef FIO
-		" SUM(amount/2) as amount,for_section"
+		" amount,amount_paid,for_section,reference"
 #else
-		" amount,amount_paid,recommendations"
+		" amount,amount_paid,recommendations,reference"
 #endif
 		" FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
-		" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state %1"
+		" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state"
 #ifndef FIO
-		" GROUP BY for_section"
+		" AND section NOT IN (%1) GROUP BY for_section"
 #endif
-		" ORDER BY for_section ASC;").arg(notIn));
+		" ORDER BY for_section ASC;")
+#ifndef FIO
+		.arg(notIn)
+#endif
+	);
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
 	query.bindValue(":state", (int)Invoice::StatePaid);
 	// only contribute payments till the end of the selected year
 	query.bindValue(":year_begin", QDate(spinYear->value(), 1, 1).toString("yyyy-MM-dd"));
 	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
-	query.exec();
 #ifndef FIO
 	for (int i = 0; i < dontContribute.size(); i++) {
 		query.bindValue(i+5, dontContribute.at(i));
@@ -524,24 +499,63 @@ void Contributions::createQif() {
 #endif
 	query.exec();
 
+	// Show a Progressbar
+	QProgressDialog progress(tr("Preparing and save contribution..."), tr("Please wait..."), 0, 1, this);
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setValue(0);
+
 #ifndef FIO
+	QHash<QString, float> contributions;
+	float famount;
 	while (query.next()) {
-		amount = query.value(0).toString();
+		num_contrib++;
+		famount = query.value(0).toFloat() / 2;
 		section = query.value(1).toString();
+		contributions.insert(section, contributions.value(section, 0) + famount);
+	}
+	progress.setMaximum(num_contrib);
+	
+	QHash<QString, float>::const_iterator it = contributions.constBegin();
+	while (it != contributions.constEnd()) {
+		amount = QString::number(it.value());
+		section = it.key();
 #else
+	bool do_contribute = FALSE;
 	QList< contribution_data * > cdata;
-	calculateFioContribution(&cdata, &query, 1, 2);
+	calculateFioContribution(&cdata, &query, 1, 2, 3);
+
+	// For the status bar: Get the number of saving contributions
+	for (int i = 0; i < cdata.size(); i++) {
+		num_contrib += cdata.at(i)->amount_list.size();
+	}
+	progress.setMaximum(num_contrib);
 
 	// Fill the details with the calculated recommend values
 	while (!cdata.isEmpty()) {
 		contribution_data *cd = cdata.takeFirst();
 		section = cd->section;
-		if (dontContribute.contains(section)) {
+		do_contribute = !dontContribute.contains(section);
+
+		// Save all contribution parts into a separate table
+		query2.bindValue(":section", cd->section);
+		query2.bindValue(":date", valuta);
+		query2.bindValue(":state", do_contribute ? Invoice::StateContributed : Invoice::StateOpen);
+		query2.bindValue(":year", spinYear->value());
+		for (int i = 0; i < cd->amount_list.size(); i++) {
+			progress.setValue(++progress_contrib);
+			
+			query2.bindValue(":reference", cd->amount_list.at(i).first);
+			query2.bindValue(":amount", QString::number(cd->amount_list.at(i).second));
+			query2.exec();
+		}
+
+		// Check if the current dataset is held back or not
+		if (!do_contribute) {
 			continue;
 		}
 		amount = QString::number(cd->sum);
 #endif
-		qDebug() << section;
+
 		// National Liability QIF
 		qif_national.append("\nD" + valuta);
 		qif_national.append("\nT-" + amount);
@@ -566,6 +580,7 @@ void Contributions::createQif() {
 		delete cd;
 #endif
 	}
+	progress.setValue(num_contrib);
 
 	// Safe the Liabilities-QIF
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Liabilities for the payer"), "", tr("Quicken Interchange Format (*.qif)"));
@@ -581,18 +596,24 @@ void Contributions::createQif() {
 
 	// Mark all Invoices as Contributed - Don't use the Invoice-Class here in case of one vs. lot of queries
 	query.prepare(QString("UPDATE pps_invoice SET state=:newstate WHERE paid_date>=:start AND paid_date<=:end"
-		"AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state %1;").arg(notIn));
+		" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state"
+#ifndef FIO
+		" AND section NOT IN (%1);").arg(notIn)
+#else
+		";")
+#endif
+	);
+	query.bindValue(":newstate", (int)Invoice::StateContributed);
 	query.bindValue(":start", dateFrom->date().toString("yyyy-MM-dd"));
 	query.bindValue(":end", dateUntil->date().toString("yyyy-MM-dd"));
-	query.bindValue(":state", (int)Invoice::StatePaid);
-	query.bindValue(":newstate", (int)Invoice::StateContributed);
-	// only contribute payments til the end of the year - those have to be in the balance of the next year
 	query.bindValue(":year_begin", QDate(spinYear->value(), 1, 1).toString("yyyy-MM-dd"));
 	query.bindValue(":year_end", QDate(spinYear->value(), 12, 31).toString("yyyy-MM-dd"));
-
+	query.bindValue(":state", (int)Invoice::StatePaid);
+#ifndef FIO
 	for (int i = 0; i < dontContribute.size(); i++) {
 		query.bindValue(i+6, dontContribute.at(i));
 	}
+#endif
 	query.exec();
 }
 

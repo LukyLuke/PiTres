@@ -108,6 +108,7 @@ public:
 	// Getter
 	int memberUid() const { return i_memberUid; };
 	QString reference();// const { return s_reference; }; // Reformatted
+	QString referencePlain() const { return s_reference; };
 	QDate issueDate() const { return d_issueDate; };
 	QDate payableDue() const { return d_payableDue; };
 	QDate paidDate() const { return d_paidDate; };
