@@ -56,7 +56,6 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	connect(import.actionImport, SIGNAL(triggered()), this, SLOT(importPaymentsFromDialog()));
 	connect(import.actionParse, SIGNAL(triggered()), this, SLOT(parsePaymentsFromDialog()));
 	connect(import.actionFile, SIGNAL(triggered()), this, SLOT(showPaymentsImportFilesDialog()));
-	connect(btnImport, SIGNAL(clicked()), this, SLOT(showPaymentsImportDialog()));
 }
 
 PaymentImport::~PaymentImport() {
@@ -209,6 +208,7 @@ void PaymentImport::importPaymentsFromDialog() {
 	QFile file(import.editFile->text());
 	payment::PaymentItem *entity;
 	Invoice invoice;
+	bool _unpaid = import.onlyUnpaid->isChecked();
 
 	if (file.open(QFile::ReadOnly)) {
 		switch (import.importType->itemData( import.importType->currentIndex() ).toInt()) {
@@ -219,8 +219,14 @@ void PaymentImport::importPaymentsFromDialog() {
 				for (qint32 i = 0; i < record.data.size(); i++) {
 					invoice.loadByReference(record.data.at(i).reference_number);
 					if (invoice.memberUid() > 0) {
+						// Not import already paid invoices
+						if (_unpaid && invoice.isPaid()) {
+							continue;
+						}
+
+						// Import payment
 						entity = new payment::PaymentItem;
-						entity->setReference( invoice.reference() );
+						entity->setReference( invoice.referencePlain() );
 						entity->setPayable( invoice.payableDue() );
 						entity->setName( invoice.addressName() );
 						entity->setMember( invoice.memberUid() );
@@ -248,8 +254,14 @@ void PaymentImport::importPaymentsFromDialog() {
 				for (qint32 i = 0; i < record.data.size(); i++) {
 					invoice.loadByReference(record.data.at(i).reference_number);
 					if (invoice.memberUid() > 0) {
+						// Not import already paid invoices
+						if (_unpaid && invoice.isPaid()) {
+							continue;
+						}
+
+						// Import payment
 						entity = new payment::PaymentItem;
-						entity->setReference( invoice.reference() );
+						entity->setReference( invoice.referencePlain() );
 						entity->setPayable( invoice.payableDue() );
 						entity->setName( invoice.addressName() );
 						entity->setMember( invoice.memberUid() );
@@ -331,14 +343,20 @@ void PaymentImport::parsePaymentsFromDialog() {
 void PaymentImport::_addParsedImportLine(qint32 row, QDate valuta, float amount, QString reference) {
 	QTableWidgetItem *item;
 	QColor color(255, 190, 160);
+	QColor unpaid(178, 178, 178);
 	Invoice invoice;
 	invoice.loadByReference(reference);
 	bool _valid = invoice.memberUid() > 0;
+	bool _unpaid = import.onlyUnpaid->isChecked() && invoice.isPaid();
+	qDebug() << invoice.reference() << " " << invoice.isPaid();
 
 	// Valuta column
 	item = new QTableWidgetItem( valuta.toString("yyyy-MM-dd") );
 	if (!_valid) {
 		item->setBackgroundColor(color);
+	}
+	else if (_unpaid) {
+		item->setBackgroundColor(unpaid);
 	}
 	import.tableWidget->setItem(row, 0, item);
 
@@ -347,12 +365,18 @@ void PaymentImport::_addParsedImportLine(qint32 row, QDate valuta, float amount,
 	if (!_valid) {
 		item->setBackgroundColor(color);
 	}
+	else if (_unpaid) {
+		item->setBackgroundColor(unpaid);
+	}
 	import.tableWidget->setItem(row, 1, item);
 
 	// Reference column.
 	item = new QTableWidgetItem( reference );
 	if (!_valid) {
 		item->setBackgroundColor(color);
+	}
+	else if (_unpaid) {
+		item->setBackgroundColor(unpaid);
 	}
 	import.tableWidget->setItem(row, 2, item);
 }
