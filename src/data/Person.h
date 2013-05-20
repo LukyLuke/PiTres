@@ -136,7 +136,7 @@ public:
 	QDate joining() const { return d_joining; };
 	Language language() const { return m_language; };
 	QList<QDate> paidDueList() const { return l_paidDue; };
-	QDate paidDue() const { return l_paidDue.first(); };
+	QDate paidDue() const { return l_paidDue.last(); };
 	PersonType type() const { return m_type; };
 	NotifyMethod notify() const { return m_notify; };
 

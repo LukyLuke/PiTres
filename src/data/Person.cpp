@@ -279,6 +279,7 @@ void PPSPerson::loadPaidDueDates() {
 			l_paidDue << d;
 		}
 	}
+	qSort(l_paidDue);
 }
 
 bool PPSPerson::loadByPersonsFields(QString uid) {

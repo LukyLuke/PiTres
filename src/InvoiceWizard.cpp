@@ -98,7 +98,7 @@ void InvoiceWizard::invoiceMembers() {
 
 			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he ahs no EMailaddress
 			// The "invoice" template is the one without an invoiceSlip, the "reminder" has attached one normally
-			if (checkPrint->isChecked() || invoice.addressEmail().isEmpty() || (pers.isLoaded() && pers.notify() == PPSPerson::SnailMail)) {
+			if (checkPrint->isChecked() || invoice.addressEmail().isEmpty() || (noSnailMail->isChecked() && pers.isLoaded() && (pers.notify() == PPSPerson::SnailMail))) {
 				if (fileName.isEmpty()) {
 					fileName = getSaveFileName();
 				}
@@ -149,7 +149,7 @@ void InvoiceWizard::updatePreviewTable() {
 	switch (_importType) {
 		case INVOICE_IMPORTTYPE_ALL:
 			query.prepare(QString("SELECT ldap_personsuid FROM ldap_persons"
-			" WHERE ldap_personstype<=? %1;").arg(section.isEmpty() ? "" : "AND section=?"));
+			" WHERE ldap_personstype<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND section=?"));
 			query.bindValue(0, PPSPerson::Pirate);
 			if (!section.isEmpty()) {
 				query.bindValue(1, section);
@@ -158,7 +158,7 @@ void InvoiceWizard::updatePreviewTable() {
 
 		case INVOICE_IMPORTTYPE_NEW:
 			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
-			" WHERE ldap_persons.joining>=? AND ldap_persons.type<=? %1;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			" WHERE ldap_persons.joining>=? AND ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
 			query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
 			query.bindValue(1, PPSPerson::Pirate);
 			if (!section.isEmpty()) {
@@ -167,20 +167,18 @@ void InvoiceWizard::updatePreviewTable() {
 			break;
 
 		case INVOICE_IMPORTTYPE_OUTSTANDING:
-			query.prepare(QString("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
-				" WHERE (ldap_persons_dates.paid_due<? OR ldap_persons_dates.paid_due IS NULL OR ldap_persons_dates.paid_due='')"
-				" AND ldap_persons.type<=? %1;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
-			query.bindValue(0, memberUntil->date().toString("yyyy-MM-dd"));
-			query.bindValue(1, PPSPerson::Pirate);
+			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
+			" WHERE ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			query.bindValue(0, PPSPerson::Pirate);
 			if (!section.isEmpty()) {
-				query.bindValue(2, section);
+				query.bindValue(1, section);
 			}
 			break;
 
 		case INVOICE_IMPORTTYPE_REMINDER:
 			query.prepare(QString("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN pps_invoice ON (ldap_persons.uid = pps_invoice.member_uid)"
 				" WHERE pps_invoice.state=? AND (pps_invoice.paid_date IS NULL OR pps_invoice.paid_date='') AND pps_invoice.issue_date<=?"
-				" AND ldap_persons.type<=? %1;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+				" AND ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
 			query.bindValue(0, Invoice::StateOpen);
 			query.bindValue(1, paid.toString("yyyy-MM-dd"));
 			query.bindValue(2, PPSPerson::Pirate);
@@ -199,6 +197,10 @@ void InvoiceWizard::updatePreviewTable() {
 		_previewModel.beginInsert();
 		while (query.next()) {
 			if (person->load(query.value(0).toInt())) {
+				// We need to check if the person has paid or not - not possible in SQL.
+				if ((_importType == INVOICE_IMPORTTYPE_OUTSTANDING) && (person->paidDue() >= memberUntil->date())) {
+					continue;
+				}
 				_previewModel.insert(person);
 			}
 		}
@@ -221,6 +223,7 @@ void InvoiceWizard::createInvoices() {
 	Invoice invoice;
 	XmlPdf *pdf;
 	QString fileName;
+	bool reminder = (_importType == INVOICE_IMPORTTYPE_OUTSTANDING) || (_importType == INVOICE_IMPORTTYPE_REMINDER);
 
 	int num = _previewModel.rowCount();
 	int cnt = 0;
@@ -241,7 +244,13 @@ void InvoiceWizard::createInvoices() {
 		if (pers.load(uid)) {
 			if (bar.wasCanceled()) break;
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(cnt).arg(num) );
-			invoice.create(&pers);
+			if (reminder) {
+				invoice.loadLast(uid);
+				invoice.setReminded(invoice.reminded() + 1);
+				invoice.setLastReminded(QDate::currentDate());
+			} else {
+				invoice.create(&pers);
+			}
 
 			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he ahs no EMailaddress
 			// The "invoice" template is the one without an invoiceSlip, the "reminder" has attached one normally
