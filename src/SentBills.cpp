@@ -561,6 +561,7 @@ void SentBills::createPdfReminds(bool email) {
 		uid = tableModel->record(i).value(0).toInt();
 		reminder.loadLast(uid);
 		reminder.setReminded(reminder.reminded() + 1);
+		reminder.setLastReminded(QDate::currentDate());
 		pers.load(uid);
 
 		bar.setValue(i);

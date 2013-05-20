@@ -31,6 +31,10 @@ QString Formatter::telephone(QString number, QLocale::Country country) {
 	QRegExp rx("^(\\+\\+?|00)?\\s*(\\d+\\((\\d+)\\))?([\\d\\s\\-\\.\\/\\']+)$");
 	QString back("");
 	
+	if (number.isEmpty()) {
+		return back;
+	}
+	
 	if (rx.indexIn(number) >= 0) {
 		// with international prefix
 		if (rx.cap(1).length() > 0) {

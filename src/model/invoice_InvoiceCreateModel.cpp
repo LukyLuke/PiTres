@@ -37,7 +37,7 @@ namespace invoice {
 				case 6:  return tr("Last invoice");
 			}
 		}
-		return QVariant();
+		return QAbstractItemModel::headerData(section, orientation, role);
 	}
 
 	QVariant InvoiceCreateModel::data(const QModelIndex &index, int role) const {
