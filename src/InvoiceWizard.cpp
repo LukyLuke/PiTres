@@ -17,21 +17,6 @@
 */
 
 #include "InvoiceWizard.h"
-#include "data/Invoice.h"
-#include "data/Person.h"
-#include "helper/XmlPdf.h"
-
-#include <QSettings>
-#include <QFileInfo>
-#include <QDir>
-#include <QListWidgetItem>
-#include <QVariant>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QProgressDialog>
-#include <QDebug>
 
 InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	setupUi(this);

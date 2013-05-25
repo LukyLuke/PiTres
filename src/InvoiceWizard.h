@@ -23,7 +23,19 @@
 #include "data/Section.h"
 #include "delegate/DateDelegate.h"
 #include "model/invoice_InvoiceCreateModel.h"
+#include "data/Invoice.h"
+#include "data/Person.h"
+#include "helper/XmlPdf.h"
 
+#include <QSettings>
+#include <QFileInfo>
+#include <QDir>
+#include <QListWidgetItem>
+#include <QVariant>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QSqlError>
+#include <QProgressDialog>
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QString>
