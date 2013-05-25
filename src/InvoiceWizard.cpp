@@ -17,21 +17,6 @@
 */
 
 #include "InvoiceWizard.h"
-#include "data/Invoice.h"
-#include "data/Person.h"
-#include "helper/XmlPdf.h"
-
-#include <QSettings>
-#include <QFileInfo>
-#include <QDir>
-#include <QListWidgetItem>
-#include <QVariant>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QProgressDialog>
-#include <QDebug>
 
 InvoiceWizard::InvoiceWizard(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
@@ -96,9 +81,9 @@ void InvoiceWizard::invoiceMembers() {
 			bar.setLabelText(tr("Create Invoice for %1 %2 (%3 of %4)").arg(pers.familyName()).arg(pers.givenName()).arg(i).arg(max) );
 			invoice.create(&pers);
 
-			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he ahs no EMailaddress
+			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he has no EMailaddress
 			// The "invoice" template is the one without an invoiceSlip, the "reminder" has attached one normally
-			if (checkPrint->isChecked() || invoice.addressEmail().isEmpty() || (noSnailMail->isChecked() && pers.isLoaded() && (pers.notify() == PPSPerson::SnailMail))) {
+			if (checkPrint->isChecked() || invoice.addressEmail().isEmpty() || (pers.isLoaded() && (pers.notify() == PPSPerson::SnailMail))) {
 				if (fileName.isEmpty()) {
 					fileName = getSaveFileName();
 				}
@@ -124,6 +109,7 @@ void InvoiceWizard::startSearchTimer() {
 }
 
 void InvoiceWizard::updatePreviewTable() {
+	// Prepare the data.
 	_previewModel.clear();
 	_importType = radioNew->isChecked() ? INVOICE_IMPORTTYPE_NEW :
 		radioAll->isChecked() ? INVOICE_IMPORTTYPE_ALL :
@@ -253,9 +239,9 @@ void InvoiceWizard::createInvoices() {
 				invoice.create(&pers);
 			}
 
-			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he ahs no EMailaddress
+			// Send invoice by SnailMail and not EMail if "print" is checked, the user likes to become SnailsMails or he has no EMailaddress
 			// The "invoice" template is the one without an invoiceSlip, the "reminder" has attached one normally
-			if (checkPrintDate->isChecked() || invoice.addressEmail().isEmpty() || (pers.isLoaded() && pers.notify() == PPSPerson::SnailMail)) {
+			if (checkPrint->isChecked() || invoice.addressEmail().isEmpty() || (!noSnailMail->isChecked() && pers.isLoaded() && (pers.notify() == PPSPerson::SnailMail))) {
 				if (fileName.isEmpty()) {
 					fileName = getSaveFileName();
 				}
