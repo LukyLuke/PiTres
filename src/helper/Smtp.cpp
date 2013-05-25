@@ -267,7 +267,7 @@ void Smtp::readyRead() {
 	switch (state) {
 		// Initialize
 		case Init:
-			*textStream << "EHLO " << settings.value("smtp/ehlo_host", "nohost.local").toString() << "\r\n";
+			*textStream << "HELO " << settings.value("smtp/ehlo_host", "nohost.local").toString() << "\r\n";
 			textStream->flush();
 			state = username.isEmpty() ? Mail : Auth;
 			break;
