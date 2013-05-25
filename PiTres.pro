@@ -44,9 +44,9 @@ HEADERS += src/item/budget_TreeItem.h src/item/payment_PaymentItem.h
 SOURCES += src/item/budget_TreeItem.cpp src/item/payment_PaymentItem.cpp
 
 # Helper Classes and Functions
-HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/Smtp.h src/helper/FIOCalc.h src/helper/CatchKeyPress.h \
+HEADERS += src/helper/Formatter.h src/helper/XmlPdf.h src/helper/PdfElement.h src/helper/smtp_tls.h src/helper/Smtp.h src/helper/FIOCalc.h src/helper/CatchKeyPress.h \
            src/helper/ESRParser.h
-SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.cpp src/helper/Smtp.cpp src/helper/FIOCalc.cpp src/helper/CatchKeyPress.cpp \
+SOURCES += src/helper/Formatter.cpp src/helper/XmlPdf.cpp src/helper/PdfElement.cpp src/helper/smtp_tls.cpp src/helper/Smtp.cpp src/helper/FIOCalc.cpp src/helper/CatchKeyPress.cpp \
            src/helper/ESRParser.cpp
 
 # Forms
