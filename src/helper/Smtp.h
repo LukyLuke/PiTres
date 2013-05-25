@@ -19,8 +19,16 @@
 #ifndef SMTP_H
 #define SMTP_H
 
+#ifndef WIN32
+#include <magic.h>
+#endif
+
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
+
 #include <QObject>
-#include <QTcpSocket>
+#include <QSslSocket>
 #include <QString>
 #include <QChar>
 #include <QTextStream>
@@ -28,12 +36,21 @@
 #include <QMessageBox>
 #include <QPrinter>
 #include <QList>
+#include <QDateTime>
+#include <QByteArray>
+#include <QUuid>
+#include <QSettings>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+
+// #define SHOW_SMTP_DEBUG_LOG
 
 class Smtp : public QObject {
 Q_OBJECT
 
 public:
-    const static int SMTP_CHUNK_SIZE = 76;
+	const static int SMTP_CHUNK_SIZE = 76;
 	Smtp(const QString &host, const int port);
 	virtual ~Smtp();
 	void authLogin(const QString &username, const QString &password);
@@ -65,6 +82,8 @@ private slots:
 private:
 	bool isConnected;
 	bool _authLogin;
+	bool _useTLS;
+	bool _useSSL;
 	QString username;
 	QString password;
 	QString host;
@@ -73,13 +92,14 @@ private:
 	QString textBody;
 	QString htmlBody;
 	QTextStream *textStream;
-	QTcpSocket *socket;
+	QSslSocket *socket;
 	QString from;
 	QString rcpt;
 	QString response;
-	enum states { Init, Auth, User, Pass, Rcpt, Mail, Data, Body, Quit, Close };
+	enum states { Init, Init_TLS, Auth, User, Pass, Rcpt, Mail, Data, Body, Quit, Close };
 	int state;
 	QList<attachment_t> attachments;
+	int readyReadCount;
 	
 	QString dateHeader();
 	QString generateBoundary();
