@@ -31,26 +31,15 @@
 
 #include "Smtp.h"
 
-#ifndef WIN32
-#include <magic.h>
-#endif
-
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-
-#include <QDateTime>
-#include <QByteArray>
-#include <QUuid>
-#include <QSettings>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-
-Smtp::Smtp(const QString &host, const int port):QObject() {
+Smtp::Smtp(const QString &host, const int port) : QObject() {
+	QSettings settings;
+	
 	this->host = host;
 	this->port = port;
-	_authLogin = false;
+	_authLogin = FALSE;
+	_useTLS = settings.value("smtp/use_tls", FALSE).toBool();
+	_useSSL = settings.value("smtp/use_ssl", FALSE).toBool();
+	readyReadCount = 0;
 }
 
 Smtp::~Smtp() {
@@ -61,9 +50,13 @@ Smtp::~Smtp() {
 bool Smtp::send(const QString &from, const QString &to, const QString &subject) {
 	int timeout = 5000;
 	
-	socket = new QTcpSocket(this);
+	socket = new QSslSocket(this);
+	if (_useSSL) {
+		connect(socket, SIGNAL(encrypted()), this, SLOT(connected()));
+	} else {
+		connect(socket, SIGNAL(connected()), this, SLOT(connected()));
+	}
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-	connect(socket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorReceived(QAbstractSocket::SocketError)));
 	connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(stateChanged(QAbstractSocket::SocketState)));
 	connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -132,13 +125,20 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	
 	return false;
 #else
-	socket->connectToHost(host, port);
-	if (socket->waitForConnected(timeout)) {
+	if (_useSSL) {
+		socket->connectToHostEncrypted(host, port);
+	} else {
+		socket->connectToHost(host, port);
+	}
+	if (socket->waitForConnected(timeout) && socket->waitForEncrypted(timeout)) {
 		qDebug() << "Smtp: Connected on " << host << ":" << QString::number(port);
 		if (socket->waitForReadyRead(timeout)) {
 			qDebug() << "Smtp: emit from waitForReadyRead, connect can go on...";
 			isConnected = true;
+			readyRead();
 		}
+	} else {
+		qWarning() << "Smtp: Connection-Error: " << socket->errorString();
 	}
 	
 	return socket->waitForDisconnected(-1);
@@ -227,6 +227,9 @@ void Smtp::connected() {
 }
 
 void Smtp::readyRead() {
+	if (isConnected) {
+		return;
+	}
 	QSettings settings;
 	
 	// Read Line-by-Line
@@ -236,17 +239,36 @@ void Smtp::readyRead() {
 		response += responseLine;
 	} while(socket->canReadLine() && responseLine[3] != ' '); // first 3 chars are the State-Number like 250
 	responseLine.truncate(3); // remove everything after the State-Number
-	qDebug() << "Smtp: " << response.trimmed();
+	qDebug() << "Smtp: response(" << readyReadCount << "): " << response.trimmed();
+	qDebug() << "Smtp: last code(" << readyReadCount << "): " << responseLine;
+	readyReadCount++;
 	
 	// Close
 	if (state == Close) {
+		qDebug() << "Smtp: State close";
 		socket->disconnectFromHost();
 		deleteLater();
 		return;
 	}
 	
+	// Check for forced TLS by us.
+	if (_useTLS && !socket->isEncrypted()) {
+		// After the first EHLO, we must find a STARTTLS in the response.
+		if ((state == Mail || state == Auth) && response.contains("STARTTLS")) {
+			*textStream << "STARTTLS\r\n";
+			textStream->flush();
+			state = Init_TLS;
+			
+		// If we get the right answer after STARTTLS, enforce the encryption.
+		} else if ((state == Init_TLS) && (responseLine == "220")) {
+			socket->startClientEncryption();
+			state = Init;
+		}
+	}
+	
 	// Mail-Body
 	if (state == Body && responseLine[0] == '3') {
+		qDebug() << "Smtp: Send email data";
 		*textStream << message << "\r\n.\r\n";
 		textStream->flush();
 		state = Quit;
@@ -256,7 +278,8 @@ void Smtp::readyRead() {
 	
 	// Every other Smtp-Code must be from 2xx
 	if (responseLine[0] != '2' && state != User && state != Pass) {
-		qDebug() << "Smtp: Unexpected reply from SMTP-Host: : \n" << response;
+		qDebug() << "Smtp: Unexpected reply from SMTP-Host: \n" << response.trimmed();
+		qDebug() << "Smtp: Send QUIT";
 		*textStream << "QUIT\r\n";
 		textStream->flush();
 		state = Close;
@@ -267,7 +290,8 @@ void Smtp::readyRead() {
 	switch (state) {
 		// Initialize
 		case Init:
-			*textStream << "HELO " << settings.value("smtp/ehlo_host", "nohost.local").toString() << "\r\n";
+			qDebug() << "Smtp: Send EHLO " << settings.value("smtp/ehlo_host", "nohost.local").toString();
+			*textStream << "EHLO " << settings.value("smtp/ehlo_host", "nohost.local").toString() << "\r\n";
 			textStream->flush();
 			state = username.isEmpty() ? Mail : Auth;
 			break;
@@ -275,9 +299,11 @@ void Smtp::readyRead() {
 		// Authentication header
 		case Auth:
 			if (_authLogin) {
+				qDebug() << "Smtp: Send AUTH LOGIN";
 				*textStream << "AUTH LOGIN\r\n";
 				state = User;
 			} else {
+				qDebug() << "Smtp: AUTH PLAIN " << username;
 				*textStream << "AUTH PLAIN " + username + "\r\n";
 				state = Mail;
 			}
@@ -286,6 +312,7 @@ void Smtp::readyRead() {
 		
 		// Username for AUTH LOGIN
 		case User:
+			qDebug() << "Smtp: Send username " << username;
 			*textStream << username + "\r\n";
 			textStream->flush();
 			state = Pass;
@@ -293,6 +320,7 @@ void Smtp::readyRead() {
 		
 		// Password for AUTH LOGIN
 		case Pass:
+			qDebug() << "Smtp: Send password " << password;
 			*textStream << password + "\r\n";
 			textStream->flush();
 			state = Mail;
@@ -300,6 +328,7 @@ void Smtp::readyRead() {
 			
 		// EHLO-Response was OK, send from
 		case Mail:
+			qDebug() << "Smtp: Send MAIL FROM: " << from;
 			*textStream << "MAIL FROM: " << from << "\r\n";
 			textStream->flush();
 			state = Rcpt;
@@ -307,6 +336,7 @@ void Smtp::readyRead() {
 			
 		// MAIL-FROM-Response was OK, send rcpt to
 		case Rcpt:
+			qDebug() << "Smtp: Send RCPT TO: " << rcpt;
 			*textStream << "RCPT TO: " << rcpt << "\r\n";
 			textStream->flush();
 			state = Data;
@@ -314,6 +344,7 @@ void Smtp::readyRead() {
 			
 		// RCPT-TO-Response was OK, send Data
 		case Data:
+			qDebug() << "Smtp: Send DATA";
 			*textStream << "DATA\r\n";
 			textStream->flush();
 			state = Body;
@@ -321,6 +352,7 @@ void Smtp::readyRead() {
 			
 		// DATA-Response was OK, send mail
 		case Quit:
+			qDebug() << "Smtp: Send QUIT";
 			*textStream << "QUIT\r\n";
 			textStream->flush();
 			state = Close;
