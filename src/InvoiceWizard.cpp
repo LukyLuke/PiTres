@@ -248,6 +248,7 @@ void InvoiceWizard::createInvoices() {
 				invoice.loadLast(uid);
 				invoice.setReminded(invoice.reminded() + 1);
 				invoice.setLastReminded(QDate::currentDate());
+				invoice.save();
 			} else {
 				invoice.create(&pers);
 			}
