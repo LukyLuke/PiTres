@@ -44,6 +44,8 @@
 #include <QFile>
 #include <QFileInfo>
 
+// #define SHOW_SMTP_DEBUG_LOG
+
 class Smtp : public QObject {
 Q_OBJECT
 

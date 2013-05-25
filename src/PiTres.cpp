@@ -48,6 +48,7 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	connectActions();
 	
 	settingsDialog = new QDialog(this);
+	_settingsShowed = FALSE;
 	settingsForm.setupUi(settingsDialog);
 	connect(settingsForm.actionSave, SIGNAL(triggered()), this, SLOT(doSaveSettings()));
 	
@@ -198,10 +199,12 @@ void PiTres::showSettings() {
 #ifndef FIO
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/amount_default", 30.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/amount_limited", 60.0).toFloat());
-	delete settingsForm.labelrecommendationsMaxSections;
-	delete settingsForm.maxNumSections;
-	delete settingsForm.memberAmountMin;
-	delete settingsForm.labelMemberAmountMinimum;
+	if (!_settingsShowed) {
+		delete settingsForm.labelrecommendationsMaxSections;
+		delete settingsForm.maxNumSections;
+		delete settingsForm.memberAmountMin;
+		delete settingsForm.labelMemberAmountMinimum;
+	}
 #else
 	settingsForm.memberAmountFull->setValue(settings.value("invoice/recommendation_maximum", 125.0).toFloat());
 	settingsForm.memberAmountLimited->setValue(settings.value("invoice/recommendation_none", 15.0).toFloat());
@@ -221,8 +224,10 @@ void PiTres::showSettings() {
 	settingsForm.assetMemo->setText(settings.value("qif/memo", "Member UID: ").toString());
 	settingsForm.assetAccountFull->setText(settings.value("qif/income_default", "Membership Default %1").toString());
 #ifdef FIO
-	delete settingsForm.assetAccountLimited;
-	delete settingsForm.labelAssetsAccountLimited;
+	if (!_settingsShowed) {
+		delete settingsForm.assetAccountLimited;
+		delete settingsForm.labelAssetsAccountLimited;
+	}
 	settingsForm.labelAssetsAccount->setText(tr("Income Account"));
 #else
 	settingsForm.assetAccountLimited->setText(settings.value("qif/income_limited", "Membership Limited %2").toString());
@@ -270,6 +275,11 @@ void PiTres::showSettings() {
 		settings.value("smtp/authentication", "plain").toString() == "login" ? 2 :
 		0
 	);
+	settingsForm.smtpEncryption->setCurrentIndex(
+		settings.value("smtp/use_tls", FALSE).toBool() ? 1 :
+		settings.value("smtp/use_ssl", FALSE).toBool() ? 2 :
+		0
+	);
 	
 	settingsForm.pdfPPCounty->setText(settings.value("pdf/var_pp_country", "CH").toString());
 	settingsForm.pdfPPZip->setText(settings.value("pdf/var_pp_zip", "1337").toString());
@@ -281,6 +291,7 @@ void PiTres::showSettings() {
 	settingsForm.pdfEmailPrepend->setText(settings.value("pdf/email_prepend", "info").toString());
 	settingsForm.pdfEmailAppend->setText(settings.value("pdf/email_append", "piratenpartei.ch").toString());
 	
+	_settingsShowed = TRUE;
 	settingsDialog->show();
 }
 
@@ -353,6 +364,8 @@ void PiTres::doSaveSettings() {
 	settings.setValue("smtp/password", settingsForm.smtpPassword->text());
 	settings.setValue("smtp/from", settingsForm.smtpFrom->text());
 	settings.setValue("smtp/authentication", settingsForm.smtpAuthentication->currentText());
+	settings.setValue("smtp/use_tls", settingsForm.smtpEncryption->currentIndex() == 1);
+	settings.setValue("smtp/use_ssl", settingsForm.smtpEncryption->currentIndex() == 2);
 	
 	settings.setValue("pdf/var_pp_country", settingsForm.pdfPPCounty->text());
 	settings.setValue("pdf/var_pp_zip", settingsForm.pdfPPZip->text());

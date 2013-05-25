@@ -57,6 +57,7 @@ class PiTres : public QMainWindow, private Ui::MainWindow {
 Q_OBJECT
 private:
 	QDialog *settingsDialog;
+	bool _settingsShowed;
 	Ui::settingsForm settingsForm;
 	QSqlDatabase db;
 	QWidget *content;
