@@ -347,6 +347,26 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="btnFindMissing">
+       <property name="text">
+        <string>Discrepancies</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../PiTres.qrc">
+         <normaloff>:/icons/resources/icons/adjust_members.png</normaloff>:/icons/resources/icons/adjust_members.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnLdap">
        <property name="text">
         <string>Update LDAP</string>

@@ -21,9 +21,11 @@
 
 #include "ui_userlist.h"
 #include "ui_dateform.h"
+#include "ui_missingpeople.h"
 
 #include "data/Person.h"
 #include "data/Invoice.h"
+#include "data/Section.h"
 #include "PaymentWizard.h"
 
 #include <QWidget>
@@ -70,7 +72,9 @@ private:
 	QAction *actionManualPayment;
 	QAction *actionEditDueDate;
 	QDialog *editDateDialog;
+	QDialog *missingPeopleDialog;
 	Ui::dateForm dateForm;
+	Ui::MissingPeopleForm missingPeopleForm;
 	
 	void loadSections();
 	QSqlQuery createQuery();
@@ -94,6 +98,8 @@ public slots:
 	void showMemberDueAdjust();
 	void adjustMemberDueDate();
 	void exportLdif();
+	void openMissingDialog();
+	void exportMissingPeople();
 
 protected:
 	void timerEvent(QTimerEvent *event);

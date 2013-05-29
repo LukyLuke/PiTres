@@ -54,7 +54,7 @@ FORMS = forms/PiTres.ui forms/userlist.ui forms/sentbills.ui forms/paymentimport
         forms/fromtodates.ui forms/settings.ui forms/dateform.ui forms/invoicewizard.ui \
         forms/payment.ui forms/invoiceedit.ui forms/contributions.ui forms/budget.ui forms/editsections.ui \
         forms/donations.ui forms/donation_import.ui forms/statistics.ui forms/invoiceexportcsv.ui \
-        forms/paymentimport_file.ui
+        forms/paymentimport_file.ui  forms/missingpeople.ui
 
 # Config
 CONFIG += qt thread sql
