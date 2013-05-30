@@ -17,9 +17,9 @@
 */
 
 #include "Userlist.h"
-#include "data/Section.h"
 
 Userlist::Userlist(QWidget *parent) : QWidget(parent) {
+	QSettings settings;
 	setupUi(this);
 
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
@@ -28,6 +28,7 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	connect(tableView, SIGNAL(activated(QModelIndex)), this, SLOT(showDetails(QModelIndex)));
 	connect(btnExport, SIGNAL(clicked()), this, SLOT(exportData()));
 	connect(btnLdap, SIGNAL(clicked()), this, SLOT(exportLdif()));
+	connect(btnFindMissing, SIGNAL(clicked()), this, SLOT(openMissingDialog()));
 
 	tableModel = new QSqlQueryModel(tableView);
 
@@ -43,12 +44,32 @@ Userlist::Userlist(QWidget *parent) : QWidget(parent) {
 	dateForm.setupUi(editDateDialog);
 	dateForm.hintLabel->setText(tr("Select the new 'Member Due'-Date for the selected member."));
 	connect(dateForm.actionChoose, SIGNAL(triggered()), this, SLOT(adjustMemberDueDate()));
+	
+	missingPeopleDialog = new QDialog(this);
+	missingPeopleForm.setupUi(missingPeopleDialog);
+	QDate paidDue = QDate::currentDate();
+	if (settings.value("invoice/member_due_next_year", TRUE).toBool()) {
+		paidDue = paidDue.addYears(1);
+	}
+	missingPeopleForm.datePaidDue->setDate( QDate::fromString(paidDue.toString(settings.value("invoice/member_due_format", "yyyy-02-15").toString()), "yyyy-MM-dd") );
+	missingPeopleForm.tableView->setModel(new QSqlQueryModel);
+	missingPeopleForm.tableView->model()->setHeaderData(0, Qt::Horizontal, tr("UID"));
+	missingPeopleForm.tableView->model()->setHeaderData(1, Qt::Horizontal, tr("Name"));
+	missingPeopleForm.tableView->model()->setHeaderData(2, Qt::Horizontal, tr("Address"));
+	missingPeopleForm.tableView->model()->setHeaderData(3, Qt::Horizontal, tr("city"));
+	missingPeopleForm.tableView->model()->setHeaderData(4, Qt::Horizontal, tr("Section"));
+	missingPeopleForm.tableView->model()->setHeaderData(5, Qt::Horizontal, tr("Last paid"));
+	missingPeopleForm.tableView->model()->setHeaderData(6, Qt::Horizontal, tr("Paid due"));
+	connect(missingPeopleForm.btnClose, SIGNAL(clicked()), missingPeopleDialog, SLOT(hide()));
+	connect(missingPeopleForm.btnExportLdif, SIGNAL(clicked()), this, SLOT(exportMissingPeople()));
+	connect(missingPeopleForm.datePaidDue, SIGNAL(dateChanged(QDate)), this, SLOT(openMissingDialog()));
 }
 
 Userlist::~Userlist() {
 	delete actionManualPayment;
 	delete actionEditDueDate;
 	delete editDateDialog;
+	delete missingPeopleDialog;
 }
 
 void Userlist::createContextMenu() {
@@ -65,8 +86,8 @@ void Userlist::createContextMenu() {
 
 void Userlist::loadData() {
 	QSqlQuery query("SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname,"
-	                " ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons"
-	                " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;", db);
+		" ldap_persons.familyname, ldap_persons.city, ldap_persons.joining, ldap_persons.section FROM ldap_persons"
+		" LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;", db);
 	tableModel->setQuery(query);
 
 	// InvoiceState: o_pen, c_anceled, p_aid, u_nknown
@@ -137,8 +158,8 @@ QSqlQuery Userlist::createQuery() {
 
 	} else {
 		qs = "SELECT ldap_persons.uid, MAX(ldap_persons_dates.paid_due) AS paid_due, ldap_persons.nickname, ldap_persons.givenname, ldap_persons.familyname,"
-			 " ldap_persons.city, ldap_persons.joining, ldap_persons.section, ldap_persons.type FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
-			 " WHERE ldap_persons.section=:section";
+			" ldap_persons.city, ldap_persons.joining, ldap_persons.section, ldap_persons.type FROM ldap_persons LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid)"
+			" WHERE ldap_persons.section=:section";
 		if (sl.size() > 0) {
 			qs.append(" AND (").append(search).append(")");
 		}
@@ -371,10 +392,10 @@ void Userlist::exportLdif() {
 	// Only get the last if entries should be relaced or all the other way
 	if (replaceAttribute) {
 		query.prepare("SELECT ldap_persons.uid,MAX(ldap_persons_dates.paid_due) AS paid_due,ldap_persons.type,ldap_persons.section FROM ldap_persons"
-		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
+			" LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) GROUP BY ldap_persons_dates.uid;");
 	} else {
 		query.prepare("SELECT ldap_persons.uid,ldap_persons_dates.paid_due,ldap_persons.type,ldap_persons.section FROM ldap_persons"
-		              " LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
+			" LEFT JOIN ldap_persons_dates ON (ldap_persons.uid = ldap_persons_dates.uid) ORDER BY ldap_persons_dates.uid,ldap_persons_dates.paid_due;");
 	}
 
 	if (query.exec()) {
@@ -471,4 +492,52 @@ void Userlist::exportLdif() {
 	} else {
 		QMessageBox::warning(this, tr("Adjusting dates failed"), tr("No Datasets found which would need an Update..."));
 	}
+}
+
+void Userlist::openMissingDialog() {
+	QSqlQuery query(db);
+	query.prepare("SELECT pps_invoice.member_uid, pps_invoice.address_name, pps_invoice.address_street1, pps_invoice.address_city,"
+		" pps_invoice.for_section, pps_invoice.paid_date, ldap_persons_dates.paid_due"
+		" FROM pps_invoice"
+		" LEFT JOIN ldap_persons_dates ON (pps_invoice.member_uid=ldap_persons_dates.uid)"
+		" LEFT JOIN ldap_persons ON (pps_invoice.member_uid=ldap_persons.uid)"
+		" WHERE (pps_invoice.state==2 OR pps_invoice.state==4) AND ldap_persons.uid IS NULL"
+		" AND ldap_persons_dates.paid_due>=:paid_due"
+		" GROUP BY pps_invoice.member_uid"
+		" ORDER BY pps_invoice.member_uid ASC, ldap_persons_dates.paid_due ASC;");
+	query.bindValue(":paid_due", missingPeopleForm.datePaidDue->date());
+	query.exec();
+	QSqlQueryModel *model = (QSqlQueryModel*) missingPeopleForm.tableView->model();
+	model->setQuery(query);
+	if (!missingPeopleDialog->isVisible()) {
+		missingPeopleDialog->show();
+	}
+}
+
+void Userlist::exportMissingPeople() {
+	QSettings settings;
+	QString list;
+	QSqlQueryModel *model = (QSqlQueryModel *) missingPeopleForm.tableView->model();
+
+	while (model->canFetchMore()) {
+		model->fetchMore();
+	}
+
+	for (int i = 0; i < model->rowCount(); i++) {
+		QModelIndex idx = model->index(i, 0);
+		list.append(model->data(idx, Qt::DisplayRole).toString()).append("\n");
+	}
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save discrepancies UIDs"), "", tr("Plaintext (*.txt)"));
+	if (!fileName.isEmpty()) {
+		QFile f(fileName);
+		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+			QTextStream out(&f);
+			out << list;
+		} else {
+			QMessageBox::warning(this, tr("Export failed"), tr("An Error occured while opening the file.\n\nDo you have Write-Permission to\n%1?").arg(fileName));
+		}
+	}
+
+	missingPeopleDialog->hide();
 }
