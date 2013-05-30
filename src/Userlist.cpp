@@ -515,15 +515,29 @@ void Userlist::openMissingDialog() {
 }
 
 void Userlist::exportMissingPeople() {
-	QAbstractItemModel *model = missingPeopleForm.tableView->model();
+	QSettings settings;
+	QString list;
+	QSqlQueryModel *model = (QSqlQueryModel *) missingPeopleForm.tableView->model();
+
 	while (model->canFetchMore()) {
 		model->fetchMore();
 	}
-	
+
 	for (int i = 0; i < model->rowCount(); i++) {
 		QModelIndex idx = model->index(i, 0);
-		QString member = model->data(idx, Qt::DisplayRole).toString();
-		qDebug() << member;
+		list.append(model->data(idx, Qt::DisplayRole).toString()).append("\n");
 	}
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save discrepancies UIDs"), "", tr("Plaintext (*.txt)"));
+	if (!fileName.isEmpty()) {
+		QFile f(fileName);
+		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
+			QTextStream out(&f);
+			out << list;
+		} else {
+			QMessageBox::warning(this, tr("Export failed"), tr("An Error occured while opening the file.\n\nDo you have Write-Permission to\n%1?").arg(fileName));
+		}
+	}
+
 	missingPeopleDialog->hide();
 }
