@@ -143,8 +143,11 @@ void InvoiceWizard::updatePreviewTable() {
 			break;
 
 		case INVOICE_IMPORTTYPE_NEW:
-			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
-			" WHERE ldap_persons.joining>=? AND ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			query.prepare(QString("SELECT ldap_persons.uid,pps_invoice.member_uid FROM ldap_persons"
+			" LEFT JOIN pps_invoice ON (ldap_persons.uid = pps_invoice.member_uid)"
+			" WHERE ldap_persons.joining>=? AND ldap_persons.type<=? %1"
+			" AND pps_invoice.member_uid IS NULL"
+			" ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
 			query.bindValue(0, newMemberDate->date().toString("yyyy-MM-dd"));
 			query.bindValue(1, PPSPerson::Pirate);
 			if (!section.isEmpty()) {
