@@ -546,7 +546,7 @@ void Contributions::createQif() {
 			
 			query2.bindValue(":reference", cd->amount_list.at(i).first);
 			query2.bindValue(":amount", QString::number(cd->amount_list.at(i).second));
-			query2.exec();
+//			query2.exec();
 		}
 
 		// Check if the current dataset is held back or not
@@ -614,7 +614,7 @@ void Contributions::createQif() {
 		query.bindValue(i+6, dontContribute.at(i));
 	}
 #endif
-	query.exec();
+//	query.exec();
 }
 
 void Contributions::exportData() {
@@ -656,6 +656,10 @@ void Contributions::sendEmail() {
 	QList<QString>::const_iterator section;
 	QList<QString> keys = sectionQif.keys();
 	for (section = keys.constBegin(); section != keys.constEnd(); section++) {
+		XmlPdf *pdf = getPdf(*section, QDate(spinYear->value(), 1, 1), QDate(spinYear->value(), 12, 31));
+		delete pdf;
+		continue;
+		
 		// Create a tmp file form the QIF
 		char fname [L_tmpnam];
 		tmpnam(fname);
@@ -736,5 +740,24 @@ void Contributions::selectYear() {
 	searchContributions();
 }
 
-
+XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const QDate &to) const {
+	XmlPdf *pdf = new XmlPdf;
+	QSqlQuery query(db);
+	
+	query.prepare("SELECT cont.section,cont.reference,inv.paid_date,cont.amount,inv.address_name,inv.address_city,inv.member_uid"
+	" FROM pps_contribution cont LEFT JOIN pps_invoice AS inv ON (cont.reference=inv.reference)"
+	" WHERE cont.section=:section AND cont.contribute_date>=:begin AND cont.contribute_date<=:end AND cont.state=:state"
+	" ORDER BY cont.section,inv.address_name ASC;");
+	query.bindValue(":section", section);
+	query.bindValue(":begin", from);
+	query.bindValue(":end", to);
+	query.bindValue(":state", (int)Invoice::StateContributed);
+	query.exec();
+	
+	while (query.next()) {
+		qDebug() << query.value(1);
+	}
+	
+	return pdf;
+}
 

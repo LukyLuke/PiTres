@@ -25,6 +25,7 @@
 #include "data/Invoice.h"
 #include "data/Person.h"
 #include "helper/Smtp.h"
+#include "helper/XmlPdf.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -75,6 +76,7 @@ private:
 public:
 	Contributions(QWidget *parent = 0);
 	virtual ~Contributions();
+	XmlPdf * getPdf(const QString &section, const QDate &from, const QDate &to) const;
 
 public slots:
 	void searchData();
