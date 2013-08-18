@@ -56,6 +56,7 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	connect(settingsForm.reminderSelect, SIGNAL(clicked()), this, SLOT(showReminderFileDialog()));
 	connect(settingsForm.receiptSelect, SIGNAL(clicked()), this, SLOT(showReceiptFileDialog()));
 	connect(settingsForm.statisticSelect, SIGNAL(clicked()), this, SLOT(showStatisticFileDialog()));
+	connect(settingsForm.contributionSelect, SIGNAL(clicked()), this, SLOT(showContributionFileDialog()));
 	
 	// Load the Database
 	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
@@ -218,6 +219,7 @@ void PiTres::showSettings() {
 	settingsForm.pdfReminder->setText(settings.value("pdf/reminder_template", "data/reminder.xml").toString());
 	settingsForm.pdfReceipt->setText(settings.value("pdf/receipt_template", "data/receipt.xml").toString());
 	settingsForm.pdfStatistic->setText(settings.value("pdf/statistic_template", "data/statistic.xml").toString());
+	settingsForm.pdfContribution->setText(settings.value("pdf/contribution_template", "data/contribution.xml").toString());
 	
 	settingsForm.assetType->setText(settings.value("qif/account_asset", "Oth A").toString());
 	settingsForm.assetLabel->setText(settings.value("qif/invoice_label", "Membership: %1 (%2)").toString());
@@ -317,6 +319,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("pdf/reminder_template", settingsForm.pdfReminder->text());
 	settings.setValue("pdf/receipt_template", settingsForm.pdfReceipt->text());
 	settings.setValue("pdf/statistic_template", settingsForm.pdfStatistic->text());
+	settings.setValue("pdf/contribution_template", settingsForm.pdfContribution->text());
 	
 	settings.setValue("qif/account_asset", settingsForm.assetType->text());
 	settings.setValue("qif/invoice_label", settingsForm.assetLabel->text());
@@ -403,5 +406,12 @@ void PiTres::showStatisticFileDialog() {
 	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfReceipt->text(), tr("PDF-Templates (*.xml)"));
 	if (!file.isEmpty()) {
 		settingsForm.pdfStatistic->setText(file);
+	}
+}
+
+void PiTres::showContributionFileDialog() {
+	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfReceipt->text(), tr("PDF-Templates (*.xml)"));
+	if (!file.isEmpty()) {
+		settingsForm.pdfContribution->setText(file);
 	}
 }

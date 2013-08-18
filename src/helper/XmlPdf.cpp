@@ -129,7 +129,7 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 	qreal paperHeight = printer->pageRect(QPrinter::DevicePixel).height();
 	QHash<QString, PdfElement>::const_iterator it;
 	QHash<QString, QList<XmlPdfEntry*> >::const_iterator rit;
-	
+
 	// Set the pagenumber and calculate number of pages
 	qint32 num_pages = 1;
 	for (rit = repeatingEntries.constBegin(); rit != repeatingEntries.constEnd(); rit++) {
@@ -191,7 +191,7 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 	}
 }
 
-void XmlPdf::addStatics(QPainter *painter) {
+void XmlPdf::addStatics(QPainter *painter, int row, int max) {
 	QHash<QString, PdfElement>::const_iterator it;
 	for (it = elements.constBegin(); it != elements.constEnd(); it++) {
 		if (repeatingEntries.contains(it.key())) {
@@ -199,7 +199,11 @@ void XmlPdf::addStatics(QPainter *painter) {
 		}
 		PdfElement elem = it.value();
 		elem.setVars(&variables);
-		elem.paint(painter);
+		if (row == 0 && max == 0) {
+			elem.paint(painter);
+		} else {
+			elem.paint(painter, row, max);
+		}
 	}
 }
 

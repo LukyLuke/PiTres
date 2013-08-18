@@ -643,6 +643,7 @@ void Contributions::sendEmail() {
 	PPSPerson pers;
 	QString subject, message, email, fileName, section_file;
 	QString attachment = tr("Contribution_%1.qif").arg(QDate::currentDate().toString("yyyy-MM-dd"));
+	QString attachment_pdf = tr("Contribution_%1.pdf").arg(QDate::currentDate().toString("yyyy-MM-dd"));
 
 	Smtp mail(settings.value("smtp/host", "localhost").toString(), settings.value("smtp/port", 587).toInt());
 	if (settings.value("smtp/authentication", "login").toString() == "login") {
@@ -656,14 +657,32 @@ void Contributions::sendEmail() {
 	QList<QString>::const_iterator section;
 	QList<QString> keys = sectionQif.keys();
 	for (section = keys.constBegin(); section != keys.constEnd(); section++) {
+		mail.clearAttachments();
+		sec.load(*section);
+		pers.load(sec.treasurer());
+
+		// Create and attach the statistical PDF for selected time span
 		XmlPdf *pdf = getPdf(*section, QDate(spinYear->value(), 1, 1), QDate(spinYear->value(), 12, 31));
-		delete pdf;
-		continue;
-		
+		pdf->setVar("section_name", sec.name());
+		pdf->setVar("section_treasurer", pers.givenName() + " " + pers.familyName());
+		pdf->setVar("section_address", sec.address());
+		pdf->setVar("section_fullname", sec.name());
+		pdf->setVar("section_email", pers.email().first());
+		pdf->setVar("pp_country", settings.value("pdf/var_pp_country", "CH").toString());
+		pdf->setVar("pp_zip", settings.value("pdf/var_pp_zip", "1337").toString());
+		pdf->setVar("pp_city", settings.value("pdf/var_pp_city", "Vallorbe").toString());
+
+		char fname1 [L_tmpnam];
+		tmpnam(fname1);
+		QString fileName(fname1);
+		fileName = QString("/home/lukas/Documents/tmp/").append(*section).append(".pdf");
+		pdf->print(fileName);
+		mail.attach(fileName, attachment_pdf);
+
 		// Create a tmp file form the QIF
-		char fname [L_tmpnam];
-		tmpnam(fname);
-		QString tmpFileName(fname);
+		char fname2 [L_tmpnam];
+		tmpnam(fname2);
+		QString tmpFileName(fname2);
 		QFile f(tmpFileName);
 		if (f.open(QFile::WriteOnly | QFile::Truncate)) {
 			QTextStream out(&f);
@@ -671,21 +690,14 @@ void Contributions::sendEmail() {
 			out.flush();
 			f.close();
 		}
-		mail.clearAttachments();
 		mail.attach(tmpFileName, attachment);
-
-		// Load the treasurer of the current Section
-		sec.load(*section);
-		pers.load(sec.treasurer());
 
 		// TODO: Load Subject and Texts
 		subject = QString("Membership fee contributions for %1").arg(*section);
 		message = "Ahoi Treasurer,\n"
-			"This time still in a not verry beautifull Mailing.\n"
-			"In future you will also receive an additional PDF-Evidence with all information included. This time, the evidence from your Bank has to be be enough.\n\n"
-			"Attatched you'l find the contribution of the membership fee of the Pirate Party Switzerland for your section as a Quicken-Interchange File. This you can easily import with GnuCash in your accounting through 'File' -> 'Import' -> 'Import QIF...'.\n"
-			"You will receive the settlement during next days, change the valuta after in the imported booking.\n\n"
-			"Greetings,\nLukas Zurschmiede\nTreasurer Pirate Party Switzerland\n";
+			"Attatched you'l find the contribution of the membership fee of the Pirate Party Switzerland for your section as a Quicken-Interchange File as well as a pdf with an anonymized list of all payments. The QIF you can easily import in GnuCash or any othe accounting software through 'File' -> 'Import' -> 'Import QIF...'.\n"
+			"You will receive the settlement during next days, so you need to change the valuta from the imported booking after.\n\n"
+			"Greetings,\nNational Treasurer Pirate Party Switzerland\n";
 
 		// Set the Mailtext and send the mail
 		mail.setTextMessage(message);
@@ -699,22 +711,24 @@ void Contributions::sendEmail() {
 			if (fileName.isEmpty()) {
 				fileName = QFileDialog::getSaveFileName(this, tr("Save Contribution for the section"), "", tr("Quicken Interchange Format (*.qif)"));
 			}
-			section_file = fileName;
+			section_file = tmpFileName;
 			section_file.replace(".qif", "_" + (*section) + ".qif");
 			if (!fileName.isEmpty()) {
 				if (QFile::exists( section_file )) {
 					QFile::remove( section_file );
 				}
-				if (!QFile::copy(fname, section_file)) {
-					qDebug() << "Error while copying the QIF: " << fname << " to " << section_file;
+				if (!QFile::copy(fname2, section_file)) {
+					qDebug() << "Error while copying the QIF: " << fname2 << " to " << section_file;
 				}
 			} else {
 				qDebug() << "Error, no file name given to copy the QIF to...";
 			}
 		}
 
-		// remove the tmp file
-		remove(fname);
+		// Remove temporary files and clean up
+		remove(fname1);
+		remove(fname2);
+		delete pdf;
 	}
 }
 
@@ -741,10 +755,15 @@ void Contributions::selectYear() {
 }
 
 XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const QDate &to) const {
+	QSettings settings;
+	QString date_format = settings.value("pdf/date_format", "dd.MM.yyyy").toString();
 	XmlPdf *pdf = new XmlPdf;
+	XmlPdfEntry *entry;
 	QSqlQuery query(db);
+	qint32 num = 0;
+	float total = 0;
 	
-	query.prepare("SELECT cont.section,cont.reference,inv.paid_date,cont.amount,inv.address_name,inv.address_city,inv.member_uid"
+	query.prepare("SELECT cont.section,inv.paid_date,cont.amount,inv.address_city,cont.contribute_date,cont.year,inv.member_uid"
 	" FROM pps_contribution cont LEFT JOIN pps_invoice AS inv ON (cont.reference=inv.reference)"
 	" WHERE cont.section=:section AND cont.contribute_date>=:begin AND cont.contribute_date<=:end AND cont.state=:state"
 	" ORDER BY cont.section,inv.address_name ASC;");
@@ -754,9 +773,27 @@ XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const Q
 	query.bindValue(":state", (int)Invoice::StateContributed);
 	query.exec();
 	
+	pdf->loadTemplate(settings.value("pdf/contribution_template", "data/contribution.xml").toString());
 	while (query.next()) {
-		qDebug() << query.value(1);
+		entry = pdf->addEntry("payment");
+		entry->setVar("num", ++num);
+		entry->setVar("section", query.value(0).toString());
+		entry->setVar("paid", query.value(1).toDate().toString(date_format));
+		entry->setVar("amount", query.value(2).toFloat());
+		entry->setVar("city", query.value(3).toString());
+		entry->setVar("date", query.value(4).toDate().toString(date_format));
+		entry->setVar("year", query.value(5).toInt());
+		entry->setVar("member", query.value(6).toInt());
+
+		total += query.value(2).toFloat();
 	}
+	pdf->setVar("section_name", section);
+	pdf->setVar("contribution_year", QDate::currentDate().toString("yyyy"));
+	pdf->setVar("contribution_number", QString::number(num));
+	pdf->setVar("contribution_total", QString::number(total, 'f', 2));
+	pdf->setVar("contribution_average", QString::number(total/num, 'f', 2));
+	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Vallorbe").toString());
+	pdf->setVar("print_date", QDate::currentDate().toString(date_format));
 	
 	return pdf;
 }

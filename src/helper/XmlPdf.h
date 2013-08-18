@@ -70,7 +70,7 @@ private:
 	qint32 currentPage;
 	
 	void loadFonts();
-	void addStatics(QPainter *painter);
+	void addStatics(QPainter *painter, int row = 0, int max = 0);
 	void addDynamics(QPainter *painter, QPrinter *printer);
 };
 

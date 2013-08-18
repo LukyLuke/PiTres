@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>793</width>
-    <height>617</height>
+    <width>877</width>
+    <height>648</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -52,8 +52,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>853</width>
+            <height>574</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -343,8 +343,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>853</width>
+            <height>574</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -420,7 +420,28 @@
                 </item>
                </layout>
               </item>
-              <item row="4" column="1">
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_59">
+                <property name="text">
+                 <string>Statistics Template</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QLineEdit" name="pdfStatistic"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="statisticSelect">
+                  <property name="text">
+                   <string>Select File</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="5" column="1">
                <widget class="QLabel" name="labelTemplateHint">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -436,20 +457,20 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_59">
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_60">
                 <property name="text">
-                 <string>Statistics Template</string>
+                 <string>Contribution Template</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item row="4" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
                 <item>
-                 <widget class="QLineEdit" name="pdfStatistic"/>
+                 <widget class="QLineEdit" name="pdfContribution"/>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="statisticSelect">
+                 <widget class="QPushButton" name="contributionSelect">
                   <property name="text">
                    <string>Select File</string>
                   </property>
@@ -667,8 +688,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>853</width>
+            <height>574</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -949,8 +970,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>769</width>
-            <height>543</height>
+            <width>400</width>
+            <height>390</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
