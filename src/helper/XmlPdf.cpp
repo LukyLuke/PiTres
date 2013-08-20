@@ -148,9 +148,9 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 					bottom = 0;
 				}
 				PdfElement elem = it.value();
-				if (elem.checkShow(i+1, list.size())) {
-					elem.setTop(bottom);
-					bottom = elem.bottom(i+1, list.size());
+				elem.setTop(bottom);
+				bottom = elem.bottom(i+1, list.size());
+				if (bottom >= 0) {
 					nextBottom = bottom + (bottom - elem.top()) + elem.bottomSpace();
 				}
 			}
@@ -172,7 +172,7 @@ void XmlPdf::addDynamics(QPainter *painter, QPrinter *printer) {
 			nextBottom = 0;
 			for (int i = 0; i < list.size(); i++) {
 				if (nextBottom >= paperHeight) {
-					addStatics(painter);
+					addStatics(painter, currentPage, num_pages);
 					printer->newPage();
 					bottom = 0;
 					currentPage++;
@@ -200,7 +200,7 @@ void XmlPdf::addStatics(QPainter *painter, int row, int max) {
 		PdfElement elem = it.value();
 		elem.setVars(&variables);
 		if (row == 0 && max == 0) {
-			elem.paint(painter);
+			elem.paint(painter, variables["num_pages"].toInt(), variables["num_pages"].toInt());
 		} else {
 			elem.paint(painter, row, max);
 		}
