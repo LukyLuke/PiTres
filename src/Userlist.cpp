@@ -272,6 +272,8 @@ void Userlist::showDetails(int index) {
 }
 
 void Userlist::exportData() {
+	PPSPerson person;
+	
 	// Reset all membes types
 	PPSPerson::resetMembertypes();
 
@@ -280,16 +282,21 @@ void Userlist::exportData() {
 	query.exec();
 
 	QRegExp re("[\"',\r\n]+");
-	QString csv("Member,Nickname,Givenname,Familyname,City,Section,Type,Paid\n");
+	QString csv("Member,Nickname,Givenname,Familyname,Postalcode,City,Country,Section,Type,Paid,Email 1,Email 2,Tel 1,Tel 2\n");
+	
+	// "SELECT uid,paid_due_date,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
 	while (query.next()) {
-		// "SELECT uid,paid_due_date,nickname,givenname,familyname,city,joining,section FROM ldap_persons;";
-		csv.append( query.value(0).toString().remove(re) ).append(",");
-		csv.append( query.value(2).toString().remove(re) ).append(",");
-		csv.append( query.value(3).toString().remove(re) ).append(",");
-		csv.append( query.value(4).toString().remove(re) ).append(",");
-		csv.append( query.value(5).toString().remove(re) ).append(",");
-		csv.append( query.value(7).toString().remove(re) ).append(",");
-		switch (query.value(8).toInt()) {
+		person.load(query.value(0).toInt());
+		
+		csv.append( QString::number(person.uid()) ).append(",");
+		csv.append( person.nickname().remove(re) ).append(",");
+		csv.append( person.givenName().remove(re) ).append(",");
+		csv.append( person.familyName().remove(re) ).append(",");
+		csv.append( person.postalCode().remove(re) ).append(",");
+		csv.append( person.city().remove(re) ).append(",");
+		csv.append( person.country().remove(re) ).append(",");
+		csv.append( person.section().remove(re) ).append(",");
+		switch (person.type()) {
 			case PPSPerson::LandLubber: csv.append("LandLubber").append(","); break;
 			case PPSPerson::Sympathizer: csv.append("Sympathizer").append(","); break;
 			case PPSPerson::Pirate: csv.append("Pirate").append(","); break;
@@ -298,7 +305,25 @@ void Userlist::exportData() {
 			case PPSPerson::FleetPirate: csv.append("FleetPirate").append(","); break;
 			default: csv.append("Unknown").append(","); break;
 		}
-		csv.append( query.value(1).toString().remove(re) ).append("\n");
+		
+		// Paid until
+		csv.append( person.paidDue().toString("yyyy-MM-dd").append(",") );
+		
+		// Email and Telephone
+		QString val;
+		val = person.email().value(0);
+		csv.append( val.remove(re).append(",") );
+		
+		val = person.email().value(1);
+		csv.append( val.remove(re).append(",") );
+		
+		val = person.telephone().value(0);
+		csv.append( val.remove(re).append(",") );
+		
+		val = person.telephone().value(1);
+		csv.append( val.remove(re) );
+		
+		csv.append("\n");
 	}
 
 	// Safe as File
