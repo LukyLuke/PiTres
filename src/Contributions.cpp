@@ -675,7 +675,6 @@ void Contributions::sendEmail() {
 		char fname1 [L_tmpnam];
 		tmpnam(fname1);
 		QString fileName(fname1);
-		fileName = QString("/home/lukas/Documents/kdevelopWorkspace/PiTres/tmp/pdf/").append(*section).append(".pdf");
 		pdf->print(fileName);
 		mail.attach(fileName, attachment_pdf);
 
@@ -763,10 +762,10 @@ XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const Q
 	qint32 num = 0;
 	float total = 0;
 	
-	query.prepare("SELECT cont.section,inv.paid_date,cont.amount,inv.address_city,cont.contribute_date,cont.year,inv.member_uid"
+	query.prepare("SELECT cont.section,inv.paid_date,cont.amount,inv.address_city,cont.contribute_date,cont.year,inv.member_uid,inv.amount_paid"
 	" FROM pps_contribution cont LEFT JOIN pps_invoice AS inv ON (cont.reference=inv.reference)"
 	" WHERE cont.section=:section AND cont.contribute_date>=:begin AND cont.contribute_date<=:end AND cont.state=:state"
-	" ORDER BY cont.section,inv.address_name ASC;");
+	" ORDER BY cont.section,cont.contribute_date,inv.paid_date ASC;");
 	query.bindValue(":section", section);
 	query.bindValue(":begin", from);
 	query.bindValue(":end", to);
@@ -784,6 +783,7 @@ XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const Q
 		entry->setVar("date", query.value(4).toDate().toString(date_format));
 		entry->setVar("year", query.value(5).toInt());
 		entry->setVar("member", query.value(6).toInt());
+		entry->setVar("amount_paid", query.value(7).toFloat());
 
 		total += query.value(2).toFloat();
 	}

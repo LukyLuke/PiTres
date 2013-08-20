@@ -49,15 +49,17 @@ CH-1337 Vallorbe]]></text>
 		</g>
 
 		<g part="text1">
-			<text x="20" y="300" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Quittung Auszahlung Mitgliederbeiträge Seite {current_page}]]></text>
+			<text x="20" y="300" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Quittung: Auszahlung Mitgliederbeiträge, Seite {current_page}]]></text>
 		</g>
 
 		<g part="payment" offset="12" top="350" bottom="100">
-			<text x="130" y="3" width="100" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[#{num}]]></text>
-			<text x="180" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[Bezahlt am {paid}]]></text>
+			<text x="30" y="3" width="100" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[#{num}]]></text>
+			<text x="70" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[Verrechnet am {date}]]></text>
+			<text x="220" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[bezahlt am {paid}]]></text>
 			<text x="350" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[aus {city}]]></text>
-			<text x="500" y="3" width="100" height="10" wordwrap="false" size="8" halign="right" weight="bold"><![CDATA[{amount} CHF]]></text>
-			<line x1="130" y1="16" x2="600" y2="16" stroke="0.4" />
+			<text x="460" y="3" width="100" height="10" wordwrap="false" size="8" halign="right" weight="bold"><![CDATA[{amount} CHF]]></text>
+			<text x="550" y="3" width="100" height="10" wordwrap="false" size="8" halign="right" weight="bold"><![CDATA[von {amount_paid} CHF]]></text>
+			<line x1="30" y1="16" x2="650" y2="16" stroke="0.4" />
 		</g>
 		<g part="footer">
 			<text x="10" y="1050" width="690" height="10" wordwrap="false" size="8" halign="center"><![CDATA[Seite {current_page} von {num_pages}]]></text>
