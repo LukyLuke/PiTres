@@ -675,7 +675,7 @@ void Contributions::sendEmail() {
 		char fname1 [L_tmpnam];
 		tmpnam(fname1);
 		QString fileName(fname1);
-		fileName = QString("/home/lukas/Documents/tmp/").append(*section).append(".pdf");
+		fileName = QString("/home/lukas/Documents/kdevelopWorkspace/PiTres/tmp/pdf/").append(*section).append(".pdf");
 		pdf->print(fileName);
 		mail.attach(fileName, attachment_pdf);
 
