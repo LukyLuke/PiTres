@@ -300,15 +300,18 @@
            </size>
           </property>
           <property name="title">
-           <string>Year</string>
+           <string>Selection</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
             <widget class="QListWidget" name="yearList">
              <property name="showDropIndicator" stdset="0">
               <bool>false</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <widget class="QListWidget" name="dateList"/>
            </item>
           </layout>
          </widget>
@@ -368,7 +371,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>186</width>
-                <height>212</height>
+                <height>388</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -397,6 +400,28 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnSendDetail">
+                 <property name="text">
+                  <string>Send details</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../PiTres.qrc">
+                   <normaloff>:/icons/resources/icons/email.png</normaloff>:/icons/resources/icons/email.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnExportDetail">
+                 <property name="text">
+                  <string>Export details</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../PiTres.qrc">
+                   <normaloff>:/icons/resources/icons/mime-pdf.png</normaloff>:/icons/resources/icons/mime-pdf.png</iconset>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

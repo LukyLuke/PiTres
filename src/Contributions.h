@@ -69,6 +69,8 @@ private:
 	void loadSectionContributions();
 	QSqlQuery createContributionsQuery();
 	void showContributionsDetails();
+	void fillContributionDateList(int year);
+	XmlPdf * createContributionsPdf(QString section, bool showAll = FALSE);
 #ifdef FIO
 	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference );
 #endif
@@ -85,7 +87,10 @@ public slots:
 	void sendEmail();
 	void selectSection();
 	void selectYear();
+	void selectDate();
 	void searchContributions();
+	void sendContributionDetails();
+	void exportContributionDetails();
 	
 protected:
 	void timerEvent(QTimerEvent *event);

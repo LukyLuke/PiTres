@@ -28,6 +28,9 @@ Contributions::Contributions(QWidget *parent) : QWidget(parent) {
 	connect(btnEmail, SIGNAL(clicked()), this, SLOT(sendEmail()));
 	connect(sectionList, SIGNAL(currentIndexChanged(int)), this, SLOT(selectSection()));
 	connect(yearList, SIGNAL(itemSelectionChanged()), this, SLOT(selectYear()));
+	connect(dateList, SIGNAL(itemSelectionChanged()), this, SLOT(selectDate()));
+	connect(btnSendDetail, SIGNAL(clicked()), this, SLOT(sendContributionDetails()));
+	connect(btnExportDetail, SIGNAL(clicked()), this, SLOT(exportContributionDetails()));
 
 	tableModel = new QSqlQueryModel(tableView);
 	contributionsModel = new QSqlQueryModel(contributionTable);
@@ -73,6 +76,8 @@ void Contributions::loadSectionContributions() {
 	contributionsModel->setHeaderData(4, Qt::Horizontal, tr("Section"));
 	contributionsModel->setHeaderData(5, Qt::Horizontal, tr("Member UID"));
 	contributionsModel->setHeaderData(6, Qt::Horizontal, tr("Reference-Number"));
+	contributionsModel->setHeaderData(7, Qt::Horizontal, tr("Year"));
+	contributionsModel->setHeaderData(8, Qt::Horizontal, tr("Contributed"));
 
 	contributionTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	contributionTable->setSortingEnabled(false);
@@ -102,24 +107,33 @@ QSqlQuery Contributions::createQuery() {
 
 QSqlQuery Contributions::createContributionsQuery() {
 	qint32 year;
+	QString selection_date;
 	QSqlQuery query(db);
 
-	if (yearList->selectedItems().count() > 0 && yearList->currentRow() > 0) {
+	if (yearList->selectedItems().count() > 0 && yearList->currentRow() >= 0) {
 		year = yearList->selectedItems().at(0)->text().toInt();
 	} else {
 		year = QDate::currentDate().year();
 	}
 
+	if (dateList->selectedItems().count() > 0 && dateList->currentRow() >= 0) {
+		selection_date = dateList->selectedItems().at(0)->data(Qt::UserRole).toDate().toString("yyyy-MM-dd");
+	}
+
 	query.prepare(QString("SELECT inv.paid_date,cont.amount,inv.address_name,inv.address_city,cont.section,"
-		"inv.member_uid,cont.reference FROM pps_invoice AS inv, pps_contribution cont"
+		"inv.member_uid,cont.reference,cont.year,cont.contribute_date FROM pps_invoice AS inv, pps_contribution cont"
 		" WHERE inv.reference = cont.reference AND cont.section %1 :section"
-		" AND cont.year=:year AND cont.state=:state"
+		" AND cont.year=:year AND cont.state=:state %2"
 		" ORDER BY cont.section,inv.address_name ASC;").arg(
-			(sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "=")
+			(sectionList->currentIndex() == 0 || sectionList->count() == 0 ? "<>" : "="),
+			(selection_date.isEmpty() ? "" : " AND cont.contribute_date = :date")
 		));
 	query.bindValue(":section", sectionList->currentText());
 	query.bindValue(":year", year);
 	query.bindValue(":state", (int)Invoice::StateContributed);
+	if (!selection_date.isEmpty()) {
+		query.bindValue(":date", selection_date);
+	}
 	return query;
 }
 
@@ -751,7 +765,90 @@ void Contributions::selectSection() {
 }
 
 void Contributions::selectYear() {
+	dateList->clearSelection();
+
+	if (yearList->selectedItems().count() > 0 && yearList->currentRow() >= 0) {
+		fillContributionDateList(yearList->selectedItems().at(0)->text().toInt());
+	} else {
+		fillContributionDateList(QDate::currentDate().year());
+	}
+
 	searchContributions();
+}
+
+void Contributions::fillContributionDateList(int year) {
+	QSqlQuery query(db);
+
+	query.prepare("SELECT contribute_date FROM pps_contribution WHERE year=:year GROUP BY contribute_date;");
+	query.bindValue(":year", year);
+	query.exec();
+
+	dateList->clear();
+	while (query.next()) {
+		QListWidgetItem *item = new QListWidgetItem;
+		item->setData(Qt::UserRole, query.value(0).toDate());
+		item->setText(query.value(0).toDate().toString("d. MMMM"));
+		dateList->addItem(item);
+	}
+}
+
+void Contributions::selectDate() {
+	searchContributions();
+}
+
+void Contributions::exportContributionDetails() {
+	XmlPdf *pdf = createContributionsPdf("Members", TRUE);
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Contributions overview as PDF"), "", tr("Portable Document Format (*.pdf)"));
+	if (!fileName.isEmpty()) {
+		pdf->print(fileName);
+	}
+	delete pdf;
+}
+
+void Contributions::sendContributionDetails() {
+
+}
+
+XmlPdf *Contributions::createContributionsPdf(QString section, bool showAll) {
+	QSettings settings;
+	QString date_format = settings.value("pdf/date_format", "dd.MM.yyyy").toString();
+	QString year;
+	XmlPdf *pdf = new XmlPdf;
+	XmlPdfEntry *entry;
+	QSqlQuery query(db);
+	qint32 num = 0;
+	float total = 0;
+
+	pdf->loadTemplate(settings.value("pdf/contribution_template", "data/contribution.xml").toString());
+
+	for (int i = 0; i < contributionsModel->rowCount(); i++) {
+		if (!showAll && (section != contributionsModel->data(contributionsModel->index(i, 4)).toString())) {
+			continue;
+		}
+		entry = pdf->addEntry("payment");
+		entry->setVar("num", ++num);
+		entry->setVar("section", contributionsModel->data(contributionsModel->index(i, 4)).toString());
+		entry->setVar("paid", contributionsModel->data(contributionsModel->index(i, 0)).toDate().toString(date_format));
+		entry->setVar("amount", contributionsModel->data(contributionsModel->index(i, 1)).toFloat());
+		entry->setVar("city", contributionsModel->data(contributionsModel->index(i, 3)).toString());
+		entry->setVar("date", contributionsModel->data(contributionsModel->index(i, 8)).toDate().toString(date_format));
+		entry->setVar("year", contributionsModel->data(contributionsModel->index(i, 7)).toInt());
+		entry->setVar("member", contributionsModel->data(contributionsModel->index(i, 5)).toInt());
+
+		total += query.value(2).toFloat();
+		if (i == 0) {
+			year = contributionsModel->data(contributionsModel->index(i, 7)).toString();
+		}
+	}
+	pdf->setVar("section_name", section);
+	pdf->setVar("contribution_year", QDate::currentDate().toString("yyyy"));
+	pdf->setVar("contribution_number", QString::number(num));
+	pdf->setVar("contribution_total", QString::number(total, 'f', 2));
+	pdf->setVar("contribution_average", QString::number(total/num, 'f', 2));
+	pdf->setVar("print_city", settings.value("pdf/var_print_city", "Vallorbe").toString());
+	pdf->setVar("print_date", QDate::currentDate().toString(date_format));
+
+	return pdf;
 }
 
 XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const QDate &to) const {
@@ -762,7 +859,7 @@ XmlPdf *Contributions::getPdf(const QString &section, const QDate &from, const Q
 	QSqlQuery query(db);
 	qint32 num = 0;
 	float total = 0;
-	
+
 	query.prepare("SELECT cont.section,inv.paid_date,cont.amount,inv.address_city,cont.contribute_date,cont.year,inv.member_uid"
 	" FROM pps_contribution cont LEFT JOIN pps_invoice AS inv ON (cont.reference=inv.reference)"
 	" WHERE cont.section=:section AND cont.contribute_date>=:begin AND cont.contribute_date<=:end AND cont.state=:state"
