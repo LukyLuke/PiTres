@@ -7,7 +7,7 @@
 {SECTION_EMAIL}]]></text>
 		</g>
 
-		<g part="sender" nth="1">
+		<g part="sender" nth="first">
 			<rect x="400" y="142" width="150" height="26" stroke="0.2"/>
 			<text x="404" y="144" width="10" height="10" wordwrap="false" weight="bold" size="14"><![CDATA[P.P.]]></text>
 			<text x="535" y="147" width="10" height="10" wordwrap="false" size="6" halign="right"><![CDATA[{PP_COUNTRY} - {PP_ZIP}
@@ -18,46 +18,48 @@ CH-1337 Vallorbe]]></text>
 			<line x1="400" y1="174" x2="698" y2="174" stroke="0.2" />
 		</g>
 
-		<g part="address" nth="1">
+		<g part="address" nth="first">
 			<text x="400" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[z.H. {SECTION_TREASURER}
 {SECTION_ADDRESS}]]></text>
 		</g>
 
-		<g part="memberinfo" nth="1">
-			<line x1="5" y1="190" x2="5" y2="295" stroke="0.2" />
+		<g part="memberinfo">
+			<line x1="5" y1="140" x2="5" y2="245" stroke="0.2" />
 
-			<text x="10" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[Sektion:]]></text>
-			<text x="130" y="190" width="300" height="10" wordwrap="false" size="9"><![CDATA[{SECTION_NAME}]]></text>
+			<text x="10" y="140" width="300" height="10" wordwrap="false" size="9"><![CDATA[Sektion:]]></text>
+			<text x="130" y="140" width="300" height="10" wordwrap="false" size="9"><![CDATA[{SECTION_NAME}]]></text>
 
-			<text x="10" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Dokument:]]></text>
-			<text x="130" y="205" width="300" height="10" wordwrap="false" size="9"><![CDATA[Mitgliederbeiträge]]></text>
+			<text x="10" y="155" width="300" height="10" wordwrap="false" size="9"><![CDATA[Dokument:]]></text>
+			<text x="130" y="155" width="300" height="10" wordwrap="false" size="9"><![CDATA[MitgliederbeitrÃ¤ge]]></text>
 
-			<text x="10" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[Beitragsjahr:]]></text>
-			<text x="130" y="220" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_YEAR}]]></text>
+			<text x="10" y="170" width="300" height="10" wordwrap="false" size="9"><![CDATA[Beitragsjahr:]]></text>
+			<text x="130" y="170" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_YEAR}]]></text>
 
-			<text x="10" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[Anzahl Zahlungen:]]></text>
-			<text x="130" y="235" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_NUMBER}]]></text>
+			<text x="10" y="185" width="300" height="10" wordwrap="false" size="9"><![CDATA[Anzahl Zahlungen:]]></text>
+			<text x="130" y="185" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_NUMBER}]]></text>
 
-			<text x="10" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[Total:]]></text>
-			<text x="130" y="250" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_TOTAL} CHF]]></text>
+			<text x="10" y="200" width="300" height="10" wordwrap="false" size="9"><![CDATA[Total:]]></text>
+			<text x="130" y="200" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_TOTAL} CHF]]></text>
 
-			<text x="10" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[Durchschnitt:]]></text>
-			<text x="130" y="265" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_AVERAGE} CHF]]></text>
+			<text x="10" y="215" width="300" height="10" wordwrap="false" size="9"><![CDATA[Durchschnitt:]]></text>
+			<text x="130" y="215" width="300" height="10" wordwrap="false" size="9"><![CDATA[{CONTRIBUTION_AVERAGE} CHF]]></text>
 
-			<text x="10" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
-			<text x="130" y="280" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
+			<text x="10" y="230" width="300" height="10" wordwrap="false" size="9"><![CDATA[Ort, Datum:]]></text>
+			<text x="130" y="230" width="300" height="10" wordwrap="false" size="9"><![CDATA[{PRINT_CITY}, {PRINT_DATE}]]></text>
 		</g>
 
-		<g part="text1" nth="1">
-			<text x="20" y="370" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Quittung Auszahlung Mitgliederbeiträge]]></text>
-			<text x="20" y="400" width="690" height="10" wordwrap="true" size="10"><![CDATA[Nachfolgend eine anonymisierte Liste aller Zahlungen welche an die Sektion {SECTION_FULLNAME} ausbezahlt wurden:]]></text>
+		<g part="text1">
+			<text x="20" y="300" width="500" height="10" wordwrap="false" weight="bold" size="12"><![CDATA[Quittung: Auszahlung MitgliederbeitrÃ¤ge, Seite {current_page}]]></text>
 		</g>
-		<g part="payment" offset="12" top="450" bottom="100">
-			<text x="130" y="3" width="100" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[#{num}]]></text>
-			<text x="180" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[Bezahlt am {paid}]]></text>
+
+		<g part="payment" offset="12" top="350" bottom="100">
+			<text x="30" y="3" width="100" height="10" wordwrap="false" size="8" halign="left" weight="bold"><![CDATA[#{num}]]></text>
+			<text x="70" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[Verrechnet am {date}]]></text>
+			<text x="220" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[bezahlt am {paid}]]></text>
 			<text x="350" y="3" width="100" height="10" wordwrap="false" size="8" halign="left"><![CDATA[aus {city}]]></text>
-			<text x="500" y="3" width="100" height="10" wordwrap="false" size="8" halign="right" weight="bold"><![CDATA[{amount} CHF]]></text>
-			<line x1="130" y1="16" x2="600" y2="16" stroke="0.4" />
+			<text x="460" y="3" width="100" height="10" wordwrap="false" size="8" halign="right" weight="bold"><![CDATA[{amount} CHF]]></text>
+			<text x="550" y="3" width="100" height="10" wordwrap="false" size="8" halign="right" weight="bold"><![CDATA[von {amount_paid} CHF]]></text>
+			<line x1="30" y1="16" x2="650" y2="16" stroke="0.4" />
 		</g>
 		<g part="footer">
 			<text x="10" y="1050" width="690" height="10" wordwrap="false" size="8" halign="center"><![CDATA[Seite {current_page} von {num_pages}]]></text>

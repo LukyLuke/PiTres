@@ -72,6 +72,12 @@ qreal PdfElement::paint(QPainter *painter, const qint32 row, const qint32 maxrow
 	PdfElementImage *_image;
 	qreal back = 0, bottom = 0;
 	
+	// Return if this Element-Group should not be printed
+	if ((row > 0) && !checkShow(row, maxrows)) {
+		return 0;
+	}
+	
+	// Print all Elements in this group
 	for (int i = 0; i < _nodes.size(); i++) {
 		PdfElement e = _nodes.at(i);
 		if ((row > 0) && !e.checkShow(row, maxrows)) {
@@ -133,6 +139,12 @@ qreal PdfElement::bottom(const qint32 row, const qint32 maxrows) {
 	PdfElementImage *_image;
 	qreal back = 0, _bottom = 0;
 	
+	// Return if this Element-Group should not be printed
+	if ((row > 0) && !checkShow(row, maxrows)) {
+		return -1;
+	}
+	
+	// Print all Elements in this group
 	for (int i = 0; i < _nodes.size(); i++) {
 		PdfElement e = _nodes.at(i);
 		if ((row > 0) && !e.checkShow(row, maxrows)) {
@@ -195,6 +207,15 @@ void PdfElement::setElement(QDomElement element) {
 	_offset = element.hasAttribute("offset") ? toQReal(element.attribute("offset")) : 0;
 	_top = element.hasAttribute("top") ? toQReal(element.attribute("top")) : 0;
 	_bottomSpace = element.hasAttribute("bottom") ? toQReal(element.attribute("bottom")) : 0;
+	
+	_onlyOnLast = false;
+	_onlyOnFirst = false;
+	_onlyOnNth = 0;
+	if (element.hasAttribute("nth") && !element.attribute("nth").isEmpty()) {
+		_onlyOnLast = element.attribute("nth").toLower() == "last";
+		_onlyOnFirst = element.attribute("nth").toLower() == "first";
+		_onlyOnNth = _onlyOnLast || _onlyOnFirst ? 1 : element.attribute("nth").toInt();
+	}
 	
 	for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling()) {
 		parse(n);
