@@ -49,10 +49,15 @@ Q_OBJECT
 
 private:
 #ifdef FIO
+	struct contribution_data_invoice {
+		QString reference;
+		float amount;
+		QDate valuta;
+	};
 	struct contribution_data {
 		QString section;
 		float sum;
-		QList< QPair<QString, float> > amount_list;
+		QList< contribution_data_invoice > amount_list;
 	};
 	QList< contribution_data * > l_contrib_data;
 #endif
@@ -68,11 +73,12 @@ private:
 	void createQif();
 	void loadSectionContributions();
 	QSqlQuery createContributionsQuery();
+	QSqlQuery newContributionsQuery(QDate from, QDate until, int payable_year, QString section = "", Invoice::State state = Invoice::StatePaid);
 	void showContributionsDetails();
 	void fillContributionDateList(int year);
 	XmlPdf * createContributionsPdf(QString section, bool showAll = FALSE);
 #ifdef FIO
-	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference );
+	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference, int col_valuta);
 #endif
 
 public:
@@ -91,6 +97,7 @@ public slots:
 	void searchContributions();
 	void sendContributionDetails();
 	void exportContributionDetails();
+	void recalculateContributions();
 	
 protected:
 	void timerEvent(QTimerEvent *event);
