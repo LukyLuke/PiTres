@@ -601,14 +601,27 @@
   <tabstop>dateFrom</tabstop>
   <tabstop>dateUntil</tabstop>
   <tabstop>tableView</tabstop>
-  <tabstop>btnExport</tabstop>
   <tabstop>btnEmail</tabstop>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>btnExport</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>tabWidget</tabstop>
   <tabstop>sectionList</tabstop>
   <tabstop>yearList</tabstop>
+  <tabstop>dateList</tabstop>
   <tabstop>contributionTable</tabstop>
   <tabstop>scrollArea_2</tabstop>
+  <tabstop>btnSendDetail</tabstop>
+  <tabstop>btnExportDetail</tabstop>
+  <tabstop>recalcSection</tabstop>
+  <tabstop>recalcYear</tabstop>
+  <tabstop>checkNoFIO</tabstop>
+  <tabstop>recalcPeriodFrom</tabstop>
+  <tabstop>recalcPeriodUntil</tabstop>
+  <tabstop>recalcQ1</tabstop>
+  <tabstop>recalcQ2</tabstop>
+  <tabstop>recalcQ3</tabstop>
+  <tabstop>recalcQ4</tabstop>
+  <tabstop>recalcButton</tabstop>
  </tabstops>
  <resources>
   <include location="../PiTres.qrc"/>
