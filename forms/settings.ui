@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -76,103 +76,6 @@
                  <string>data/userlist.sqlite</string>
                 </property>
                </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="memberSettingsGroupBox">
-             <property name="title">
-              <string>Member Settings</string>
-             </property>
-             <layout class="QFormLayout" name="formLayout_6">
-              <property name="fieldGrowthPolicy">
-               <enum>QFormLayout::ExpandingFieldsGrow</enum>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelMemberAmountFull">
-                <property name="text">
-                 <string>Full income (default)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="memberAmountFull">
-                <property name="maximum">
-                 <double>9999.989999999999782</double>
-                </property>
-                <property name="value">
-                 <double>60.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelMemberAmountLimited">
-                <property name="text">
-                 <string>Limited Income</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="memberAmountLimited">
-                <property name="maximum">
-                 <double>9999.989999999999782</double>
-                </property>
-                <property name="value">
-                 <double>30.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="labelrecommendationsMaxSections">
-                <property name="text">
-                 <string>Maximum number sections</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="maxNumSections">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="value">
-                 <number>4</number>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_29">
-                <property name="text">
-                 <string>Member due Date Format</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="memberDueDate">
-                <property name="toolTip">
-                 <string>&lt;p&gt;The Format must be in form of &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy-MM-dd&lt;/span&gt; but can have static values.&lt;br/&gt;For example to terminate to the end of a Year, enter &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy-12-31&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy&lt;/span&gt; for the 4-digit Year&lt;br/&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;MM&lt;/span&gt; for the 2-digit Month&lt;br/&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;dd&lt;/span&gt; for the 2-digit Day&lt;/p&gt;</string>
-                </property>
-                <property name="text">
-                 <string>yyyy-12-13</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QCheckBox" name="memberDueDateNextYear">
-                <property name="text">
-                 <string>Member due next Year</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelMemberAmountMinimum">
-                <property name="text">
-                 <string>Minimal amount</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="memberAmountMin"/>
               </item>
              </layout>
             </widget>
@@ -970,8 +873,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>400</width>
-            <height>390</height>
+            <width>853</width>
+            <height>574</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -1276,6 +1179,210 @@
               </item>
              </layout>
             </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>Payments</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QScrollArea" name="scrollArea_5">
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_5">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>847</width>
+            <height>568</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <widget class="QGroupBox" name="memberSettingsGroupBox">
+             <property name="title">
+              <string>Member Settings</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_6">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::ExpandingFieldsGrow</enum>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelMemberAmountFull">
+                <property name="text">
+                 <string>Full income (default)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="memberAmountFull">
+                <property name="maximum">
+                 <double>9999.989999999999782</double>
+                </property>
+                <property name="value">
+                 <double>60.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelMemberAmountLimited">
+                <property name="text">
+                 <string>Limited Income</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="memberAmountLimited">
+                <property name="maximum">
+                 <double>9999.989999999999782</double>
+                </property>
+                <property name="value">
+                 <double>30.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="labelrecommendationsMaxSections">
+                <property name="text">
+                 <string>Maximum number sections</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="maxNumSections">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="value">
+                 <number>4</number>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_29">
+                <property name="text">
+                 <string>Member due Date Format</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="memberDueDate">
+                <property name="toolTip">
+                 <string>&lt;p&gt;The Format must be in form of &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy-MM-dd&lt;/span&gt; but can have static values.&lt;br/&gt;For example to terminate to the end of a Year, enter &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy-12-31&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;yyyy&lt;/span&gt; for the 4-digit Year&lt;br/&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;MM&lt;/span&gt; for the 2-digit Month&lt;br/&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;dd&lt;/span&gt; for the 2-digit Day&lt;/p&gt;</string>
+                </property>
+                <property name="text">
+                 <string>yyyy-12-13</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QCheckBox" name="memberDueDateNextYear">
+                <property name="text">
+                 <string>Member due next Year</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelMemberAmountMinimum">
+                <property name="text">
+                 <string>Minimal amount</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="memberAmountMin"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_5">
+             <property name="title">
+              <string>Contribution</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_12">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Quartal 1</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDateEdit" name="dateContributionQ1">
+                <property name="displayFormat">
+                 <string>yyyy-MM-dd</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_61">
+                <property name="text">
+                 <string>Quartal 2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_62">
+                <property name="text">
+                 <string>Quartal 3</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_63">
+                <property name="text">
+                 <string>Quartal 4</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDateEdit" name="dateContributionQ2">
+                <property name="displayFormat">
+                 <string>yyyy-MM-dd</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDateEdit" name="dateContributionQ3">
+                <property name="displayFormat">
+                 <string>yyyy-MM-dd</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDateEdit" name="dateContributionQ4">
+                <property name="displayFormat">
+                 <string>yyyy-MM-dd</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>

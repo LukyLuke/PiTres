@@ -193,6 +193,7 @@ void PiTres::showStatistics() {
 
 void PiTres::showSettings() {
 	QSettings settings;
+	QDate now = QDate::currentDate();
 	
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-02-15").toString());
@@ -293,6 +294,11 @@ void PiTres::showSettings() {
 	settingsForm.pdfEmailPrepend->setText(settings.value("pdf/email_prepend", "info").toString());
 	settingsForm.pdfEmailAppend->setText(settings.value("pdf/email_append", "piratenpartei.ch").toString());
 	
+	settingsForm.dateContributionQ1->setDate(settings.value("payment/contribution_q1", QDate(now.year(), 3, 31)).toDate());
+	settingsForm.dateContributionQ2->setDate(settings.value("payment/contribution_q2", QDate(now.year(), 6, 30)).toDate());
+	settingsForm.dateContributionQ3->setDate(settings.value("payment/contribution_q3", QDate(now.year(), 9, 30)).toDate());
+	settingsForm.dateContributionQ4->setDate(settings.value("payment/contribution_q4", QDate(now.year(), 12, 31)).toDate());
+	
 	_settingsShowed = TRUE;
 	settingsDialog->show();
 }
@@ -379,6 +385,11 @@ void PiTres::doSaveSettings() {
 	settings.setValue("pdf/date_format", settingsForm.pdfDateFormat->text());
 	settings.setValue("pdf/email_prepend", settingsForm.pdfEmailPrepend->text());
 	settings.setValue("pdf/email_append", settingsForm.pdfEmailPrepend->text());
+	
+	settings.setValue("payment/contribution_q1", settingsForm.dateContributionQ1->date());
+	settings.setValue("payment/contribution_q2", settingsForm.dateContributionQ2->date());
+	settings.setValue("payment/contribution_q3", settingsForm.dateContributionQ3->date());
+	settings.setValue("payment/contribution_q4", settingsForm.dateContributionQ4->date());
 }
 
 void PiTres::showInvoiceFileDialog() {
