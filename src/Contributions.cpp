@@ -476,7 +476,7 @@ void Contributions::createQif() {
 	dontContribute.removeAll("");
 #ifndef FIO
 	QString notIn(QString("?,").repeated( dontContribute.size() ));
-	notIn.remove(notIn.length()-2, 1); // remove last ','
+	notIn.remove(notIn.length()-1, 1); // remove last ','
 #endif
 	
 	// Prepare query2 for insert all contribution in a separate table
@@ -606,35 +606,33 @@ void Contributions::createQif() {
 	}
 }
 
-QSqlQuery Contributions::contributionsQuery(QDate from, QDate until, int payable_year, QString section, Invoice::State state) {
+QSqlQuery Contributions::contributionsQuery(QDate from, QDate until, int payable_year, QString section, Invoice::State state, bool noFioCalculation) {
 	QSettings settings;
 	QSqlQuery query(db);
+	QStringList dontContribute;
+	QString notIn;
 	
-#ifndef FIO
 	// Load "do not contribute this sections" list
-	QStringList dontContribute = settings.value("contribution/dontpay", "members").toStringList();
-	dontContribute.removeAll("");
-	QString notIn(QString("?,").repeated( dontContribute.size() ));
-	notIn.remove(notIn.length()-2, 1); // remove last ','
-#endif
+	if (noFioCalculation) {
+		dontContribute.append(settings.value("contribution/dontpay", "members").toStringList());
+		dontContribute.removeAll("");
+		notIn = QString("?,").repeated(dontContribute.size());
+		notIn.remove(notIn.length()-1, 1); // remove last ','
+	}
 	
 	// Get all payments in the selected daterange
 	QString sql = "SELECT"
-#ifndef FIO
-	" amount,amount_paid,for_section,reference,paid_date"
-#else
-	" amount,amount_paid,recommendations,reference,paid_date"
-#endif
+	" amount,amount_paid,recommendations,reference,paid_date,for_section"
 	" FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end"
 	" AND payable_date>=:year_begin AND payable_date<=:year_end AND state=:state";
 	if (!section.isEmpty()) {
 		sql.append(" AND for_section=:section");
 	}
-#ifndef FIO
-	sql.append(QString(" AND section NOT IN (%1) ORDER BY for_section ASC;").arg(notIn));
-#else
-	sql.append(" ORDER BY for_section ASC;");
-#endif
+	if (noFioCalculation) {
+		sql.append(QString(" AND for_section NOT IN (%1) ORDER BY for_section ASC;").arg(notIn));
+	} else {
+		sql.append(" ORDER BY for_section ASC;");
+	}
 	
 	query.prepare(sql);
 	query.bindValue(":start", from.toString("yyyy-MM-dd"));
@@ -648,12 +646,12 @@ QSqlQuery Contributions::contributionsQuery(QDate from, QDate until, int payable
 	query.bindValue(":year_begin", QDate(payable_year, 1, 1).toString("yyyy-MM-dd"));
 	query.bindValue(":year_end", QDate(payable_year, 12, 31).toString("yyyy-MM-dd"));
 	
-#ifndef FIO
-	int offset = section.isEmpty() ? 5 : 6;
-	for (int i = 0; i < dontContribute.size(); i++) {
-		query.bindValue(i + offset, dontContribute.at(i));
+	if (noFioCalculation) {
+		int offset = section.isEmpty() ? 5 : 6;
+		for (int i = 0; i < dontContribute.size(); i++) {
+			query.bindValue(i + offset, dontContribute.at(i));
+		}
 	}
-#endif
 	query.exec();
 	return query;
 }
@@ -947,7 +945,11 @@ void Contributions::recalculateContributions() {
 		query.exec();
 		
 		// Get all contributions for the selected year.
-		query = contributionsQuery(recalcPeriodFrom->date(), recalcPeriodUntil->date(), year, section, Invoice::StateContributed);
+		query = contributionsQuery(recalcPeriodFrom->date(), recalcPeriodUntil->date(), year, section, Invoice::StateContributed
+#ifdef FIO
+			, checkNoFIO->isChecked()
+#endif
+		);
 		
 		// Show a Progressbar
 		QProgressDialog progress(tr("Recalculate and save contributions..."), tr("Please wait..."), 0, 1, this);
@@ -970,6 +972,7 @@ void Contributions::recalculateContributions() {
 		while (query.next() && !cancelProgress) {
 			progress.setValue(++num_contrib);
 			
+			// Query-Fields: amount, amount_paid, recommendations, reference, paid_date, for_section
 			// Get the valuta for the contribution
 			valuta = query.value(4).toDate();
 			if (valuta < q1) {
@@ -984,13 +987,12 @@ void Contributions::recalculateContributions() {
 				continue;
 			}
 			
-			// Query-Fields: amount, amount_paid, for_section, reference, valuta
-			query2.bindValue(":section", query.value(2).toString());
+			query2.bindValue(":section", query.value(5).toString());
 			query2.bindValue(":date", valuta);
 			query2.bindValue(":state", dontContribute.contains(query.value(2).toString()) ? Invoice::StateOpen : Invoice::StateContributed);
 			query2.bindValue(":year", year);
 			query2.bindValue(":reference", query.value(3).toString());
-			query2.bindValue(":amount", query.value(1).toFloat() / 2.0);
+			query2.bindValue(":amount", query.value(0).toFloat() / 2.0);
 			query2.exec();
 		}
 		progress.setMaximum(query.size() + 1);

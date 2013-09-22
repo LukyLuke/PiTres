@@ -75,7 +75,7 @@ private:
 	void createQif();
 	void loadSectionContributions();
 	QSqlQuery createContributionsQuery();
-	QSqlQuery contributionsQuery(QDate from, QDate until, int payable_year, QString section = "", Invoice::State state = Invoice::StatePaid);
+	QSqlQuery contributionsQuery(QDate from, QDate until, int payable_year, QString section = "", Invoice::State state = Invoice::StatePaid, bool noFioCalculation = FALSE);
 	void showBookedContributions();
 	void fillContributionDateList(int year);
 	XmlPdf * createContributionsPdf(QString section, bool showAll = FALSE);
