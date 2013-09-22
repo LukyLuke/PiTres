@@ -42,6 +42,7 @@
 #include <QTimerEvent>
 #include <QPair>
 #include <QHash>
+#include <QDate>
 #include <QProgressDialog>
 
 class Contributions : public QWidget, private Ui::ContributionsForm {
@@ -66,15 +67,16 @@ private:
 	QSqlQueryModel *contributionsModel;
 	QHash<QString, QString> sectionQif;
 	int searchTimer;
+	bool cancelProgress;
 	
-	QSqlQuery createQuery();
+	QSqlQuery createTableModelQuery();
 	void loadData();
 	void showOverview();
 	void createQif();
 	void loadSectionContributions();
 	QSqlQuery createContributionsQuery();
-	QSqlQuery newContributionsQuery(QDate from, QDate until, int payable_year, QString section = "", Invoice::State state = Invoice::StatePaid);
-	void showContributionsDetails();
+	QSqlQuery contributionsQuery(QDate from, QDate until, int payable_year, QString section = "", Invoice::State state = Invoice::StatePaid);
+	void showBookedContributions();
 	void fillContributionDateList(int year);
 	XmlPdf * createContributionsPdf(QString section, bool showAll = FALSE);
 #ifdef FIO
@@ -98,6 +100,7 @@ public slots:
 	void sendContributionDetails();
 	void exportContributionDetails();
 	void recalculateContributions();
+	void cancelRecreate();
 	
 protected:
 	void timerEvent(QTimerEvent *event);

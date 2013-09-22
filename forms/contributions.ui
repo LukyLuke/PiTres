@@ -484,68 +484,107 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="8" column="1">
            <widget class="QPushButton" name="recalcButton">
             <property name="text">
              <string>Recalculate</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="4" column="1">
            <widget class="QDateEdit" name="recalcQ1">
             <property name="displayFormat">
              <string>yyyy-MM-dd</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="5" column="1">
            <widget class="QDateEdit" name="recalcQ2">
             <property name="displayFormat">
              <string>yyyy-MM-dd</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="6" column="1">
            <widget class="QDateEdit" name="recalcQ3">
             <property name="displayFormat">
              <string>yyyy-MM-dd</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="7" column="1">
            <widget class="QDateEdit" name="recalcQ4">
             <property name="displayFormat">
              <string>yyyy-MM-dd</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>Contribution date Q1</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
              <string>Contribution date Q2</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_10">
             <property name="text">
              <string>Contribution date Q3</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>Contribution date Q4</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="checkNoFIO">
+            <property name="text">
+             <string>Do not use FIO calculation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Payment date period</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QDateEdit" name="recalcPeriodFrom">
+              <property name="displayFormat">
+               <string>yyyy-MM-dd</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>to</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDateEdit" name="recalcPeriodUntil">
+              <property name="displayFormat">
+               <string>yyyy-MM-dd</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
