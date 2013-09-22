@@ -19,6 +19,7 @@
 #ifndef Helper_Formatter_H 
 #define Helper_Formatter_H 
 
+#include <cmath>
 #include <QString>
 #include <QLocale>
 
@@ -27,6 +28,8 @@ public:
 	static QString telephone(QString number);
 	static QString telephone(QString number, QLocale::Country country);
 	static QString email(QString email);
+	static QString number(float number, int precision = 2);
+	static QString currency(float amount);
 };
 
 #endif // Helper_Formatter_H 

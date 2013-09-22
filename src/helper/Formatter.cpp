@@ -67,3 +67,27 @@ QString Formatter::email(QString email) {
 	//QRegExp rx("^$");
 	return email;
 }
+
+QString Formatter::number(float number, int precision) {
+	precision = abs(precision);
+	QString back = QString::number(round(number* 10) / 10, 'f', precision);
+	
+	// Position of the thousand separator - if we have decimals, we must move it by that amount to left
+	int pos = 3;
+	if (precision > 0) {
+		pos += precision + 1;
+	}
+	
+	// Add a separator on each
+	while (back.size() > pos) {
+		back.insert(back.size() - pos, '\'');
+		pos += 4;
+	}
+	return back;
+}
+
+QString Formatter::currency(float amount) {
+	QLocale locale;
+	QString back = Formatter::number(amount);
+	return back.append(" ").append(locale.currencySymbol());
+}
