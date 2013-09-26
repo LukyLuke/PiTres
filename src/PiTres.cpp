@@ -56,6 +56,7 @@ PiTres::PiTres(QMainWindow *parent) : QMainWindow(parent) {
 	connect(settingsForm.reminderSelect, SIGNAL(clicked()), this, SLOT(showReminderFileDialog()));
 	connect(settingsForm.receiptSelect, SIGNAL(clicked()), this, SLOT(showReceiptFileDialog()));
 	connect(settingsForm.statisticSelect, SIGNAL(clicked()), this, SLOT(showStatisticFileDialog()));
+	connect(settingsForm.contributionSelect, SIGNAL(clicked()), this, SLOT(showContributionFileDialog()));
 	
 	// Load the Database
 	QFileInfo dbfile(settings.value("database/sqlite", "data/userlist.sqlite").toString());
@@ -192,6 +193,7 @@ void PiTres::showStatistics() {
 
 void PiTres::showSettings() {
 	QSettings settings;
+	QDate now = QDate::currentDate();
 	
 	settingsForm.sqliteFile->setText(settings.value("database/sqlite", "data/userlist.sqlite").toString());
 	settingsForm.memberDueDate->setText(settings.value("invoice/member_due_format", "yyyy-02-15").toString());
@@ -218,6 +220,7 @@ void PiTres::showSettings() {
 	settingsForm.pdfReminder->setText(settings.value("pdf/reminder_template", "data/reminder.xml").toString());
 	settingsForm.pdfReceipt->setText(settings.value("pdf/receipt_template", "data/receipt.xml").toString());
 	settingsForm.pdfStatistic->setText(settings.value("pdf/statistic_template", "data/statistic.xml").toString());
+	settingsForm.pdfContribution->setText(settings.value("pdf/contribution_template", "data/contribution.xml").toString());
 	
 	settingsForm.assetType->setText(settings.value("qif/account_asset", "Oth A").toString());
 	settingsForm.assetLabel->setText(settings.value("qif/invoice_label", "Membership: %1 (%2)").toString());
@@ -291,6 +294,11 @@ void PiTres::showSettings() {
 	settingsForm.pdfEmailPrepend->setText(settings.value("pdf/email_prepend", "info").toString());
 	settingsForm.pdfEmailAppend->setText(settings.value("pdf/email_append", "piratenpartei.ch").toString());
 	
+	settingsForm.dateContributionQ1->setDate(settings.value("payment/contribution_q1", QDate(now.year(), 3, 31)).toDate());
+	settingsForm.dateContributionQ2->setDate(settings.value("payment/contribution_q2", QDate(now.year(), 6, 30)).toDate());
+	settingsForm.dateContributionQ3->setDate(settings.value("payment/contribution_q3", QDate(now.year(), 9, 30)).toDate());
+	settingsForm.dateContributionQ4->setDate(settings.value("payment/contribution_q4", QDate(now.year(), 12, 31)).toDate());
+	
 	_settingsShowed = TRUE;
 	settingsDialog->show();
 }
@@ -317,6 +325,7 @@ void PiTres::doSaveSettings() {
 	settings.setValue("pdf/reminder_template", settingsForm.pdfReminder->text());
 	settings.setValue("pdf/receipt_template", settingsForm.pdfReceipt->text());
 	settings.setValue("pdf/statistic_template", settingsForm.pdfStatistic->text());
+	settings.setValue("pdf/contribution_template", settingsForm.pdfContribution->text());
 	
 	settings.setValue("qif/account_asset", settingsForm.assetType->text());
 	settings.setValue("qif/invoice_label", settingsForm.assetLabel->text());
@@ -376,6 +385,11 @@ void PiTres::doSaveSettings() {
 	settings.setValue("pdf/date_format", settingsForm.pdfDateFormat->text());
 	settings.setValue("pdf/email_prepend", settingsForm.pdfEmailPrepend->text());
 	settings.setValue("pdf/email_append", settingsForm.pdfEmailPrepend->text());
+	
+	settings.setValue("payment/contribution_q1", settingsForm.dateContributionQ1->date());
+	settings.setValue("payment/contribution_q2", settingsForm.dateContributionQ2->date());
+	settings.setValue("payment/contribution_q3", settingsForm.dateContributionQ3->date());
+	settings.setValue("payment/contribution_q4", settingsForm.dateContributionQ4->date());
 }
 
 void PiTres::showInvoiceFileDialog() {
@@ -403,5 +417,12 @@ void PiTres::showStatisticFileDialog() {
 	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfReceipt->text(), tr("PDF-Templates (*.xml)"));
 	if (!file.isEmpty()) {
 		settingsForm.pdfStatistic->setText(file);
+	}
+}
+
+void PiTres::showContributionFileDialog() {
+	QString file = QFileDialog::getOpenFileName(settingsDialog, tr("Select PDF-Template"), settingsForm.pdfReceipt->text(), tr("PDF-Templates (*.xml)"));
+	if (!file.isEmpty()) {
+		settingsForm.pdfContribution->setText(file);
 	}
 }

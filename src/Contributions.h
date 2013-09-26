@@ -25,6 +25,7 @@
 #include "data/Invoice.h"
 #include "data/Person.h"
 #include "helper/Smtp.h"
+#include "helper/XmlPdf.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -41,6 +42,7 @@
 #include <QTimerEvent>
 #include <QPair>
 #include <QHash>
+#include <QDate>
 #include <QProgressDialog>
 
 class Contributions : public QWidget, private Ui::ContributionsForm {
@@ -48,10 +50,15 @@ Q_OBJECT
 
 private:
 #ifdef FIO
+	struct contribution_data_invoice {
+		QString reference;
+		float amount;
+		QDate valuta;
+	};
 	struct contribution_data {
 		QString section;
 		float sum;
-		QList< QPair<QString, float> > amount_list;
+		QList< contribution_data_invoice > amount_list;
 	};
 	QList< contribution_data * > l_contrib_data;
 #endif
@@ -60,21 +67,26 @@ private:
 	QSqlQueryModel *contributionsModel;
 	QHash<QString, QString> sectionQif;
 	int searchTimer;
+	bool cancelProgress;
 	
-	QSqlQuery createQuery();
+	QSqlQuery createTableModelQuery();
 	void loadData();
 	void showOverview();
 	void createQif();
 	void loadSectionContributions();
 	QSqlQuery createContributionsQuery();
-	void showContributionsDetails();
+	QSqlQuery contributionsQuery(QDate from, QDate until, int payable_year, QString section = "", Invoice::State state = Invoice::StatePaid, bool noFioCalculation = FALSE);
+	void showBookedContributions();
+	void fillContributionDateList(int year);
+	XmlPdf * createContributionsPdf(QString section, bool showAll = FALSE);
 #ifdef FIO
-	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference );
+	void calculateFioContribution( QList< contribution_data * > *cdata, QSqlQuery *query, int col_amount, int col_recom, int col_reference, int col_valuta);
 #endif
 
 public:
 	Contributions(QWidget *parent = 0);
 	virtual ~Contributions();
+	XmlPdf * getPdf(const QString &section, const QDate &from, const QDate &to) const;
 
 public slots:
 	void searchData();
@@ -83,7 +95,12 @@ public slots:
 	void sendEmail();
 	void selectSection();
 	void selectYear();
+	void selectDate();
 	void searchContributions();
+	void sendContributionDetails();
+	void exportContributionDetails();
+	void recalculateContributions();
+	void cancelRecreate();
 	
 protected:
 	void timerEvent(QTimerEvent *event);

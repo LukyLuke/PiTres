@@ -82,10 +82,10 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 	message.append("To: " + to + "\r\n");
 	message.append("From: " + from + "\r\n");
 	message.append("Subject: " + subject + "\r\n");
-	message.append("Content-Type: multipart/mixed;\r\n\tboundary=\""+msgBoundary+"\"\r\n");
+	message.append("Content-Type: multipart/mixed;\r\n\tboundary=\"" + msgBoundary + "\"\r\n");
 	message.append("This is a multi-part message in MIME format.\r\n\r\n");
 	message.append("--" + msgBoundary);
-	message.append("\r\nContent-Type: multipart/alternative;\r\n\tboundary=\""+bodyBoundary+"\"\r\n\r\n");
+	message.append("\r\nContent-Type: multipart/alternative;\r\n\tboundary=\"" + bodyBoundary + "\"\r\n\r\n");
 	message.append("--" + bodyBoundary + "\r\n");
 	message.append("Content-Type: text/plain; charset=\"utf-8\"\r\n");
 	message.append("Content-Transfer-Encoding: 8Bit\r\n\r\n");
@@ -105,7 +105,10 @@ bool Smtp::send(const QString &from, const QString &to, const QString &subject) 
 		message.append("Content-Transfer-Encoding: base64\r\n");
 		message.append("Content-Disposition: " + a.contentDisposition + ";\r\n\tfilename=\"" + a.fileName + "\"\r\n\r\n");
 		message.append(chuckSplit(a.data));
-		message.append("\r\n--" + msgBoundary + "--\r\n\r\n");
+		message.append("\r\n");
+	}
+	if (!attachments.empty()) {
+		message.append("--" + msgBoundary + "--\r\n\r\n");
 	}
 	
 	this->from = from;

@@ -21,7 +21,7 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>New Contributions</string>
+       <string>Open</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -126,8 +126,21 @@
          <property name="childrenCollapsible">
           <bool>false</bool>
          </property>
-         <widget class="QTableView" name="tableView"/>
+         <widget class="QTableView" name="tableView">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>3</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
          <widget class="QGroupBox" name="overviewGroup">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="title">
            <string>Contribution Overview</string>
           </property>
@@ -148,7 +161,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>177</width>
+                <width>141</width>
                 <height>156</height>
                </rect>
               </property>
@@ -245,7 +258,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Old Contributions</string>
+       <string>Booked</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
@@ -300,15 +313,18 @@
            </size>
           </property>
           <property name="title">
-           <string>Year</string>
+           <string>Selection</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
             <widget class="QListWidget" name="yearList">
              <property name="showDropIndicator" stdset="0">
               <bool>false</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <widget class="QListWidget" name="dateList"/>
            </item>
           </layout>
          </widget>
@@ -337,7 +353,7 @@
          <widget class="QGroupBox" name="groupBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>1</horstretch>
+            <horstretch>3</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
@@ -368,7 +384,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>186</width>
-                <height>212</height>
+                <height>388</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -398,12 +414,179 @@
                  </property>
                 </spacer>
                </item>
+               <item>
+                <widget class="QPushButton" name="btnSendDetail">
+                 <property name="text">
+                  <string>Send details</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../PiTres.qrc">
+                   <normaloff>:/icons/resources/icons/email.png</normaloff>:/icons/resources/icons/email.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnExportDetail">
+                 <property name="text">
+                  <string>Export details</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../PiTres.qrc">
+                   <normaloff>:/icons/resources/icons/mime-pdf.png</normaloff>:/icons/resources/icons/mime-pdf.png</iconset>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </widget>
            </item>
           </layout>
          </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Administration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Recalculate</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Section</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="recalcSection"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Year</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="recalcYear">
+            <property name="minimum">
+             <number>2000</number>
+            </property>
+            <property name="maximum">
+             <number>9999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QPushButton" name="recalcButton">
+            <property name="text">
+             <string>Recalculate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QDateEdit" name="recalcQ1">
+            <property name="displayFormat">
+             <string>yyyy-MM-dd</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QDateEdit" name="recalcQ2">
+            <property name="displayFormat">
+             <string>yyyy-MM-dd</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QDateEdit" name="recalcQ3">
+            <property name="displayFormat">
+             <string>yyyy-MM-dd</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QDateEdit" name="recalcQ4">
+            <property name="displayFormat">
+             <string>yyyy-MM-dd</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Contribution date Q1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Contribution date Q2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Contribution date Q3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Contribution date Q4</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="checkNoFIO">
+            <property name="text">
+             <string>Do not use FIO calculation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Payment date period</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QDateEdit" name="recalcPeriodFrom">
+              <property name="displayFormat">
+               <string>yyyy-MM-dd</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>to</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDateEdit" name="recalcPeriodUntil">
+              <property name="displayFormat">
+               <string>yyyy-MM-dd</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -418,14 +601,27 @@
   <tabstop>dateFrom</tabstop>
   <tabstop>dateUntil</tabstop>
   <tabstop>tableView</tabstop>
-  <tabstop>btnExport</tabstop>
   <tabstop>btnEmail</tabstop>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>btnExport</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>tabWidget</tabstop>
   <tabstop>sectionList</tabstop>
   <tabstop>yearList</tabstop>
+  <tabstop>dateList</tabstop>
   <tabstop>contributionTable</tabstop>
   <tabstop>scrollArea_2</tabstop>
+  <tabstop>btnSendDetail</tabstop>
+  <tabstop>btnExportDetail</tabstop>
+  <tabstop>recalcSection</tabstop>
+  <tabstop>recalcYear</tabstop>
+  <tabstop>checkNoFIO</tabstop>
+  <tabstop>recalcPeriodFrom</tabstop>
+  <tabstop>recalcPeriodUntil</tabstop>
+  <tabstop>recalcQ1</tabstop>
+  <tabstop>recalcQ2</tabstop>
+  <tabstop>recalcQ3</tabstop>
+  <tabstop>recalcQ4</tabstop>
+  <tabstop>recalcButton</tabstop>
  </tabstops>
  <resources>
   <include location="../PiTres.qrc"/>

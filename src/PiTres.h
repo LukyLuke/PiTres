@@ -86,6 +86,7 @@ public slots:
 	void showReminderFileDialog();
 	void showReceiptFileDialog();
 	void showStatisticFileDialog();
+	void showContributionFileDialog();
 	void showContributions();
 	void showBudget();
 	void showSectionEdit();

@@ -22,14 +22,22 @@ SentBills::SentBills(QWidget *parent) : QWidget(parent) {
 	setupUi(this);
 
 	QSettings settings;
-	checkOpen->setChecked(settings.value("sentbills/pending", false).toBool());
+	checkOpposite->setChecked(settings.value("sentbills/search_opposite", false).toBool());
+	checkOpen->setChecked(settings.value("sentbills/search_pending", false).toBool());
+	checkPaid->setChecked(settings.value("sentbills/search_paid", false).toBool());
+	checkCanceled->setChecked(settings.value("sentbills/search_cancelled", false).toBool());
+	checkContributed->setChecked(settings.value("sentbills/search_contributed", false).toBool());
 	sinceDate->setDate(settings.value("sentbills/sincedate", QDate::currentDate().addMonths(-3)).toDate());
 	maxDate->setDate(settings.value("sentbills/maxdate", QDate::currentDate().addDays(1)).toDate());
 
 	connect(searchEdit, SIGNAL(returnPressed()), this, SLOT(searchData()));
 	connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchDataTimeout()));
 	connect(btnInvoiceQif, SIGNAL(clicked()), this, SLOT(exportQifAssets()));
+	connect(checkOpposite, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(checkOpen, SIGNAL(toggled(bool)), this, SLOT(searchData()));
+	connect(checkPaid, SIGNAL(toggled(bool)), this, SLOT(searchData()));
+	connect(checkCanceled, SIGNAL(toggled(bool)), this, SLOT(searchData()));
+	connect(checkContributed, SIGNAL(toggled(bool)), this, SLOT(searchData()));
 	connect(sinceDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchDataTimeout()));
 	connect(maxDate, SIGNAL(dateChanged(QDate)), this, SLOT(searchDataTimeout()));
 	connect(btnPaymentsExport, SIGNAL(clicked()), this, SLOT(exportQifPayments()));
@@ -161,16 +169,53 @@ void SentBills::searchDataTimeout() {
 
 QSqlQuery SentBills::createQuery() {
 	QSqlQuery query(db);
-	QStringList sl = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+	QString search_operator( checkOpposite->isChecked() ? " <> " : " = " );
+	QString search_connector( checkOpposite->isChecked() ? " AND " : " OR " );
+	QStringList search_tags = searchEdit->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	QString qs("SELECT * FROM pps_invoice WHERE issue_date >= :issued_after AND issue_date <= :issued_before");
+	QString state_query;
 
+	// Get all open invoices
 	if (checkOpen->isChecked()) {
-		qs.append(" AND state=" + QString::number((int)Invoice::StateOpen));
+		if (!state_query.isEmpty()) {
+			state_query.append(search_connector);
+		}
+		state_query.append("state" + search_operator + QString::number((int)Invoice::StateOpen));
 	}
 
-	if (sl.size() > 0) {
+	// Get all paid invoices
+	if (checkPaid->isChecked()) {
+		if (!state_query.isEmpty()) {
+			state_query.append(search_connector);
+		}
+		state_query.append("state" + search_operator + QString::number((int)Invoice::StatePaid));
+	}
+
+	// Get all canceled invoices
+	if (checkCanceled->isChecked()) {
+		if (!state_query.isEmpty()) {
+			state_query.append(search_connector);
+		}
+		state_query.append("state" + search_operator + QString::number((int)Invoice::StateCanceled));
+	}
+
+	// Get all contributed invoices
+	if (checkContributed->isChecked()) {
+		if (!state_query.isEmpty()) {
+			state_query.append(search_connector);
+		}
+		state_query.append("state" + search_operator + QString::number((int)Invoice::StateContributed));
+	}
+
+	// Append the state query
+	if (!state_query.isEmpty()) {
+		qs.append(" AND (" + state_query + ")");
+	}
+
+	// Append all search keywords
+	if (search_tags.size() > 0) {
 		qs.append(" AND (reference LIKE :reference OR (");
-		for (int i = 0; i < sl.size(); i++) {
+		for (int i = 0; i < search_tags.size(); i++) {
 			if (i > 0) {
 				qs.append(" AND ");
 			}
@@ -187,14 +232,14 @@ QSqlQuery SentBills::createQuery() {
 	query.bindValue(":issued_after", sinceDate->date().toString("yyyy-MM-dd"));
 	query.bindValue(":issued_before", maxDate->date().toString("yyyy-MM-dd"));
 
-	if (sl.size() > 0) {
-		query.bindValue(":reference", QString("%%1%").arg(sl.join(" ")));
-		for (int i = 0; i < sl.size(); i++) {
-			query.bindValue(QString(":uid_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-			query.bindValue(QString(":issue_date_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-			query.bindValue(QString(":payable_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-			query.bindValue(QString(":name_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
-			query.bindValue(QString(":email_").append(QString::number(i)), QString("%%1%").arg(sl.at(i)));
+	if (search_tags.size() > 0) {
+		query.bindValue(":reference", QString("%%1%").arg(search_tags.join(" ")));
+		for (int i = 0; i < search_tags.size(); i++) {
+			query.bindValue(QString(":uid_").append(QString::number(i)), QString("%%1%").arg(search_tags.at(i)));
+			query.bindValue(QString(":issue_date_").append(QString::number(i)), QString("%%1%").arg(search_tags.at(i)));
+			query.bindValue(QString(":payable_").append(QString::number(i)), QString("%%1%").arg(search_tags.at(i)));
+			query.bindValue(QString(":name_").append(QString::number(i)), QString("%%1%").arg(search_tags.at(i)));
+			query.bindValue(QString(":email_").append(QString::number(i)), QString("%%1%").arg(search_tags.at(i)));
 		}
 	}
 	query.exec();
@@ -203,7 +248,11 @@ QSqlQuery SentBills::createQuery() {
 
 void SentBills::searchData() {
 	QSettings settings;
-	settings.setValue("sentbills/pending", checkOpen->isChecked());
+	settings.setValue("sentbills/search_opposite", checkOpposite->isChecked());
+	settings.setValue("sentbills/search_pending", checkOpen->isChecked());
+	settings.setValue("sentbills/search_paid", checkPaid->isChecked());
+	settings.setValue("sentbills/search_cancelled", checkCanceled->isChecked());
+	settings.setValue("sentbills/search_contributed", checkContributed->isChecked());
 	settings.setValue("sentbills/sincedate", sinceDate->date());
 	settings.setValue("sentbills/maxdate", maxDate->date());
 

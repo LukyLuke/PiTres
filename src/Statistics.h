@@ -21,6 +21,7 @@
 
 #include "ui_statistics.h"
 #include "helper/XmlPdf.h"
+#include "helper/Formatter.h"
 
 #include <QWidget>
 #include <QSqlDatabase>

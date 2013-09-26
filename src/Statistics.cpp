@@ -59,7 +59,7 @@ void Statistics::timerEvent(QTimerEvent * /*event*/) {
 void Statistics::updateStatistic() {
 	QSqlQuery query(db);
 	QDate begin(yearFrom->value(), 1, 1);
-	QDate end(yearTo->value()+1, 1, 1);
+	QDate end(yearTo->value(), 12, 31);
 	QString section = sectionList->currentText();
 
 	currentY = 0;
@@ -70,16 +70,18 @@ void Statistics::updateStatistic() {
 	if (yearFrom->value() > yearTo->value()) {
 		yearFrom->setValue(end.year());
 		yearTo->setValue(begin.year());
-		end.setDate(yearTo->value()+1, 1, 1);
+		end.setDate(yearTo->value(), 12, 31);
 		begin.setDate(yearFrom->value(), 1, 1);
 	}
 
-	// TODO: Imlement the Section
+	// TODO: Implement sections
 
 	// Create an Entry for each year
-	int years = end.year() - begin.year();
+	int years = end.year() - begin.year() + 1;
 	for (int i = 0; i < years; i++) {
 		QDate current(begin.year() + i, 12, 31);
+		QDate start(begin.year() + i, 1, 1);
+		QDate last(begin.year() + i - 1, 1, 1);
 		StatisticData d;
 		d.section = "members";
 		d.year = current.year();
@@ -89,70 +91,73 @@ void Statistics::updateStatistic() {
 		query.bindValue(":end", current);
 		d.members_num = query.exec() && query.first() ? query.value(0).toInt() : 0;
 
-		query.prepare("SELECT COUNT(uid) FROM ldap_persons WHERE joining>:start AND joining<=:end;");
-		query.bindValue(":start", QDate(current).addYears(-1));
+		query.prepare("SELECT COUNT(uid) FROM ldap_persons WHERE joining>=:start AND joining<=:end;");
+		query.bindValue(":start", start);
 		query.bindValue(":end", current);
 		d.members_growth = query.exec() && query.first() ? query.value(0).toInt() : 0;
 		d.members_growth_percent = 0;
 		if (d.members_num > 0) {
-			d.members_growth_percent = d.members_growth * 100.0 / d.members_num;
+			d.members_growth_percent = d.members_growth * 100 / d.members_num;
 		}
 
-		// invoice data
-		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE paid_date>:start AND paid_date<=:end;");
-		query.bindValue(":start", QDate(current).addYears(-1));
+		// Load number of paid invoices
+		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE paid_date>=:start AND paid_date<=:end;");
+		query.bindValue(":start", start);
 		query.bindValue(":end", current);
 		d.paid_num = query.exec() && query.first() ? query.value(0).toInt() : 0;
 		d.paid_percent = 0;
 		if (d.members_num > 0) {
-			d.paid_percent = d.paid_num * 100.0 / d.members_num;
+			d.paid_percent = d.paid_num * 100 / d.members_num;
 		}
 
-		// Last year to get the increase
-		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE paid_date>:start AND paid_date<=:end;");
-		query.bindValue(":start", QDate(current).addYears(-2));
-		query.bindValue(":end", QDate(current).addYears(-1));
+		// Last year to get the increase of paid invoices
+		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE paid_date>=:start AND paid_date<:end;");
+		query.bindValue(":start", last);
+		query.bindValue(":end", start);
 		d.paid_inc = query.exec() && query.first() ? d.paid_num - query.value(0).toInt() : 0;
 		d.paid_growth_percent = 0;
 		if (d.paid_num > 0) {
-			d.paid_growth_percent = d.paid_inc * 100.0 / d.paid_num;
+			d.paid_growth_percent = d.paid_inc * 100 / d.paid_num;
 		}
 
-		// Invoices
-		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE issue_date>:start AND issue_date<=:end;");
-		query.bindValue(":start", QDate(current).addYears(-1));
+		// Load number of issued invoices
+		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE payable_date>:start AND payable_date<=:end;");
+		query.bindValue(":start", start);
 		query.bindValue(":end", current);
 		d.invoiced = query.exec() && query.first() ? query.value(0).toInt() : 0;
 
-		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE issue_date>:start AND issue_date<=:end AND amount_paid > 0 AND reminded<=0;");
-		query.bindValue(":start", QDate(current).addYears(-1));
+		// Load paid invoices
+		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE payable_date>=:start AND payable_date<:end AND amount_paid>0 AND reminded<=0;");
+		query.bindValue(":start", start);
 		query.bindValue(":end", current);
 		d.invoiced_success = query.exec() && query.first() ? query.value(0).toInt() : 0;
 		d.invoiced_percent = 0;
 		if (d.invoiced > 0) {
-			d.invoiced_percent = d.invoiced_success * 100.0 / d.invoiced;
+			d.invoiced_percent = d.invoiced_success * 100 / d.invoiced;
 		}
 
-		query.prepare("SELECT SUM(amount), SUM(amount_paid) FROM pps_invoice WHERE issue_date>:start AND issue_date<=:end;");
-		query.bindValue(":start", QDate(current).addYears(-1));
-		query.bindValue(":end", current);
-		d.amount_requested = query.exec() && query.first() ? query.value(0).toFloat() : 0;
-		d.amount_paid = query.exec() && query.first() ? query.value(1).toFloat() : 0;
-
-		// Reminders
-		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE issue_date>:start AND issue_date<=:end AND reminded>0;");
-		query.bindValue(":start", QDate(current).addYears(-1));
+		// Load all reminders
+		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE payable_date>:start AND payable_date<=:end AND reminded>0;");
+		query.bindValue(":start", start);
 		query.bindValue(":end", current);
 		d.reminded = query.exec() && query.first() ? query.value(0).toInt() : 0;
 
-		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE issue_date>:start AND issue_date<=:end AND amount_paid > 0 AND reminded>0;");
-		query.bindValue(":start", QDate(current).addYears(-1));
+		// Load paid reminders
+		query.prepare("SELECT COUNT(reference) FROM pps_invoice WHERE payable_date>=:start AND payable_date<:end AND amount_paid>0 AND reminded>0;");
+		query.bindValue(":start", start);
 		query.bindValue(":end", current);
 		d.reminded_success = query.exec() && query.first() ? query.value(0).toInt() : 0;
 		d.reminded_percent = 0;
 		if (d.reminded > 0) {
-			d.reminded_percent = d.reminded_success * 100.0 / d.reminded;
+			d.reminded_percent = d.reminded_success * 100 / d.reminded;
 		}
+
+		// Load the total and paid amount
+		query.prepare("SELECT SUM(amount), SUM(amount_paid) FROM pps_invoice WHERE payable_date>:start AND payable_date<=:end;");
+		query.bindValue(":start", start);
+		query.bindValue(":end", current);
+		d.amount_requested = query.exec() && query.first() ? query.value(0).toFloat() : 0;
+		d.amount_paid = query.exec() && query.first() ? query.value(1).toFloat() : 0;
 
 		list.append(d);
 		printData(d);
@@ -282,11 +287,11 @@ void Statistics::printData(Statistics::StatisticData data) {
 	item->setPos(1, currentY);
 	currentY += lh;
 
-	item = scene.addText(tr("Amount requested:\t%1").arg( locale.toCurrencyString(data.amount_requested) ), font);
+	item = scene.addText(tr("Amount requested:\t%1").arg( Formatter::currency(data.amount_requested) ), font);
 	item->setPos(1, currentY);
 	currentY += lh;
 
-	item = scene.addText(tr("Total amount paid:\t%1").arg( locale.toCurrencyString(data.amount_paid) ), font);
+	item = scene.addText(tr("Total amount paid:\t%1").arg( Formatter::currency(data.amount_paid) ), font);
 	item->setPos(1, currentY);
 	currentY += lh;
 
@@ -294,11 +299,11 @@ void Statistics::printData(Statistics::StatisticData data) {
 	item->setPos(1, currentY);
 	currentY += lh;
 
-	item = scene.addText(tr("Number invoices:\t%L1 of %2 paid  ( %3\% )").arg(data.invoiced_success).arg(data.invoiced).arg(data.invoiced_percent, 0, 'g', prec), font);
+	item = scene.addText(tr("Number invoices:\t%L1 of %2 paid  ( %3\% )").arg(Formatter::number(data.invoiced_success, 0)).arg(Formatter::number(data.invoiced, 0)).arg(data.invoiced_percent, 0, 'g', prec), font);
 	item->setPos(1, currentY);
 	currentY += lh;
 
-	item = scene.addText(tr("Number reminders:\t%L1 of %2 paid  ( %3\% )").arg(data.reminded_success).arg(data.reminded).arg(data.reminded_percent, 0, 'g', prec), font);
+	item = scene.addText(tr("Number reminders:\t%L1 of %2 paid  ( %3\% )").arg(Formatter::number(data.reminded_success, 0)).arg(Formatter::number(data.reminded, 0)).arg(data.reminded_percent, 0, 'g', prec), font);
 	item->setPos(1, currentY);
 	currentY += lh;
 
