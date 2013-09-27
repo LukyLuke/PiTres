@@ -200,6 +200,8 @@ void Statistics::exportStatistic() {
 	QString templateFile = settings.value(QString("pdf/statistic_template"), "data/statistic_de.xml").toString();
 	templateFile.replace(QRegExp("^(.*_)([a-zA-Z]{2})(\\.xml)$"), "\\1de\\3"); // TODO: Use short language of the user settings here and not only german...
 	pdf.loadTemplate(templateFile);
+	pdf.setVar("year_begin", QString::number(list.first().year));
+	pdf.setVar("year_end", QString::number(list.last().year));
 	
 	QList<StatisticData>::const_iterator it;
 	for (it = list.constBegin(); it != list.constEnd(); it++) {
