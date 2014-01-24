@@ -134,8 +134,8 @@ void InvoiceWizard::updatePreviewTable() {
 	QSqlQuery query(db);
 	switch (_importType) {
 		case INVOICE_IMPORTTYPE_ALL:
-			query.prepare(QString("SELECT ldap_personsuid FROM ldap_persons"
-			" WHERE ldap_personstype<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND section=?"));
+			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
+			" WHERE ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND section=?"));
 			query.bindValue(0, PPSPerson::Pirate);
 			if (!section.isEmpty()) {
 				query.bindValue(1, section);
