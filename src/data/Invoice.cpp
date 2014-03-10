@@ -500,9 +500,9 @@ QString Invoice::getEsr() {
 	QSettings settings;
 	QString esr;
 	if (settings.value("pdf/esr_currency", "CHF").toString() == "EUR") {
-		esr.append("21"); // ESR in CHF: values must not match the boxes exactly
+		esr.append("31"); // ESR+ in EUR
 	} else {
-		esr.append("01"); // ESR in CHF: values must not match the boxes exactly
+		esr.append("04"); // ESR+ in CHF
 	}
 	esr.append( QString::number(esrChecksum(esr)) );
 	esr.append(">"); // Checksum and seperator
