@@ -515,9 +515,17 @@ QString Invoice::getEsr() {
 	QString account;
 	QStringList accountNumber = settings.value("pdf/bank_account_number", "0-0-0").toString().split("-", QString::SkipEmptyParts);
 	if (accountNumber.size() == 3) {
-		account.append(accountNumber.at(0));
-		account.append(QString(accountNumber.at(1)).prepend( QString("").fill(QChar('0'), 8 - accountNumber.at(1).length()) ));
-		account.append(accountNumber.at(2));
+		// Append 2-char ESR code
+		account.append(accountNumber.at(0).left(2));
+		if (account.size() == 1) {
+			account.prepend("0");
+		}
+		
+		// Append the Account-Number which must be 6 chars, filled with "0" in front
+		account.append(QString(accountNumber.at(1).left(6)).prepend( QString("").fill(QChar('0'), 6 - accountNumber.at(1).length()) ));
+		
+		// Append the checknum which can be only 1 char
+		account.append(accountNumber.at(2).left(1));
 	} else {
 		account.append("000000000"); // No Account-Number
 	}
