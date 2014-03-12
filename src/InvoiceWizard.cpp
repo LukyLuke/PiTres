@@ -111,16 +111,16 @@ void InvoiceWizard::startSearchTimer() {
 void InvoiceWizard::updatePreviewTable() {
 	// Prepare the data.
 	_previewModel.clear();
-	_importType = radioNew->isChecked() ? INVOICE_IMPORTTYPE_NEW :
-		radioAll->isChecked() ? INVOICE_IMPORTTYPE_ALL :
-		radioPaidDue->isChecked() ? INVOICE_IMPORTTYPE_OUTSTANDING :
-		radioReminder->isChecked() ? INVOICE_IMPORTTYPE_REMINDER :
-		INVOICE_IMPORTTYPE_UNKNOWN;
+	_invoiceState = radioNew->isChecked() ? INVOICE_STATE_TYPE_NEW :
+		radioAll->isChecked() ? INVOICE_STATE_TYPE_ALL :
+		radioPaidDue->isChecked() ? INVOICE_STATE_TYPE_OUTSTANDING :
+		radioReminder->isChecked() ? INVOICE_STATE_TYPE_REMINDER :
+		INVOICE_STATE_TYPE_UNKNOWN;
 
 	// Enable/Disable elements
-	newMemberDate->setEnabled(_importType == INVOICE_IMPORTTYPE_NEW);
-	memberUntil->setEnabled(_importType == INVOICE_IMPORTTYPE_OUTSTANDING);
-	reminderChooser->setEnabled(_importType == INVOICE_IMPORTTYPE_REMINDER);
+	newMemberDate->setEnabled(_invoiceState == INVOICE_STATE_TYPE_NEW);
+	memberUntil->setEnabled(_invoiceState == INVOICE_STATE_TYPE_OUTSTANDING);
+	reminderChooser->setEnabled(_invoiceState == INVOICE_STATE_TYPE_REMINDER);
 
 	// Prepare values for the query.
 	QString section = sectionList->currentIndex().isValid() ? sectionList->currentItem()->text() : "";
@@ -132,8 +132,8 @@ void InvoiceWizard::updatePreviewTable() {
 
 	// Create the query and fill the table model.
 	QSqlQuery query(db);
-	switch (_importType) {
-		case INVOICE_IMPORTTYPE_ALL:
+	switch (_invoiceState) {
+		case INVOICE_STATE_TYPE_ALL:
 			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
 			" WHERE ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND section=?"));
 			query.bindValue(0, PPSPerson::Pirate);
@@ -142,7 +142,7 @@ void InvoiceWizard::updatePreviewTable() {
 			}
 			break;
 
-		case INVOICE_IMPORTTYPE_NEW:
+		case INVOICE_STATE_TYPE_NEW:
 			query.prepare(QString("SELECT ldap_persons.uid,pps_invoice.member_uid FROM ldap_persons"
 			" LEFT JOIN pps_invoice ON (ldap_persons.uid = pps_invoice.member_uid)"
 			" WHERE ldap_persons.joining>=? AND ldap_persons.type<=? %1"
@@ -155,7 +155,7 @@ void InvoiceWizard::updatePreviewTable() {
 			}
 			break;
 
-		case INVOICE_IMPORTTYPE_OUTSTANDING:
+		case INVOICE_STATE_TYPE_OUTSTANDING:
 			query.prepare(QString("SELECT ldap_persons.uid FROM ldap_persons"
 			" WHERE ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
 			query.bindValue(0, PPSPerson::Pirate);
@@ -164,10 +164,13 @@ void InvoiceWizard::updatePreviewTable() {
 			}
 			break;
 
-		case INVOICE_IMPORTTYPE_REMINDER:
+		case INVOICE_STATE_TYPE_REMINDER:
 			query.prepare(QString("SELECT DISTINCT ldap_persons.uid FROM ldap_persons LEFT JOIN pps_invoice ON (ldap_persons.uid = pps_invoice.member_uid)"
-				" WHERE pps_invoice.state=? AND (pps_invoice.paid_date IS NULL OR pps_invoice.paid_date='') AND pps_invoice.issue_date<=?"
-				" AND ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
+			" WHERE pps_invoice.state=? "
+			// This is not needed coz all paid invoices must have the state for being paid and not open.
+			// " AND (pps_invoice.paid_date IS NULL OR pps_invoice.paid_date='' OR pps_invoice.paid_date<='1970-01-01')"
+			" AND pps_invoice.issue_date<=?"
+			" AND ldap_persons.type<=? %1 ORDER BY ldap_persons.uid;").arg(section.isEmpty() ? "" : "AND ldap_persons.section=?"));
 			query.bindValue(0, Invoice::StateOpen);
 			query.bindValue(1, paid.toString("yyyy-MM-dd"));
 			query.bindValue(2, PPSPerson::Pirate);
@@ -187,7 +190,7 @@ void InvoiceWizard::updatePreviewTable() {
 		while (query.next()) {
 			if (person->load(query.value(0).toInt())) {
 				// We need to check if the person has paid or not - not possible in SQL.
-				if ((_importType == INVOICE_IMPORTTYPE_OUTSTANDING) && (person->paidDue() >= memberUntil->date())) {
+				if ((_invoiceState == INVOICE_STATE_TYPE_OUTSTANDING) && (person->paidDue() >= memberUntil->date())) {
 					continue;
 				}
 				_previewModel.insert(person);
@@ -212,7 +215,7 @@ void InvoiceWizard::createInvoices() {
 	Invoice invoice;
 	XmlPdf *pdf;
 	QString fileName;
-	bool reminder = (_importType == INVOICE_IMPORTTYPE_OUTSTANDING) || (_importType == INVOICE_IMPORTTYPE_REMINDER);
+	bool reminder = (_invoiceState == INVOICE_STATE_TYPE_OUTSTANDING) || (_invoiceState == INVOICE_STATE_TYPE_REMINDER);
 
 	int num = _previewModel.rowCount();
 	int cnt = 0;

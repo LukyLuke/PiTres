@@ -50,11 +50,11 @@ Q_OBJECT
 public:
 	InvoiceWizard(QWidget *parent = 0);
 	virtual ~InvoiceWizard();
-	enum InvoiceImportType { INVOICE_IMPORTTYPE_UNKNOWN, INVOICE_IMPORTTYPE_NEW, INVOICE_IMPORTTYPE_OUTSTANDING, INVOICE_IMPORTTYPE_REMINDER, INVOICE_IMPORTTYPE_ALL };
+	enum InvoiceStateType { INVOICE_STATE_TYPE_UNKNOWN, INVOICE_STATE_TYPE_NEW, INVOICE_STATE_TYPE_OUTSTANDING, INVOICE_STATE_TYPE_REMINDER, INVOICE_STATE_TYPE_ALL };
 
 private:
 	QSqlDatabase db;
-	InvoiceImportType _importType;
+	InvoiceStateType _invoiceState;
 	invoice::InvoiceCreateModel _previewModel;
 	int searchTimer;
 	void fillSectionList();
