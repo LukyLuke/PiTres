@@ -74,6 +74,7 @@ public slots:
 	void searchDataTimeout(QString data);
 	void continuePayment();
 	void addSelectedInvoice();
+	void keyPressedAmount(Qt::Key key);
 	void invoiceSelected(payment::PaymentItem item);
 	void invoiceRowChange(const QModelIndex &current, const QModelIndex &previous);
 	void showPaymentsImportDialog();

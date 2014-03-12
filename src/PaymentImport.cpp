@@ -35,7 +35,7 @@ PaymentImport::PaymentImport(QWidget *parent) : QWidget(parent) {
 	// Helper EventFilter for returnPressed in SpinBox
 	CatchKeyPress *amountKeyPress = new CatchKeyPress(this);
 	editAmount->installEventFilter(amountKeyPress);
-	connect(amountKeyPress, SIGNAL(returnPressed()), this, SLOT(addSelectedInvoice()));
+	connect(amountKeyPress, SIGNAL(keyPressed(Qt::Key)), this, SLOT(keyPressedAmount(Qt::Key)));
 
 	// List view displays all seacrh results and select the payed one.
 	listAvailable->setModel(&listModel);
@@ -146,6 +146,12 @@ void PaymentImport::invoiceSelected(payment::PaymentItem item) {
 	}
 	datePaidDue->setDate(paidDue);
 	editAmount->setValue(item.amount() - item.amountPaidTotal());
+}
+
+void PaymentImport::keyPressedAmount(Qt::Key key) {
+	if (key == Qt::Key_Return || key == Qt::Key_Enter) {
+		addSelectedInvoice();
+	}
 }
 
 void PaymentImport::addSelectedInvoice() {
