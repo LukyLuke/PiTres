@@ -17,7 +17,8 @@
 */
 
 #include "Person.h"
-#include "../helper/Formatter.h"
+#include "helper/Formatter.h"
+#include "data/Invoice.h"
 
 #include <QObject>
 #include <QString>
@@ -256,7 +257,7 @@ bool PPSPerson::load(int uid) {
 			l_email << query.value(0).toString();
 		}
 
-		_invoice.loadLast(uid);
+		//_invoice.loadLast(uid);
 		is_loaded = TRUE;
 	}
 
@@ -324,6 +325,9 @@ bool PPSPerson::loadByAnyField(QString uid) {
 }
 
 Invoice *PPSPerson::getInvoice() {
+	if (!_invoice.isLoaded()) {
+		_invoice.loadLast(i_uid);
+	}
 	return &_invoice;
 }
 

@@ -19,7 +19,7 @@
 #ifndef Data_Person_H
 #define Data_Person_H
 
-#include "Invoice.h"
+#include "data/Invoice.h"
 
 #include <QObject>
 #include <QString>
