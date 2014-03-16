@@ -19,14 +19,23 @@
 #ifndef Data_Invoice_H
 #define Data_Invoice_H
 
-#include "../helper/XmlPdf.h"
+#include "helper/Formatter.h"
+#include "helper/XmlPdf.h"
+#include "data/Section.h"
 
+#include <cstdlib>
+#include <ctime>
 #include <QObject>
+#include <QSettings>
+#include <QVariant>
+#include <QSqlQuery>
+#include <QSqlError>
 #include <QString>
 #include <QDate>
 #include <QList>
 #include <QHash>
 #include <QSqlDatabase>
+#include <QSqlRecord>
 
 class PPSPerson;
 class Invoice : public QObject {
@@ -63,6 +72,7 @@ public:
 	void save();
 	void clear();
 	void setIsLoaded(bool loaded);
+	bool isLoaded();
 	void loadLast(int member);
 	XmlPdf *createPdf(QString tpl = 0);
 	QString getEsr();
@@ -92,6 +102,7 @@ public:
 	void setReminded(int reminded);
 	void setLastReminded(QDate lastReminded);
 	void setAddressPrefix(QString addressPrefix);
+	void setAddressPrefix(int gender);
 	void setAddressCompany(QString addressCompany);
 	void setAddressName(QString addressName);
 	void setAddressStreet1(QString addressStreet1);
@@ -188,6 +199,7 @@ private:
 	int esrChecksum(QString num);
 	QString createReference(int memberUid);
 	QString getLanguageString(Language lang);
+	void setProperties(QSqlQuery *record);
 };
 
 #endif // Data_Invoice_H

@@ -17,22 +17,8 @@
 */
 
 #include "Invoice.h"
-#include "Person.h"
-#include "Section.h"
 
-#include <cstdlib>
-#include <ctime>
-#include <QObject>
-#include <QSettings>
-#include <QVariant>
-#include <QString>
-#include <QVariant>
-#include <QDate>
-#include <QList>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QSqlError>
-#include <QDebug>
+#include "data/Person.h"
 
 Invoice::Invoice(QObject *parent) : QObject(parent) {
 	srand(time(NULL));
@@ -69,6 +55,10 @@ void Invoice::clear() {
 
 void Invoice::setIsLoaded(bool loaded) {
 	_loaded = loaded;
+}
+
+bool Invoice::isLoaded() {
+	return _loaded;
 }
 
 void Invoice::createTables() {
@@ -175,28 +165,12 @@ void Invoice::loadLast(int member) {
 	query.prepare("SELECT * FROM pps_invoice WHERE member_uid=? ORDER BY issue_date DESC;");
 	query.bindValue(0, member);
 	query.exec();
+	QSqlRecord record = query.record();
 
 	_loaded = query.first();
 	if (_loaded) {
-		QSqlRecord record = query.record();
-		i_memberUid = query.value(record.indexOf("member_uid")).toInt();
-		setReference(query.value(record.indexOf("reference")).toString()); // we reformat the Reference
-		d_issueDate = query.value(record.indexOf("issue_date")).toDate();
-		d_payableDue = query.value(record.indexOf("payable_date")).toDate();
-		d_paidDate = query.value(record.indexOf("paid_date")).toDate();
-		f_amount = query.value(record.indexOf("amount")).toFloat();
-		f_amountPaid = query.value(record.indexOf("amount_paid")).toFloat();
-		m_state = (State) query.value(record.indexOf("state")).toInt();
-		i_reminded = query.value(record.indexOf("reminded")).toInt();
-		d_last_reminded = query.value(record.indexOf("last_reminder")).toDate();
-		s_addressPrefix = query.value(record.indexOf("address_prefix")).toString();
-		s_addressCompany = query.value(record.indexOf("address_company")).toString();
-		s_addressName = query.value(record.indexOf("address_name")).toString();
-		s_addressStreet1 = query.value(record.indexOf("address_street1")).toString();
-		s_addressStreet2 = query.value(record.indexOf("address_street2")).toString();
-		s_addressCity = query.value(record.indexOf("address_city")).toString();
-		s_addressEmail = query.value(record.indexOf("address_email")).toString();
-		s_forSection = query.value(record.indexOf("for_section")).toString();
+		setProperties(&query);
+		
 #ifdef FIO
 		QStringList sl,l = query.value(record.indexOf("recommendations")).toString().split(';', QString::SkipEmptyParts);
 		for (int i = 0; i < l.length(); i++) {
@@ -235,28 +209,12 @@ void Invoice::loadByReference(QString reference) {
 	query.prepare("SELECT * FROM pps_invoice WHERE reference=?;");
 	query.bindValue(0, ref);
 	query.exec();
+	QSqlRecord record = query.record();
 
 	_loaded = query.first();
 	if (_loaded) {
-		QSqlRecord record = query.record();
-		i_memberUid = query.value(record.indexOf("member_uid")).toInt();
-		setReference(query.value(record.indexOf("reference")).toString()); // we reformat the Reference
-		d_issueDate = query.value(record.indexOf("issue_date")).toDate();
-		d_payableDue = query.value(record.indexOf("payable_date")).toDate();
-		d_paidDate = query.value(record.indexOf("paid_date")).toDate();
-		f_amount = query.value(record.indexOf("amount")).toFloat();
-		f_amountPaid = query.value(record.indexOf("amount_paid")).toFloat();
-		m_state = (State) query.value(record.indexOf("state")).toInt();
-		i_reminded = query.value(record.indexOf("reminded")).toInt();
-		d_last_reminded = query.value(record.indexOf("last_reminder")).toDate();
-		s_addressPrefix = query.value(record.indexOf("address_prefix")).toString();
-		s_addressCompany = query.value(record.indexOf("address_company")).toString();
-		s_addressName = query.value(record.indexOf("address_name")).toString();
-		s_addressStreet1 = query.value(record.indexOf("address_street1")).toString();
-		s_addressStreet2 = query.value(record.indexOf("address_street2")).toString();
-		s_addressCity = query.value(record.indexOf("address_city")).toString();
-		s_addressEmail = query.value(record.indexOf("address_email")).toString();
-		s_forSection = query.value(record.indexOf("for_section")).toString();
+		setProperties(&query);
+		
 #ifdef FIO
 		QStringList sl,l = query.value(record.indexOf("recommendations")).toString().split(';', QString::SkipEmptyParts);
 		for (int i = 0; i < l.length(); i++) {
@@ -282,24 +240,8 @@ QList<Invoice *> Invoice::getInvoicesForMember(int member) {
 
 	while(query.next()) {
 		Invoice *invoice = new Invoice;
-		invoice->setMemberUid(query.value(record.indexOf("member_uid")).toInt());
-		invoice->setReference(query.value(record.indexOf("reference")).toString());
-		invoice->setIssueDate(query.value(record.indexOf("issue_date")).toDate());
-		invoice->setPayableDue(query.value(record.indexOf("payable_date")).toDate());
-		invoice->setPaidDate(query.value(record.indexOf("paid_date")).toDate());
-		invoice->setAmount(query.value(record.indexOf("amount")).toFloat());
-		invoice->setAmountPaid(query.value(record.indexOf("amount_paid")).toFloat());
-		invoice->setState((State) query.value(record.indexOf("state")).toInt());
-		invoice->setReminded(query.value(record.indexOf("reminded")).toInt());
-		invoice->setLastReminded(query.value(record.indexOf("last_reminder")).toDate());
-		invoice->setAddressPrefix(query.value(record.indexOf("address_prefix")).toString());
-		invoice->setAddressCompany(query.value(record.indexOf("address_company")).toString());
-		invoice->setAddressName(query.value(record.indexOf("address_name")).toString());
-		invoice->setAddressStreet1(query.value(record.indexOf("address_street1")).toString());
-		invoice->setAddressStreet2(query.value(record.indexOf("address_street2")).toString());
-		invoice->setAddressCity(query.value(record.indexOf("address_city")).toString());
-		invoice->setAddressEmail(query.value(record.indexOf("address_email")).toString());
-		invoice->setForSection(query.value(record.indexOf("for_section")).toString());
+		invoice->setProperties(&query);
+		
 #ifdef FIO
 		QStringList sl,l = query.value(record.indexOf("recommendations")).toString().split(';', QString::SkipEmptyParts);
 		QHash<QString, float> hash;
@@ -366,6 +308,48 @@ void Invoice::create(PPSPerson *person) {
 	setForSection(person->section());
 	setLanguage((Language)person->language());
 	save();
+}
+
+void Invoice::setProperties(QSqlQuery *query) {
+	PPSPerson *person = new PPSPerson;
+	QSqlRecord record = query->record();
+	
+	setMemberUid(query->value(record.indexOf("member_uid")).toInt());
+	setReference(query->value(record.indexOf("reference")).toString()); // we reformat the Reference
+	setIssueDate(query->value(record.indexOf("issue_date")).toDate());
+	setPayableDue(query->value(record.indexOf("payable_date")).toDate());
+	setPaidDate(query->value(record.indexOf("paid_date")).toDate());
+	setAmount(query->value(record.indexOf("amount")).toFloat());
+	setAmountPaid(query->value(record.indexOf("amount_paid")).toFloat());
+	setState((State) query->value(record.indexOf("state")).toInt());
+	setReminded(query->value(record.indexOf("reminded")).toInt());
+	setLastReminded(query->value(record.indexOf("last_reminder")).toDate());
+	setForSection(query->value(record.indexOf("for_section")).toString());
+	
+	// If we can load a person, we use that address to have the current address and the country.
+	if (person->load(i_memberUid)) {
+		setAddressPrefix(person->gender());
+		setAddressCompany("");
+		setAddressName(person->givenName() + " " + person->familyName());
+		setAddressStreet1(person->street());
+		setAddressStreet2("");
+		setAddressCity(person->postalCode() + " " + person->city());
+		setAddressCountry(person->country());
+		if (person->email().size() > 0) {
+			setAddressEmail(person->email().first());
+		}
+		setLanguage((Language)person->language());
+	} else {
+		setAddressPrefix(query->value(record.indexOf("address_prefix")).toString());
+		setAddressCompany(query->value(record.indexOf("address_company")).toString());
+		setAddressName(query->value(record.indexOf("address_name")).toString());
+		setAddressStreet1(query->value(record.indexOf("address_street1")).toString());
+		setAddressStreet2(query->value(record.indexOf("address_street2")).toString());
+		setAddressCity(query->value(record.indexOf("address_city")).toString());
+		setAddressEmail(query->value(record.indexOf("address_email")).toString());
+	}
+	
+	delete person;
 }
 
 #ifdef FIO
@@ -473,7 +457,6 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("member_street", addressStreet1());
 	pdf->setVar("member_street2", addressStreet2());
 	pdf->setVar("member_city", addressCity());
-	pdf->setVar("member_country", addressCountry());
 	pdf->setVar("member_email", addressEmail());
 	pdf->setVar("member_section", forSection());
 	pdf->setVar("member_nick", person.nickname());
@@ -482,6 +465,13 @@ XmlPdf *Invoice::createPdf(QString tpl) {
 	pdf->setVar("section_address", section.address());
 	pdf->setVar("section_logo_file", section.logoIsFile() ? "1" : "");
 	pdf->setVar("section_email", section.email());
+	
+	QLocale::Country country = Formatter::iso3166country(addressCountry());
+	if (country != QLocale::AnyCountry) {
+		pdf->setVar("member_country", QLocale::countryToString(country));
+	} else {
+		pdf->setVar("member_country", "");
+	}
 	
 	return pdf;
 }
@@ -626,6 +616,20 @@ void Invoice::setLastReminded(QDate lastReminded) {
 void Invoice::setAddressPrefix(QString addressPrefix) {
 	s_addressPrefix = addressPrefix;
 	emit addressPrefixChanged(addressPrefix);
+}
+
+void Invoice::setAddressPrefix(int gender) {
+	switch ((PPSPerson::Gender) gender) {
+		case PPSPerson::GenderMale:
+			setAddressPrefix(tr("Mr."));
+			break;
+		case PPSPerson::GenderFemale:
+			setAddressPrefix(tr("Mrs."));
+			break;
+		default:
+			setAddressPrefix("");
+			break;
+	}
 }
 
 void Invoice::setAddressCompany(QString addressCompany) {
