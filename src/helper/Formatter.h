@@ -30,6 +30,7 @@ public:
 	static QString email(QString email);
 	static QString number(float number, int precision = 2);
 	static QString currency(float amount);
+	static QLocale::Country iso3166country(QString iso639);
 };
 
 #endif // Helper_Formatter_H 
